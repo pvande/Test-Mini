@@ -4,7 +4,7 @@ use Mini::Unit::Assertions;
 
 class Mini::Unit::TestCase with Mini::Unit::Assertions {
   use TryCatch;
-  has 'name' => (is => 'ro');
+  has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
   method setup()    {}
@@ -42,5 +42,7 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
       chomp($e);
       $runner->error(ref $self, $test, $e);
     };
+
+    return $self->assertion_count();
   }
 }

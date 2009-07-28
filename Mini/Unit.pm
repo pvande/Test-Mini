@@ -45,11 +45,11 @@ class Mini::Unit {
     return $self->exit_code();
   }
 
-  method run_test_suite($filter?)
+  method run_test_suite($filter? = qr/./)
   {
     for my $tc (Mini::Unit::TestCase->meta()->subclasses()) {
       my @tests = grep { /^test/ } $tc->meta()->get_all_method_names();
-      $self->run_test_case($tc, grep { $filter || /./ } @tests);
+      $self->run_test_case($tc, grep { $filter } @tests);
     }
   }
 
@@ -60,7 +60,9 @@ class Mini::Unit {
 
   method run_test(ClassName $tc, Str $test)
   {
-    $tc->new(name => $test)->run($self)
+    my $instance = $tc->new(name => $test);
+    $instance->run($self);
+    return $instance->assertion_count();
   }
 
   method sort_tests(@tests)
@@ -70,14 +72,24 @@ class Mini::Unit {
   }
 
 
-  before run_test_suite($filter?) { $self->begin_test_suite($filter);  }
-  after  run_test_suite($filter?) { $self->finish_test_suite($filter); }
 
-  before run_test_case($tc, @tests) { $self->begin_test_case($tc, @tests);  }
-  after  run_test_case($tc, @tests) { $self->finish_test_case($tc, @tests); }
+  around run_test_suite(@args) {
+    $self->begin_test_suite(@args);
+    my $retval = $self->$orig(@args);
+    $self->finish_test_suite(@args, $retval);
+  }
 
-  before run_test($tc, $test) { $self->begin_test($tc, $test);  }
-  after  run_test($tc, $test) { $self->finish_test($tc, $test); }
+  around run_test_case(@args) {
+    $self->begin_test_case(@args);
+    my $retval = $self->$orig(@args);
+    $self->finish_test_case(@args, $retval);
+  }
+
+  around run_test(@args) {
+    $self->begin_test(@args);
+    my $retval = $self->$orig(@args);
+    $self->finish_test(@args, $retval);
+  }
 
   before run_test($tc, $test)    { $self->exit_code(0) }
   after  fail($tc, $test, $msg)  { $self->exit_code(1) }
@@ -88,10 +100,11 @@ Mini::Unit->autorun();
 
 if ($0 eq __FILE__) {
 
-  class TestCase extends Mini::Unit::TestCase {
-    method test_pass { sleep 1 }
+  class TestCase extends Mini::Unit::TestCase
+  {
+    method test_pass { $self->assert(1); $self->assert(1); sleep 1 }
     method test_fail { sleep 1; $self->assert(0, 'Failed HARD!') }
-    method test_skipped { sleep 1; Mini::Unit::Skip->throw('Skipped!') }
+    method test_skipped { sleep 1; Mini::Unit::Skip->throw('Not Yet Implemented') }
     method test_error { sleep 1; die 'fooblibarioafr!'; Mini::Unit::Foo->frobozz() }
   }
 

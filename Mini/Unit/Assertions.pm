@@ -9,18 +9,19 @@ class Mini::Unit::Skip extends Mini::Unit::Assert {}
 
 role Mini::Unit::Assertions {
   use MooseX::AttributeHelpers;
-  has __assertion_count => (
+
+  has assertion_count => (
     metaclass => 'Number',
-    is        => 'rw',
+    is        => 'ro',
     isa       => 'Int',
     default   => 0,
     provides  => {
-      add => '__add_assertions',
+      add => 'add_assertions',
     },
   );
 
   method assert($test, $msg = "Failed assertion, no message given") {
-    $self->__add_assertions(1);
+    $self->add_assertions(1);
     $msg = $msg->() if ref $msg eq 'CODE';
     Mini::Unit::Assert->throw($msg) unless $test;
   }

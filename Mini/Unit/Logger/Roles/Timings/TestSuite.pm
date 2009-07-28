@@ -7,12 +7,12 @@ role Mini::Unit::Logger::Roles::Timings::TestSuite
     finish_test_suite
   /;
 
-  before begin_test_suite($filter?)
+  before begin_test_suite($foo?)
   {
     $self->start('__SUITE__');
   }
 
-  after finish_test_suite($filter?)
+  after finish_test_suite($foo?)
   {
     $self->stop('__SUITE__');
   }

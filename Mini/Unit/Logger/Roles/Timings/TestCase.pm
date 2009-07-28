@@ -7,12 +7,12 @@ role Mini::Unit::Logger::Roles::Timings::TestCase
     finish_test_case
   /;
 
-  before begin_test_case(ClassName $tc, @tests)
+  before begin_test_case($tc, @)
   {
     $self->start($tc);
   }
 
-  after finish_test_case(ClassName $tc, @tests)
+  after finish_test_case($tc, @)
   {
     $self->stop($tc);
   }

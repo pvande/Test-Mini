@@ -16,12 +16,12 @@ role Mini::Unit::Logger is dirty
 
   clean;
 
-  method begin_test_suite($filter?)              {}
-  method begin_test_case(ClassName $tc, @tests)  {}
-  method begin_test(ClassName $tc, Str $test)    {}
-  method finish_test(ClassName $tc, Str $test)   {}
-  method finish_test_case(ClassName $tc, @tests) {}
-  method finish_test_suite($filter?)             {}
+  method begin_test_suite(@)  { }
+  method begin_test_case(@)   { }
+  method begin_test(@)        { }
+  method finish_test(@)       { }
+  method finish_test_case(@)  { }
+  method finish_test_suite(@) { }
 
   method pass(ClassName $tc, Str $test)            { }
   method fail(ClassName $tc, Str $test, Str $msg)  { }

@@ -5,6 +5,7 @@ class Mini::Unit::Logger::XUnit is mutable
   with qw/
     Mini::Unit::Logger
     Mini::Unit::Logger::Roles::Timings
+    Mini::Unit::Logger::Roles::Statistics
   /;
 
   has 'result' => ( is => 'rw', isa => 'Str' );
@@ -21,16 +22,20 @@ class Mini::Unit::Logger::XUnit is mutable
     $self->print("$tc#$test: ") if $self->verbose();
   }
 
-  method finish_test(ClassName $tc, Str $test)
+  method finish_test(ClassName $tc, Str $test, @)
   {
     $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
     $self->print($self->result());
     $self->puts() if $self->verbose();
   }
 
-  method finish_test_suite($filter?)
+  method finish_test_suite(@)
   {
-    $self->puts("\n", "Finished in @{[$self->total_time()]} seconds.");
+    $self->puts() unless $self->verbose();
+    $self->puts('', "Finished in @{[$self->total_time()]} seconds.");
+    # TODO: Error / Failure Messages
+    $self->puts();
+    $self->puts($self->statistics());
   }
 
 
