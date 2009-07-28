@@ -2,9 +2,9 @@ use MooseX::Declare;
 
 class Mini::Unit {
   use TryCatch;
-  use MooseX::ClassAttribute;
+  use Mini::Unit::Logger::XUnit;
 
-  class_has logger => (
+  has logger => (
     is => 'rw',
     does => 'Mini::Unit::Logger',
     handles => [
@@ -20,13 +20,14 @@ class Mini::Unit {
       error => 'error',
     ],
   );
-  class_has file => (
-    is      => 'ro',
-    default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
-  );
+  # class_has file => (
+  #   is      => 'ro',
+  #   default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
+  # );
 
   method autorun(ClassName $class:) {
     END {
+      $| = 1;
       return if $?;
       $? = !! Mini::Unit->new()->run(@ARGV);
     }
@@ -77,10 +78,10 @@ Mini::Unit->autorun();
 if ($0 eq __FILE__) {
 
   class TestCase extends Mini::Unit::TestCase {
-    method test_pass {}
-    method test_fail { $self->assert(0, 'Failed HARD!') }
-    method test_skipped { Mini::Unit::Skip->throw('Skipped!') }
-    method test_error { Mini::Unit::Foo->frobozz() }
+    method test_pass { sleep 1 }
+    method test_fail { sleep 1; $self->assert(0, 'Failed HARD!') }
+    method test_skipped { sleep 1; Mini::Unit::Skip->throw('Skipped!') }
+    method test_error { sleep 1; die 'fooblibarioafr!'; Mini::Unit::Foo->frobozz() }
   }
 
   use Data::Dumper;

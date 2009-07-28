@@ -1,36 +1,56 @@
 use MooseX::Declare;
 
-class Mini::Unit::Logger::XUnit {
-  # TODO: Fix 'with' to work inside a class scope.
-  Moose::with(__PACKAGE__, 'Mini::Unit::Logger');
+class Mini::Unit::Logger::XUnit is mutable
+{
+  with qw/
+    Mini::Unit::Logger
+    Mini::Unit::Logger::Roles::Timings
+  /;
 
-  after begin_test_suite($filter?) {
+  has 'result' => ( is => 'rw', isa => 'Str' );
+
+  method begin_test_suite($filter?)
+  {
     $self->print('Loaded Suite');
     $self->print(" (Filtered to /$filter/)") if $filter;
-    $self->puts("\n")
+    $self->puts("\n");
   }
 
-  after finish_test_suite($filter?) {
+  method begin_test(ClassName $tc, Str $test)
+  {
+    $self->print("$tc#$test: ") if $self->verbose();
+  }
+
+  method finish_test(ClassName $tc, Str $test)
+  {
+    $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
+    $self->print($self->result());
+    $self->puts() if $self->verbose();
+  }
+
+  method finish_test_suite($filter?)
+  {
     $self->puts("\n", "Finished in @{[$self->total_time()]} seconds.");
   }
 
-  after pass(ClassName $tc, Str $test) {
-    my $result = $self->verbose() ? 'Passed!' : '.';
-    $self->print($result);
+
+  method pass(ClassName $tc, Str $test)
+  {
+    $self->result($self->verbose() ? 'Passed!' : '.');
   }
 
-  after fail(ClassName $tc, Str $test, Str $msg) {
-    my $result = $self->verbose() ? "Failed - $msg!" : 'F';
-    $self->print($result);
+  method fail(ClassName $tc, Str $test, Str $msg)
+  {
+    $self->result($self->verbose() ? "Failed - $msg!" : 'F');
   }
 
-  after skip(ClassName $tc, Str $test, Str $msg) {
-    my $result = $self->verbose() ? "Skipped - $msg!" : 'S';
-    $self->print($result);
+  method skip(ClassName $tc, Str $test, Str $msg)
+  {
+    $self->result($self->verbose() ? "Skipped - $msg!" : 'S');
   }
 
-  after error(ClassName $tc, Str $test, Str $msg) {
-    my $result = $self->verbose() ? "ERROR - $msg" : 'E';
-    $self->print($result);
+  method error(ClassName $tc, Str $test, Str $msg)
+  {
+    $self->result($self->verbose() ? "ERROR - $msg" : 'E');
   }
 }

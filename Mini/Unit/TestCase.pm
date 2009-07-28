@@ -29,6 +29,7 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
     catch ($e) {
       # TODO: Ignore reasonable exceptions.
       $self->passed(0);
+      chomp($e);
       $runner->error(ref $self, $test, $e);
     };
 
@@ -38,6 +39,7 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
     }
     catch ($e) {
       # TODO: Ignore reasonable exceptions.
+      chomp($e);
       $runner->error(ref $self, $test, $e);
     };
   }
