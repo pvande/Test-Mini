@@ -5,11 +5,11 @@ role Mini::Unit::Logger::Roles::Statistics
   use MooseX::AttributeHelpers;
 
   my %opts = ( metaclass => 'Number', is => 'rw', isa => 'Int', default => 0 );
-  has 'assertions' => ( %opts, provides => { add => 'add_assertions' } );
-  has 'tests'      => ( %opts, curries => { add => { incr_tested  => [1] } } );
-  has 'skips'      => ( %opts, curries => { add => { incr_skipped => [1] } } );
-  has 'errors'     => ( %opts, curries => { add => { incr_errored => [1] } } );
-  has 'failures'   => ( %opts, curries => { add => { incr_failed  => [1] } } );
+  has 'assertion_count' => ( %opts, provides => { add => 'add_assertions' } );
+  has 'test_count'      => ( %opts, curries => { add => { incr_tested  => [1] } } );
+  has 'skip_count'      => ( %opts, curries => { add => { incr_skipped => [1] } } );
+  has 'error_count'     => ( %opts, curries => { add => { incr_errored => [1] } } );
+  has 'failure_count'   => ( %opts, curries => { add => { incr_failed  => [1] } } );
 
   after finish_test(@) { $self->incr_tested();       }
   after finish_test(@) { $self->add_assertions(pop); }
@@ -20,11 +20,11 @@ role Mini::Unit::Logger::Roles::Statistics
   method statistics
   {
     join(', ',
-      "@{[$self->tests()]} tests",
-      "@{[$self->assertions()]} assertions",
-      "@{[$self->failures()]} failures",
-      "@{[$self->errors()]} errors",
-      "@{[$self->skips()]} skips",
+      "@{[$self->test_count()]} tests",
+      "@{[$self->assertion_count()]} assertions",
+      "@{[$self->failure_count()]} failures",
+      "@{[$self->error_count()]} errors",
+      "@{[$self->skip_count()]} skips",
     );
   }
 }
