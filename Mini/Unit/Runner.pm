@@ -1,12 +1,15 @@
 use MooseX::Declare;
 
 class Mini::Unit::Runner {
-  use aliased 'Mini::Unit::TestCase';
-  use Mini::Unit::Logger::XUnit;
   use TryCatch;
 
-  has logger => (
-    is => 'rw',
+  with 'MooseX::Getopt';
+  has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
+  has 'filter'  => (is => 'rw', isa => 'Str', default => '');
+  has 'logger'  => (is => 'rw', isa => 'Str', default => 'Mini::Unit::Logger::XUnit');
+
+  has '_logger' => (
+    writer => 'set_logger',
     does => 'Mini::Unit::Logger',
     handles => [
       (map {
@@ -22,36 +25,31 @@ class Mini::Unit::Runner {
     ],
   );
 
-  has exit_code => ( is => 'rw', default => 1 );
+  has '_exit_code' => (accessor => 'exit_code', default => 1);
+
 
   # class_has file => (
   #   is      => 'ro',
   #   default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
   # );
 
-  method autorun(ClassName $class:)
+  method run
   {
-    END {
-      $| = 1;
-      return if $?;
-      $? = !! $class->new()->run(@ARGV);
-    }
+    Class::MOP::load_class($self->logger);
+    my $logger = $self->logger->new(verbose => $self->verbose);
+    $self->set_logger($logger);
+
+    return $self->run_test_suite();
   }
 
-  method run(@args)
+  method run_test_suite()
   {
-    my $verbosity = grep { /-v+/ } @args;
-    $self->logger(Mini::Unit::Logger::XUnit->new(verbose => $verbosity));
-    $self->run_test_suite();
-    return $self->exit_code();
-  }
-
-  method run_test_suite($filter? = qr/./)
-  {
-    for my $tc (TestCase->meta()->subclasses()) {
+    for my $tc (Mini::Unit::TestCase->meta()->subclasses()) {
       my @tests = grep { /^test/ } $tc->meta()->get_all_method_names();
-      $self->run_test_case($tc, grep { $filter } @tests);
+      $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
     }
+
+    return $self->exit_code();
   }
 
   method run_test_case(ClassName $tc, @tests)

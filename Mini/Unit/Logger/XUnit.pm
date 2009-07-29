@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Mini::Unit::Logger::XUnit is mutable
+class Mini::Unit::Logger::XUnit
 {
   with qw/
     Mini::Unit::Logger

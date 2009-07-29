@@ -27,5 +27,11 @@ class Mini::Unit is dirty
   }
 }
 
+
 use Mini::Unit::Runner;
-Mini::Unit::Runner->autorun();
+
+END {
+  $| = 1;
+  return if $?;
+  $? = Mini::Unit::Runner->new_with_options()->run();
+}
