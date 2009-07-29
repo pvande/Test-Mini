@@ -9,7 +9,7 @@ class Mini::Unit is dirty
   sub keywords {
     ClassKeyword->new(identifier => 'class'),
     RoleKeyword->new(identifier => 'role'),
-    # TestCaseKeyword->new(identifier => 'testcase'),
+    TestCaseKeyword->new(identifier => 'testcase'),
   }
 
   clean;

@@ -11,14 +11,11 @@ role Mini::Unit::Assertions {
   use Moose::Exporter;
   no warnings 'closure';
 
-  Moose::Exporter->setup_import_methods(
-    as_is => [qw/
-      assert
-    /],
-  );
+  requires 'run';
 
   my $assertion_count = 0;
   method count_assertions { return $assertion_count }
+  after run(@) { $assertion_count = 0; }
 
   sub assert
   {
@@ -29,4 +26,8 @@ role Mini::Unit::Assertions {
     $msg = $msg->() if ref $msg eq 'CODE';
     Mini::Unit::Assert->throw($msg) unless $test;
   }
+
+  Moose::Exporter->setup_import_methods(
+    as_is => [ grep { /^(assert|refute)/ } __PACKAGE__->meta->get_method_list() ],
+  );
 }
