@@ -8,20 +8,24 @@ class Mini::Unit::Assert with Throwable {
 class Mini::Unit::Skip extends Mini::Unit::Assert {}
 
 role Mini::Unit::Assertions {
-  use MooseX::AttributeHelpers;
+  use Moose::Exporter;
+  no warnings 'closure';
 
-  has assertion_count => (
-    metaclass => 'Number',
-    is        => 'ro',
-    isa       => 'Int',
-    default   => 0,
-    provides  => {
-      add => 'add_assertions',
-    },
+  Moose::Exporter->setup_import_methods(
+    as_is => [qw/
+      assert
+    /],
   );
 
-  method assert($test, $msg = "Failed assertion, no message given") {
-    $self->add_assertions(1);
+  my $assertion_count = 0;
+  method count_assertions { return $assertion_count }
+
+  sub assert
+  {
+    my ($test, $msg) = @_;
+    $msg ||= 'Assertion failed; no message given.';
+
+    $assertion_count += 1;
     $msg = $msg->() if ref $msg eq 'CODE';
     Mini::Unit::Assert->throw($msg) unless $test;
   }

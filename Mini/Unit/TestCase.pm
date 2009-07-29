@@ -7,14 +7,11 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
-  method setup()    {}
-  method teardown() {}
-
   method run($runner) {
     my $test = $self->name();
 
     try {
-      $self->setup();
+      $self->setup() if $self->can('setup');
       $self->$test();
       $self->passed(1);
     }
@@ -34,7 +31,7 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
     };
 
     try {
-      $self->teardown();
+      $self->teardown() if $self->can('teardown');
       $runner->pass(__PACKAGE__, $self->name()) if $self->passed();
     }
     catch ($e) {
@@ -43,6 +40,6 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions {
       $runner->error(ref $self, $test, $e);
     };
 
-    return $self->assertion_count();
+    return $self->count_assertions();
   }
 }
