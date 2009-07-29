@@ -1,19 +1,31 @@
 use MooseX::Declare;
-use Mini::Unit::Runner;
 
-Mini::Unit::Runner->autorun();
+class Mini::Unit is dirty
+{
+  use aliased 'MooseX::Declare::Syntax::Keyword::Class', 'ClassKeyword';
+  use aliased 'MooseX::Declare::Syntax::Keyword::Role',  'RoleKeyword';
+  use aliased 'Mini::Unit::Syntax::Keyword::TestCase',   'TestCaseKeyword';
 
-if ($0 eq __FILE__) {
+  sub keywords {
+    ClassKeyword->new(identifier => 'class'),
+    RoleKeyword->new(identifier => 'role'),
+    # TestCaseKeyword->new(identifier => 'testcase'),
+  }
 
-  class TestCase extends Mini::Unit::TestCase
+  clean;
+
+  method import(ClassName $class: %args)
   {
-    use Mini::Unit::Assertions;
+    my $caller = caller();
 
-    method test_pass { assert(1); assert(1); sleep 1 }
-    method test_fail { sleep 1; assert(0, 'Failed HARD!') }
-    method test_skipped { sleep 1; Mini::Unit::Skip->throw('Not Yet Implemented') }
-    method test_error { sleep 1; die 'fooblibarioafr!'; Mini::Unit::Foo->frobozz() }
+    strict->import;
+    warnings->import;
+
+    for my $keyword (keywords()) {
+      $keyword->setup_for($caller, %args, provided_by => $class);
+    }
   }
 }
 
-1;
+use Mini::Unit::Runner;
+Mini::Unit::Runner->autorun();

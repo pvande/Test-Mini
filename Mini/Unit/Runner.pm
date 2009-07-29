@@ -1,6 +1,7 @@
 use MooseX::Declare;
 
 class Mini::Unit::Runner {
+  use aliased 'Mini::Unit::TestCase';
   use Mini::Unit::Logger::XUnit;
   use TryCatch;
 
@@ -47,7 +48,7 @@ class Mini::Unit::Runner {
 
   method run_test_suite($filter? = qr/./)
   {
-    for my $tc (Mini::Unit::TestCase->meta()->subclasses()) {
+    for my $tc (TestCase->meta()->subclasses()) {
       my @tests = grep { /^test/ } $tc->meta()->get_all_method_names();
       $self->run_test_case($tc, grep { $filter } @tests);
     }
