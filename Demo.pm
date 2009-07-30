@@ -1,18 +1,28 @@
 use Mini::Unit;
 
+class UnderTest {
+  method foo($inverse_retval) { return $self->invert($inverse_retval) }
+  method invert($val) { die "$val was unexpected!"; return !$val }
+}
+
 testcase Foo
 {
-  method test_one { assert(1) }
+  method test_passes { assert(1) }
+  method test_fails  { assert(0) }
+  method test_skips  { skip("I'm skipping out...") }
+  method test_dies   { die 'woe is me!' }
+  method test_stack_trace { UnderTest->new()->foo(0) }
 }
-
-testcase Bar extends Foo
-{
-  method test_two { assert(0, 'This thing fails!') }
-
-  # TODO: Implement the `test` keyword
-  # TODO: Implement the `setup` keyword
-  # TODO: Implement the `teardown` keyword
-}
+#
+# testcase Bar extends Foo
+# {
+#   method test_two { assert(0, 'This thing fails!') }
+#
+#   method test_die { die 'foo' }
+#   # TODO: Implement the `test` keyword
+#   # TODO: Implement the `setup` keyword
+#   # TODO: Implement the `teardown` keyword
+# }
 
 # TODO: `testcase` should refuse to extend non-TestCases
 # class NonTestCase { sub run {} }
@@ -36,8 +46,3 @@ testcase Bar extends Foo
 #
 #   }
 # }
-
-class Demo::Tests extends Mini::Unit::TestCase
-{
-  use Mini::Unit::Assertions;
-}

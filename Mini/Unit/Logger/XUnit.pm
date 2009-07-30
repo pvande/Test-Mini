@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Mini::Unit::Logger::XUnit
+class Mini::Unit::Logger::XUnit is dirty
 {
   with qw/
     Mini::Unit::Logger
@@ -8,7 +8,35 @@ class Mini::Unit::Logger::XUnit
     Mini::Unit::Logger::Roles::Statistics
   /;
 
+  sub clean_backtrace
+  {
+    my $error = shift;
+    my $start = sub { shift->package =~ /Mini::Unit::Assertions/ };
+    my $end   = sub { shift->package =~ /Mini::Unit::TestCase/ };
+    my @context = grep { $start->($_) .. $end->($_) } $error->trace->frames();
+    return [ @context[ 1 .. ($#context - 1) ] ];
+  }
+
+  sub location
+  {
+    my $frame = clean_backtrace(shift)->[0];
+    return "@{[$frame->filename]}:@{[$frame->line]}"
+  }
+
+  clean;
+
+  use MooseX::AttributeHelpers;
+
   has 'result' => ( is => 'rw', isa => 'Str' );
+  has 'report' => (
+    metaclass => 'Collection::Array',
+    is        => 'ro',
+    isa       => 'ArrayRef',
+    default   => sub { [] },
+    provides  => {
+      push => 'add_to_report',
+    },
+  );
 
   method begin_test_suite($filter?)
   {
@@ -25,7 +53,7 @@ class Mini::Unit::Logger::XUnit
   method finish_test(ClassName $tc, Str $test, @)
   {
     $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
-    $self->print($self->result());
+    $self->print($self->result() || ());
     $self->puts() if $self->verbose();
   }
 
@@ -33,7 +61,10 @@ class Mini::Unit::Logger::XUnit
   {
     $self->puts() unless $self->verbose();
     $self->puts('', "Finished in @{[$self->total_time()]} seconds.");
-    # TODO: Error / Failure Messages
+
+    my $i = 1;
+    $self->puts(sprintf("\n%3d) %s", $i++, $_)) for @{ $self->report() };
+
     $self->puts();
     $self->puts($self->statistics());
   }
@@ -41,21 +72,47 @@ class Mini::Unit::Logger::XUnit
 
   method pass(ClassName $tc, Str $test)
   {
-    $self->result($self->verbose() ? 'Passed!' : '.');
+    $self->result('.');
   }
 
-  method fail(ClassName $tc, Str $test, Str $msg)
+  method fail(ClassName $tc, Str $test, $e)
   {
-    $self->result($self->verbose() ? "Failed - $msg!" : 'F');
+    $self->result('F');
+    $self->add_to_report(
+      sprintf(
+        "Failure:\n%s(%s) [%s]:\n%s",
+        $test,
+        $tc,
+        location($e),
+        $e->message,
+      )
+    );
   }
 
-  method skip(ClassName $tc, Str $test, Str $msg)
+  method skip(ClassName $tc, Str $test, $e)
   {
-    $self->result($self->verbose() ? "Skipped - $msg!" : 'S');
+    $self->result('S');
+    $self->add_to_report(
+      sprintf(
+        "Skipped:\n%s(%s) [%s]:\n%s",
+        $test,
+        $tc,
+        location($e),
+        $e->message,
+      )
+    );
   }
 
-  method error(ClassName $tc, Str $test, Str $msg)
+  method error(ClassName $tc, Str $test, $e)
   {
-    $self->result($self->verbose() ? "ERROR - $msg" : 'E');
+    $self->result('E');
+    $self->add_to_report(
+      sprintf(
+        "Error:\n%s(%s):\n%s",
+        $test,
+        $tc,
+        ref $e ? $e->message : $e, # TODO: Get clean stacktraces
+      )
+    );
   }
 }

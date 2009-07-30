@@ -2,43 +2,49 @@ use MooseX::Declare;
 
 use Mini::Unit::Assertions;
 
-class Mini::Unit::TestCase with Mini::Unit::Assertions {
-  use TryCatch;
+class Mini::Unit::TestCase with Mini::Unit::Assertions
+{
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
-  method run($runner) {
+  method run($runner)
+  {
+    my $e; my $error;
     my $test = $self->name();
 
-    try {
+    local $SIG{__DIE__} = sub {
+      local *__ANON__ = 'die';
+
+      $error = Mini::Unit::Error->new(@_);
+      confess @_;
+    };
+
+    eval {
       $self->setup() if $self->can('setup');
       $self->$test();
       $self->passed(1);
-    }
-    catch (Mini::Unit::Skip $e) {
-      $self->passed(0);
-      $runner->skip(ref $self, $test, $e->message());
-    }
-    catch (Mini::Unit::Assert $e) {
-      $self->passed(0);
-      $runner->fail(ref $self, $test, $e->message());
-    }
-    catch ($e) {
-      # TODO: Ignore reasonable exceptions.
-      $self->passed(0);
-      chomp($e);
-      $runner->error(ref $self, $test, $e);
     };
+    if ($e = Exception::Class->caught()) {
+      $self->passed(0);
 
-    try {
+      if ($e = Exception::Class->caught('Mini::Unit::Skip')) {
+        $runner->skip(ref $self, $test, $e);
+      }
+      elsif ($e = Exception::Class->caught('Mini::Unit::Assert')) {
+        $runner->fail(ref $self, $test, $e);
+      }
+      else {
+        $runner->error(ref $self, $test, $error);
+      }
+    }
+
+    eval {
       $self->teardown() if $self->can('teardown');
       $runner->pass(__PACKAGE__, $self->name()) if $self->passed();
-    }
-    catch ($e) {
-      # TODO: Ignore reasonable exceptions.
-      chomp($e);
-      $runner->error(ref $self, $test, $e);
     };
+    if ($e = Exception::Class->caught()) {
+      $runner->error(ref $self, $test, $e);
+    }
 
     return $self->count_assertions();
   }

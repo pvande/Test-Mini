@@ -89,6 +89,6 @@ class Mini::Unit::Runner {
   }
 
   before run_test($tc, $test)    { $self->exit_code(0) }
-  after  fail($tc, $test, $msg)  { $self->exit_code(1) }
-  after  error($tc, $test, $msg) { $self->exit_code(1) }
+  after  fail(@)  { $self->exit_code(1) }
+  after  error(@) { $self->exit_code(1) }
 }
