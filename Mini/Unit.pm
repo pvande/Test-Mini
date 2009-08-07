@@ -29,6 +29,7 @@ class Mini::Unit is dirty
 
 
 use Mini::Unit::Runner;
+# $Carp::CarpLevel = 'Infinity';
 
 END {
   $| = 1;

@@ -4,7 +4,7 @@ use Mini::Unit;
 # Test case class extends Mini::Unit::TestCase
 class ClassicTest extends Mini::Unit::TestCase
 {
-  # Only methods matching /^test/ will automatically run.
+  # Only methods matching /^test.+/ will automatically run.
   method test_do_nothing() { }
 
   # Assertion methods are not automatically in scope, but do reside on $self.
@@ -30,14 +30,14 @@ testcase Foo
 
   # In addition, a 'testcase'-declared class allows you to declare tests with
   # the 'test' keyword.
-  # test keyword_passes { assert 1, 'I should pass' }
-  # test keyword_refute { refute 0, 'I should fail' }
-  # test keyword_skip   { skip "I've got better things to do"}
+  test keyword_passes { assert 1, 'I should pass' }
+  test keyword_refute { refute 0, 'I should fail' }
+  test keyword_skip   { skip "I've got better things to do" }
 
   # Furthermore, the 'test' keyword allows for more descriptive test names.
-  # test assert passes                { assert 1, 'I should pass' }
-  # test refute passes on failure     { refute 0, 'I should fail' }
-  # test I'd like to write, but won't { skip "I've got better things to do" }
+  test assert passes                  { assert 1, 'I should pass' }
+  test refute passes on failure       { refute 0, 'I should fail' }
+  test I should write but will forget { skip "I've got better things to do" }
 }
 
 # testcase Bar extends Foo
