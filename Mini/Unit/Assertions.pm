@@ -49,7 +49,7 @@ role Mini::Unit::Assertions {
 
     $assertion_count += 1;
     $msg = $msg->() if ref $msg eq 'CODE';
-    Mini::Unit::Assert->throw($msg) unless $test;
+    Mini::Unit::Assert->throw(message => $msg, ignore_package => __PACKAGE__) unless $test;
   }
 
   sub skip
@@ -58,7 +58,7 @@ role Mini::Unit::Assertions {
     $msg ||= 'Test skipped; no message given.';
 
     $msg = $msg->() if ref $msg eq 'CODE';
-    Mini::Unit::Skip->throw($msg);
+    Mini::Unit::Skip->throw(message => $msg, ignore_package => __PACKAGE__);
   }
 
   Moose::Exporter->setup_import_methods(

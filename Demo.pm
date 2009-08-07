@@ -1,8 +1,9 @@
 use Mini::Unit;
 
-class UnderTest {
+class UnderTest extends Mini::Unit::TestCase {
+  use Helper;
   method foo($inverse_retval) { return $self->invert($inverse_retval) }
-  method invert($val) { die "$val was unexpected!"; return !$val }
+  sub invert { Helper->new->doit() }
 }
 
 testcase Foo
@@ -10,7 +11,7 @@ testcase Foo
   method test_passes { assert(1) }
   method test_fails  { assert(0) }
   method test_skips  { skip("I'm skipping out...") }
-  method test_dies   { die 'woe is me!' }
+  method test_dies   { confess 'woe is me!' }
   method test_stack_trace { UnderTest->new()->foo(0) }
 }
 #

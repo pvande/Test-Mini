@@ -12,14 +12,25 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions
     my $e; my $error;
     my $test = $self->name();
 
-    local $SIG{__DIE__} = sub {
-      local *__ANON__ = 'die';
-
-      $error = Mini::Unit::Error->new(@_);
-      confess @_;
-    };
-
     eval {
+      local $SIG{__DIE__} = sub {
+        package Mini::Unit::SIGDIE;
+        (my $msg = join "\n",@_) =~ s/ at .*? line \d+\.\n$//;
+
+        $error = Mini::Unit::Error->new(
+          message        => "$msg\n",
+          ignore_package => [qw/ Mini::Unit::SIGDIE Carp /],
+        );
+
+        my $me = $error->trace->frame(0);
+        if ($me->{subroutine} eq 'Mini::Unit::TestCase::__ANON__') {
+          $me->{subroutine} = 'die';
+          $me->{args} = [ $msg ];
+        }
+
+        die @_;
+      };
+
       $self->setup() if $self->can('setup');
       $self->$test();
       $self->passed(1);

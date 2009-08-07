@@ -11,15 +11,18 @@ class Mini::Unit::Logger::XUnit is dirty
   sub clean_backtrace
   {
     my $error = shift;
-    my $start = sub { shift->package =~ /Mini::Unit::Assertions/ };
-    my $end   = sub { shift->package =~ /Mini::Unit::TestCase/ };
-    my @context = grep { $start->($_) .. $end->($_) } $error->trace->frames();
-    return [ @context[ 1 .. ($#context - 1) ] ];
+
+    my @context = grep { ?? .. $_->package =~ /Mini::Unit::TestCase/ } $error->trace->frames();
+    pop @context;
+    reset;
+
+    return @context;
   }
 
   sub location
   {
-    my $frame = clean_backtrace(shift)->[0];
+    my @trace = clean_backtrace(@_);
+    my $frame = $trace[0];
     return "@{[$frame->filename]}:@{[$frame->line]}"
   }
 
@@ -105,13 +108,20 @@ class Mini::Unit::Logger::XUnit is dirty
 
   method error(ClassName $tc, Str $test, $e)
   {
+    my $msg = $e;
+    if (ref $e) {
+      my @trace = clean_backtrace($e);
+      @trace = map { '  ' . $_->as_string } @trace; # TODO: Use friendlier @_ dump
+      $msg = $e->message . join "\n", @trace;
+    }
+
     $self->result('E');
     $self->add_to_report(
       sprintf(
         "Error:\n%s(%s):\n%s",
         $test,
         $tc,
-        ref $e ? $e->message : $e, # TODO: Get clean stacktraces
+        $msg,
       )
     );
   }
