@@ -8,9 +8,10 @@ class UnderTest extends Mini::Unit::TestCase {
 
 testcase Foo
 {
+  use Mini::Unit::Assertions;
   method test_passes { assert(1) }
   method test_fails  { assert(0) }
-  method test_skips  { skip("I'm skipping out...") }
+  method test_skips  { skip "I'm skipping out..." }
   method test_dies   { confess 'woe is me!' }
   method test_stack_trace { UnderTest->new()->foo(0) }
 }
