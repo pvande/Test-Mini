@@ -1,21 +1,45 @@
 use Mini::Unit;
 
-class UnderTest extends Mini::Unit::TestCase {
-  use Helper;
-  method foo($inverse_retval) { return $self->invert($inverse_retval) }
-  sub invert { Helper->new->doit() }
+# Classic-style Example
+# Test case class extends Mini::Unit::TestCase
+class ClassicTest extends Mini::Unit::TestCase
+{
+  # Only methods matching /^test/ will automatically run.
+  method test_do_nothing() { }
+
+  # Assertion methods are not automatically in scope, but do reside on $self.
+  method test_assert() { $self->assert(1, 'I should pass') }
+  method test_refute() { $self->refute(0, 'I should fail') }
+  method test_skip()   { $self->skip("I've got better things to do") }
+
+  # Assertion methods can be included from Mini::Unit::Assertions.
+  use Mini::Unit::Assertions;
+  method test_local_assert() { assert 1, 'I should pass' }
+  method test_local_refute() { refute 0, 'I should fail' }
+  method test_local_skip()   { skip "I've got better things to do" }
 }
 
+# Sugary Example
+# Mini::Unit also declares the 'testcase' keyword for you, which provides a
+# class definition that automatically includes the basic assertions.
 testcase Foo
 {
-  use Mini::Unit::Assertions;
-  method test_passes { assert(1) }
-  method test_fails  { assert(0) }
-  method test_skips  { skip "I'm skipping out..." }
-  method test_dies   { confess 'woe is me!' }
-  method test_stack_trace { UnderTest->new()->foo(0) }
+  method test_passes() { assert 1, 'I should pass' }
+  method test_refute() { refute 0, 'I should fail' }
+  method test_skip()   { skip "I've got better things to do" }
+
+  # In addition, a 'testcase'-declared class allows you to declare tests with
+  # the 'test' keyword.
+  # test keyword_passes { assert 1, 'I should pass' }
+  # test keyword_refute { refute 0, 'I should fail' }
+  # test keyword_skip   { skip "I've got better things to do"}
+
+  # Furthermore, the 'test' keyword allows for more descriptive test names.
+  # test assert passes                { assert 1, 'I should pass' }
+  # test refute passes on failure     { refute 0, 'I should fail' }
+  # test I'd like to write, but won't { skip "I've got better things to do" }
 }
-#
+
 # testcase Bar extends Foo
 # {
 #   method test_two { assert(0, 'This thing fails!') }

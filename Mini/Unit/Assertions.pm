@@ -39,10 +39,18 @@ role Mini::Unit::Assertions {
   {
     $assertion_count += 1;
     $msg = $msg->() if ref $msg eq 'CODE';
+
     Mini::Unit::Assert->throw(
       message        => $msg,
       ignore_package => [__PACKAGE__, 'Moose::Exporter'],
     ) unless $test;
+
+    return 1;
+  }
+
+  method refute($class: $test, $message = 'Refutation failed; no message given.')
+  {
+    return not assert($class, !$test, $message);
   }
 
   method skip($class: $msg = 'Test skipped; no message given.')
