@@ -33,11 +33,6 @@ testcase Foo
   test keyword_passes { assert 1, 'I should pass' }
   test keyword_refute { refute 0, 'I should fail' }
   test keyword_skip   { skip "I've got better things to do" }
-
-  # Furthermore, the 'test' keyword allows for more descriptive test names.
-  test assert passes                  { assert 1, 'I should pass' }
-  test refute passes on failure       { refute 0, 'I should fail' }
-  test I should write but will forget { skip "I've got better things to do" }
 }
 
 # testcase Bar extends Foo

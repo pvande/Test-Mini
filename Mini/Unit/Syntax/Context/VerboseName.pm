@@ -10,11 +10,12 @@ role Mini::Unit::Syntax::Context::VerboseName
     my $linestr = $self->get_linestr;
 
     my $name = substr($linestr, $self->offset, index($linestr, '{') - $self->offset);
-    $name =~ s/^\s+|\s+$//g; $name =~ s/ /_/g;
-    warn $name;
+    $name =~ s/^\s+|\s+$//g;
 
-    warn $linestr = substr($linestr, 0, $self->offset - 1) . ' ' . substr($linestr, index($linestr, '{'));
-    warn
+    $linestr = join(' ',
+      substr($linestr, 0, $self->offset - 1),
+      substr($linestr, index($linestr, '{'))
+    );
 
     $self->set_linestr($linestr);
 
