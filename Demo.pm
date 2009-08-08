@@ -7,6 +7,12 @@ class ClassicTest extends Mini::Unit::TestCase
   # Only methods matching /^test.+/ will automatically run.
   method test_do_nothing() { }
 
+  # Pre- and post- actions can be described by declaring the relevant methods.
+  # Avoiding the latter two is recommended, but they are provided for those
+  # interested in them.
+  method setup()    { 'This runs before each test...' }
+  method teardown() { 'This runs after each test...' }
+
   # Assertion methods are not automatically in scope, but do reside on $self.
   method test_assert() { $self->assert(1, 'I should pass') }
   method test_refute() { $self->refute(0, 'I should fail') }
@@ -33,37 +39,9 @@ testcase Foo
   test keyword_passes { assert 1, 'I should pass' }
   test keyword_refute { refute 0, 'I should fail' }
   test keyword_skip   { skip "I've got better things to do" }
+
+  # Pre- and post- actions can be declared with the 'setup' and 'teardown'
+  # keywords; multiple invocations will execute in order of declaration.
+  setup    { 'This runs before each test...' }
+  teardown { 'This runs after each test...' }
 }
-
-# testcase Bar extends Foo
-# {
-#   method test_two { assert(0, 'This thing fails!') }
-#
-#   method test_die { die 'foo' }
-#   # TODO: Implement the `test` keyword
-#   # TODO: Implement the `setup` keyword
-#   # TODO: Implement the `teardown` keyword
-# }
-
-# TODO: `testcase` should refuse to extend non-TestCases
-# class NonTestCase { sub run {} }
-# testcase Baz extends NonTestCase { }
-
-# TODO: Make anonymous `testcase`s work, especially for the nested case
-# testcase quxx {
-#   after setup { ... }
-#   before teardown { ... }
-#
-#   method test_one { ... }
-#
-#   testcase { # package quxx::case1
-#     after setup { ... } # wraps quxx::setup
-#     before teardown { ... } # wraps quxx::teardown
-#
-#     method test_one { ... } # outer tests don't persist
-#   }
-#
-#   testcase fuzz { # package quxx::fuzz
-#
-#   }
-# }

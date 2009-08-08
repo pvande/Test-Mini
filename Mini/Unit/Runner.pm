@@ -45,7 +45,7 @@ class Mini::Unit::Runner {
   method run_test_suite()
   {
     for my $tc (Mini::Unit::TestCase->meta()->subclasses()) {
-      my @tests = grep { /^test/ } $tc->meta()->get_all_method_names();
+      my @tests = grep { /^test.+/ } $tc->meta()->get_all_method_names();
       $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
     }
 
