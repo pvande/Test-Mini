@@ -35,6 +35,20 @@ role Mini::Unit::Assertions {
   method count_assertions { return $assertion_count }
   after run(@) { $assertion_count = 0; }
 
+  sub message {
+    my ($default, $msg) = @_;
+
+    return sub {
+      if ($msg) {
+        $msg .= '.' if length($msg);
+        $msg .= "\n$default.";
+      }
+      else {
+        "$default."
+      }
+    }
+  }
+
   method assert($class: $test, $msg = 'Assertion failed; no message given.')
   {
     $assertion_count += 1;
@@ -46,6 +60,38 @@ role Mini::Unit::Assertions {
     ) unless $test;
 
     return 1;
+  }
+
+  method assert_block($class: Str|CodeRef $msg_or_block, CodeRef $block?)
+  {
+    my $msg = $msg_or_block if $block;
+    $block ||= $msg_or_block;
+
+    $msg = message('Expected block to return true value', $msg);
+    assert($class, $block->(), $msg);
+  }
+
+  method assert_empty($class: $obj, Str $msg?)
+  {
+    $msg = message("Expected $obj to be empty");
+    if (ref $obj eq 'ARRAY') {
+      $class->assert(@$obj == 0, $msg);
+    }
+    elsif (ref $obj eq 'HASH') {
+      $class->assert(%$obj == 0, $msg);
+    }
+    elsif (ref $obj && $obj->can('is_empty')) {
+      $class->assert($obj->is_empty(), $msg);
+    }
+    elsif (ref $obj && $obj->can('length')) {
+      $class->assert($obj->length == 0, $msg);
+    }
+    elsif (!ref $obj) {
+      $class->assert(length($obj) == 0, $msg);
+    }
+    else {
+      $class->flunk("Unable to determine emptiness of $obj");
+    }
   }
 
   method refute($class: $test, $message = 'Refutation failed; no message given.')
@@ -62,11 +108,15 @@ role Mini::Unit::Assertions {
     );
   }
 
+  method flunk($class: $msg = 'Epic failure')
+  {
+    $class->assert(0, $msg);
+  }
 
   use Moose::Exporter;
   Moose::Exporter->setup_import_methods(
     with_caller => [
-      grep { /^(assert|refute|skip)/ } __PACKAGE__->meta->get_method_list(),
+      grep { /^(assert|refute|skip$|flunk$)/ } __PACKAGE__->meta->get_method_list(),
     ],
   );
 }

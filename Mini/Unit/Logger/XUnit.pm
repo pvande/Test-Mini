@@ -30,7 +30,7 @@ class Mini::Unit::Logger::XUnit is dirty
 
   use MooseX::AttributeHelpers;
 
-  has 'result' => ( is => 'rw', isa => 'Str' );
+  has 'result' => (is => 'rw', isa => 'Str');
   has 'report' => (
     metaclass => 'Collection::Array',
     is        => 'ro',
