@@ -2,7 +2,8 @@ use MooseX::Declare;
 
 role Mini::Unit::Logger is dirty
 {
-  has verbose => (is => 'ro');
+  has 'verbose' => (is => 'ro', default => 0);
+  has 'runner'  => (is => 'ro', required => 1);
 
   method print(@msg)
   {

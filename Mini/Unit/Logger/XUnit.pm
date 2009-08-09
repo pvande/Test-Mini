@@ -45,7 +45,7 @@ class Mini::Unit::Logger::XUnit is dirty
   {
     $self->print('Loaded Suite');
     $self->print(" (Filtered to /$filter/)") if $filter;
-    $self->puts("\n");
+    $self->puts("\nSeeded with @{[$self->runner->seed]}\n");
   }
 
   method begin_test(ClassName $tc, Str $test)

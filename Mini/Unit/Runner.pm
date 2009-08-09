@@ -7,6 +7,7 @@ class Mini::Unit::Runner {
   has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
   has 'filter'  => (is => 'rw', isa => 'Str', default => '');
   has 'logger'  => (is => 'rw', isa => 'Str', default => 'Mini::Unit::Logger::XUnit');
+  has 'seed'    => (is => 'rw', isa => 'Int', default => int(rand(64_000_000)));
 
   has '_logger' => (
     writer => 'set_logger',
@@ -36,25 +37,28 @@ class Mini::Unit::Runner {
   method run
   {
     Class::MOP::load_class($self->logger);
-    my $logger = $self->logger->new(verbose => $self->verbose);
+    my $logger = $self->logger->new(runner => $self, verbose => $self->verbose);
     $self->set_logger($logger);
+
+    srand($self->seed);
 
     return $self->run_test_suite();
   }
 
   method run_test_suite()
   {
-    for my $tc (Mini::Unit::TestCase->meta()->subclasses()) {
-      my @tests = grep { /^test.+/ } $tc->meta()->get_all_method_names();
+    my @testcases = Mini::Unit::TestCase->meta->subclasses;
+    for my $tc ($self->randomize(@testcases)) {
+      my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
       $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
     }
 
-    return $self->exit_code();
+    return $self->exit_code;
   }
 
   method run_test_case(ClassName $tc, @tests)
   {
-    $self->run_test($tc, $_) for $self->sort_tests(@tests);
+    $self->run_test($tc, $_) for $self->randomize(@tests);
   }
 
   method run_test(ClassName $tc, Str $test)
@@ -63,10 +67,9 @@ class Mini::Unit::Runner {
     return $instance->run($self);
   }
 
-  method sort_tests(@tests)
+  method randomize(@list)
   {
-    # TODO: Allow tests to be randomly ordered
-    @tests
+    return sort { int(rand(3)) - 1 } @list;
   }
 
 
