@@ -32,7 +32,7 @@ role Mini::Unit::Assertions
     }
   }
 
-  method assert($class: $test, $msg = 'Assertion failed; no message given.')
+  method assert($class: Any $test, $msg = 'Assertion failed; no message given.')
   {
     $assertion_count += 1;
     $msg = $msg->() if ref $msg eq 'CODE';
@@ -45,7 +45,7 @@ role Mini::Unit::Assertions
     return 1;
   }
 
-  method assert_block($class: Str|CodeRef $msg_or_block, CodeRef $block?)
+  method assert_block($class: $msg_or_block, $block?)
   {
     my $msg = $msg_or_block if $block;
     $block ||= $msg_or_block;
@@ -54,16 +54,29 @@ role Mini::Unit::Assertions
     $class->assert($block->(), $msg);
   }
 
-  method assert_empty($class: $obj, Str $msg?)
+  method assert_empty($class: $obj, $msg?)
   {
-    $msg = message("Expected @{[$obj->dump]} to be empty");
-    $class->flunk() unless $obj->can('is_empty');
+    $msg = message("Expected @{[$obj->dump]} to be empty", $msg);
+    $class->assert_can($obj, 'is_empty');
     $class->assert($obj->is_empty(), $msg);
   }
 
-  method refute($class: $test, $message = 'Refutation failed; no message given.')
+  method assert_can($class: $obj, $method, $msg?)
   {
-    return not $class->assert(!$test, $message);
+    $msg = message("Expected @{[$obj->dump]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
+    $class->assert($obj->can($method), $msg);
+  }
+
+  method assert_contains($class: $collection, Any $obj, $msg?)
+  {
+    $msg = message("Expected @{[$collection->dump]} to contain @{[$obj->dump]}");
+    $class->assert_can($collection, 'contains');
+    $class->assert($collection->contains($obj), $msg);
+  }
+
+  method refute($class: $test, $msg = 'Refutation failed; no message given.')
+  {
+    return not $class->assert(!$test, $msg);
   }
 
   method skip($class: $msg = 'Test skipped; no message given.')

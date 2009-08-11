@@ -55,9 +55,22 @@ testcase Assertions
   test assert_block { assert_block '#assert_block failed', sub { 1 } }
 
   test assert_empty_with_arrayref { assert_empty [], '#assert_empty failed' }
-  test assert_empty_with_string   { assert_empty '', '#assert_empty failed' }
   test assert_empty_with_hashref  { assert_empty {}, '#assert_empty failed' }
-  test assert_empty_via_is_empty  { assert_empty Box->new(), '#assert_empty failed' }
+  test assert_empty_with_string   { assert_empty '', '#assert_empty failed' }
+  test assert_empty_with_object   { assert_empty Mock::Bag->new(), '#assert_empty failed' }
+
+  test assert_can_with_object    { assert_can Mock::Bag->new(), 'items' }
+  test assert_can_with_reference { assert_can [], 'length' }  # Thanks Autobox!
+
+  test assert_contains_with_arrayref { assert_contains [ 'a' ], 'a' }
+  test assert_contains_with_hashref  { assert_contains { a => 42 }, 'a' }
+  test assert_contains_with_string   { assert_contains 'container', 'a' }
+  test assert_contains_with_object   { assert_contains Mock::Bag->new(), 'a'}
 }
 
-class Box { method is_empty() { 1 } }
+class Mock::Bag
+{
+  method is_empty()         { 1 }
+  method items()            { 0 }
+  method contains(Any $obj) { $obj eq 'a' }
+}
