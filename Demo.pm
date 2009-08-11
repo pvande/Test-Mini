@@ -57,9 +57,7 @@ testcase Assertions
   test assert_empty_with_arrayref { assert_empty [], '#assert_empty failed' }
   test assert_empty_with_string   { assert_empty '', '#assert_empty failed' }
   test assert_empty_with_hashref  { assert_empty {}, '#assert_empty failed' }
-  test assert_empty_via_is_empty  { assert_empty CanBeEmpty->new(), '#assert_empty failed' }
-  test assert_empty_via_length    { assert_empty HasLength->new(), '#assert_empty failed' }
+  test assert_empty_via_is_empty  { assert_empty Box->new(), '#assert_empty failed' }
 }
 
-class CanBeEmpty { method is_empty() { 1 } }
-class HasLength  { method length()   { 0 } }
+class Box { method is_empty() { 1 } }

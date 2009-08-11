@@ -1,32 +1,15 @@
 use MooseX::Declare;
 
-# class Mini::Unit::Error with Throwable {
-#   use Devel::StackTrace;
-#
-#   has 'message' => (is => 'ro');
-#   has 'backtrace' => (
-#     is => 'ro',
-#     default => sub {
-#       my $trace = Devel::StackTrace->new(no_refs => 1);
-#       my $start = sub { shift->package =~ /Mini::Unit::Assertions/ };
-#       my $end   = sub { shift->package =~ /Mini::Unit::TestCase/ };
-#       my @context = grep { $start->($_) .. $end->($_) } $trace->frames();
-#       return [ @context[ 1 .. ($#context - 1) ] ];
-#     }
-#   );
-#
-#   sub BUILDARGS { return shift->SUPER::BUILDARGS(message => join '', @_); }
-# }
-# class Mini::Unit::Assert extends Mini::Unit::Error {}
-# class Mini::Unit::Skip extends Mini::Unit::Error   {}
-
 use Exception::Class
   'Mini::Unit::Error', => {  },
   'Mini::Unit::Assert' => { isa => 'Mini::Unit::Error' },
   'Mini::Unit::Skip'   => { isa => 'Mini::Unit::Assert' },
 ;
 
-role Mini::Unit::Assertions {
+role Mini::Unit::Assertions
+{
+  use Moose::Autobox;
+  use Mini::Unit::Autobox;
   no warnings 'closure';
 
   requires 'run';
@@ -68,35 +51,19 @@ role Mini::Unit::Assertions {
     $block ||= $msg_or_block;
 
     $msg = message('Expected block to return true value', $msg);
-    assert($class, $block->(), $msg);
+    $class->assert($block->(), $msg);
   }
 
   method assert_empty($class: $obj, Str $msg?)
   {
-    $msg = message("Expected $obj to be empty");
-    if (ref $obj eq 'ARRAY') {
-      $class->assert(@$obj == 0, $msg);
-    }
-    elsif (ref $obj eq 'HASH') {
-      $class->assert(%$obj == 0, $msg);
-    }
-    elsif (ref $obj && $obj->can('is_empty')) {
-      $class->assert($obj->is_empty(), $msg);
-    }
-    elsif (ref $obj && $obj->can('length')) {
-      $class->assert($obj->length == 0, $msg);
-    }
-    elsif (!ref $obj) {
-      $class->assert(length($obj) == 0, $msg);
-    }
-    else {
-      $class->flunk("Unable to determine emptiness of $obj");
-    }
+    $msg = message("Expected @{[$obj->dump]} to be empty");
+    $class->flunk() unless $obj->can('is_empty');
+    $class->assert($obj->is_empty(), $msg);
   }
 
   method refute($class: $test, $message = 'Refutation failed; no message given.')
   {
-    return not assert($class, !$test, $message);
+    return not $class->assert(!$test, $message);
   }
 
   method skip($class: $msg = 'Test skipped; no message given.')

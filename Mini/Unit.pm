@@ -34,5 +34,6 @@ use Mini::Unit::Runner;
 END {
   $| = 1;
   return if $?;
+  use Moose::Autobox;
   $? = Mini::Unit::Runner->new_with_options()->run();
 }
