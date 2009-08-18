@@ -6,10 +6,13 @@ use Exception::Class
   'Mini::Unit::Skip'   => { isa => 'Mini::Unit::Assert' },
 ;
 
-role Mini::Unit::Assertions
+role Mini::Unit::Assertions is dirty
 {
   use Moose::Autobox;
   use Mini::Unit::Autobox;
+  use Data::Inspect ();
+  use Data::Dumper;
+  use Sub::Install qw/ install_sub /;
   no warnings 'closure';
 
   requires 'run';
@@ -32,6 +35,18 @@ role Mini::Unit::Assertions
     }
   }
 
+  sub inspect {
+    my $i = Data::Inspect->new();
+    $i->set_option('truncate_strings', 16);
+    $i->inspect(@_);
+  }
+
+  sub alias {
+    install_sub { code => $_[0], as => $_[1] }
+  }
+
+  clean;
+
   method assert($class: Any $test, $msg = 'Assertion failed; no message given.')
   {
     $assertion_count += 1;
@@ -51,28 +66,60 @@ role Mini::Unit::Assertions
     $block ||= $msg_or_block;
 
     $msg = message('Expected block to return true value', $msg);
+    $class->assert_isa($block, 'CODE');
     $class->assert($block->(), $msg);
   }
 
-  method assert_empty($class: $obj, $msg?)
+  method assert_empty($class: Any $obj, $msg?)
   {
-    $msg = message("Expected @{[$obj->dump]} to be empty", $msg);
+    $msg = message("Expected @{[inspect($obj)]} to be empty", $msg);
     $class->assert_can($obj, 'is_empty');
     $class->assert($obj->is_empty(), $msg);
   }
 
-  method assert_can($class: $obj, $method, $msg?)
+  method assert_equal($class: Any $expected, Any $actual, $msg?)
   {
-    $msg = message("Expected @{[$obj->dump]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
+    $msg = message("Expected @{[inspect($expected)]}, not @{[inspect($actual)]}", $msg);
+    if ($expected->can('equals')) {
+      $class->assert($expected->equals($actual), $msg);
+    }
+    elsif ((defined $expected && defined $actual) && ((not ref $expected) && (not ref $actual))) {
+      $class->assert($expected eq $actual, $msg);
+    }
+    else {
+      $class->assert(Dumper($expected) eq Dumper($actual), $msg);
+    }
+  }
+  alias assert_equal => 'assert_eq';
+
+  method assert_can($class: Any $obj, $method, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
     $class->assert($obj->can($method), $msg);
   }
+  alias assert_can => 'assert_respond_to';
 
-  method assert_contains($class: $collection, Any $obj, $msg?)
+  method assert_contains($class: Any $collection, Any $obj, $msg?)
   {
-    $msg = message("Expected @{[$collection->dump]} to contain @{[$obj->dump]}");
+    $msg = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $msg);
     $class->assert_can($collection, 'contains');
     $class->assert($collection->contains($obj), $msg);
   }
+
+  method assert_extends($class: Any $obj, $type, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} to be an instance of $type, not @{[ref $obj]}", $msg);
+    $class->assert(ref $obj eq $type, $msg);
+  }
+  alias assert_extends => 'assert_instance_of';
+
+  method assert_isa($class: Any $obj, $type, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
+    $class->assert($obj->isa($type) || ref $obj eq $type, $msg);
+  }
+  alias assert_isa => 'assert_is_a';
+  alias assert_isa => 'assert_kind_of';
 
   method refute($class: $test, $msg = 'Refutation failed; no message given.')
   {
