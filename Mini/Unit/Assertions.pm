@@ -12,6 +12,7 @@ role Mini::Unit::Assertions is dirty
   use Mini::Unit::Autobox;
   use Data::Inspect ();
   use Data::Dumper;
+  use List::Util qw/ min /;
   use Sub::Install qw/ install_sub /;
   no warnings 'closure';
 
@@ -66,7 +67,7 @@ role Mini::Unit::Assertions is dirty
     $block ||= $msg_or_block;
 
     $msg = message('Expected block to return true value', $msg);
-    $class->assert_isa($block, 'CODE');
+    $class->assert_instance_of($block, 'CODE');
     $class->assert($block->(), $msg);
   }
 
@@ -92,6 +93,18 @@ role Mini::Unit::Assertions is dirty
   }
   alias assert_equal => 'assert_eq';
 
+  method assert_in_delta($class: $expected, $actual, $delta, $msg?)
+  {
+    my $n = abs($expected - $actual);
+    $msg = message("Expected $expected - $actual ($n) to be < $delta", $msg);
+    $class->assert($delta >= $n, $msg);
+  }
+
+  method assert_in_epsilon($class: $a, $b, $epsilon, $msg?)
+  {
+    $class->assert_in_delta($a, $b, min($a, $b) * $epsilon, $msg);
+  }
+
   method assert_can($class: Any $obj, $method, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
@@ -105,21 +118,44 @@ role Mini::Unit::Assertions is dirty
     $class->assert_can($collection, 'contains');
     $class->assert($collection->contains($obj), $msg);
   }
+  alias assert_contains => 'assert_includes';
 
-  method assert_extends($class: Any $obj, $type, $msg?)
+  method assert_instance_of($class: Any $obj, $type, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} to be an instance of $type, not @{[ref $obj]}", $msg);
     $class->assert(ref $obj eq $type, $msg);
   }
-  alias assert_extends => 'assert_instance_of';
 
   method assert_isa($class: Any $obj, $type, $msg?)
   {
-    $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
-    $class->assert($obj->isa($type) || ref $obj eq $type, $msg);
+    $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
+    $class->assert($obj->isa($type), $msg);
   }
   alias assert_isa => 'assert_is_a';
-  alias assert_isa => 'assert_kind_of';
+
+  method assert_does($class: Any $obj, $role, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} to perform the role of $role", $msg);
+    $class->assert($obj->does($role), $msg);
+  }
+
+  method assert_kind_of($class: Any $obj, $type, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
+    $class->assert($obj->isa($type) || $obj->does($type), $msg);
+  }
+
+  method assert_match($class: $pattern, $string, $msg?)
+  {
+    $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
+    $class->assert(scalar($string =~ $pattern), $msg);
+  }
+
+  method assert_undef($class: Any $obj, $msg?)
+  {
+    $msg = message("Expected @{[inspect($obj)]} to be undef", $msg);
+    $class->assert_equal($obj, undef, $msg);
+  }
 
   method refute($class: $test, $msg = 'Refutation failed; no message given.')
   {

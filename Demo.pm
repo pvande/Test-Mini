@@ -1,4 +1,5 @@
 use Mini::Unit;
+use Math::Trig ();
 
 # # Classic-style Example
 # # Test case class extends Mini::Unit::TestCase
@@ -54,7 +55,6 @@ testcase Assertions
 
   # assert_block($msg_or_block, $block?) -- test the truthiness of the return
   # value from $block (or $msg_or_block, if $block not defined)
-  # TODO: Investigate alternate paramater orderings for #assert_block
   test assert_block { assert_block sub { 1 } }
 
   # assert_empty($container, $msg?) -- test the emptiness of various containers;
@@ -63,6 +63,27 @@ testcase Assertions
   test assert_empty_with_hashref  { assert_empty {} }
   test assert_empty_with_string   { assert_empty '' }
   test assert_empty_with_object   { assert_empty Mock::Bag->new() }
+
+  # assert_equal($expected, $actual, $msg?) -- test whether $expected and
+  # $actual are equivalent; number-like strings are tested for numerical
+  # equivalence, anything implementing an 'equals' method will rely on that
+  # result, and everything else will be checked for structural equivalence
+  test assert_equal_with_string   { assert_equal 'foo', lc('FOO') }
+  test assert_equal_with_number   { assert_equal 3, 3.00 }
+  test assert_equal_with_arrayref { assert_equal [ 1, 2 ], [ qw/ 1 2 / ] }
+  test assert_equal_with_hashref  { assert_equal { a => 1 }, { a => 1 } }
+  test assert_equal_with_object   { assert_equal Mock::Bag->new(), Mock::Bag->new() }
+  test assert_equal_with_undef    { assert_equal undef, []->[0] }
+  # Aliases for assert_equal
+  test assert_eq                  { assert_eq 'foo', lc('FOO') }
+
+  # assert_in_delta($expected, $actual, $delta, $msg?) -- tests whether $actual
+  # is within +/- $delta of $expected
+  test assert_in_delta { assert_in_delta Math::Trig::pi, (22.0 / 7.0), 0.0013 }
+
+  # assert_in_epsilon($a, $b, $epsilon, $msg?) -- test that the difference
+  # between $a and $b is within +/- $epsilon of the smaller operand
+  test assert_in_epsilon { assert_in_epsilon Math::Trig::pi, (22.0 / 7.0), 1/1000.0 }
 
   # assert_can($obj, $method, $msg?) -- test the ability of an object to respond
   # to a particular method
@@ -80,36 +101,40 @@ testcase Assertions
   test assert_contains_with_hashref  { assert_contains { a => 42 }, 'a' }
   test assert_contains_with_string   { assert_contains 'container', 'a' }
   test assert_contains_with_object   { assert_contains Mock::Bag->new(), 'a'}
-
-  # assert_equal($expected, $actual, $msg?) -- test whether $expected and
-  # $actual are equivalent; number-like strings are tested for numerical
-  # equivalence, anything implementing an 'equals' method will rely on that
-  # result, and everything else will be checked for structural equivalence
-  test assert_equal_with_string   { assert_equal 'foo', lc('FOO') }
-  test assert_equal_with_number   { assert_equal 3, 3.00 }
-  test assert_equal_with_arrayref { assert_equal [ 1, 2 ], [ qw/ 1 2 / ] }
-  test assert_equal_with_hashref  { assert_equal { a => 1 }, { a => 1 } }
-  test assert_equal_with_object   { assert_equal Mock::Bag->new(), Mock::Bag->new() }
-  test assert_equal_with_undef    { assert_equal undef, []->[0] }
-  # Aliases for assert_equal
-  test assert_eq                  { assert_eq 'foo', lc('FOO') }
+  # Aliases for assert_contains
+  test assert_includes               { assert_includes Mock::Bag->new(), 'a'}
 
   # assert_isa($obj, $type, $msg?) -- test whether $obj inherits from $type
   test assert_isa     { assert_isa Mock::Bag->new(), 'Mock::Collection' }
   # Aliases for assert_isa
   test assert_is_a    { assert_is_a Mock::Bag->new(), 'Mock::Collection' }
-  test assert_kind_of { assert_kind_of Mock::Bag->new(), 'Mock::Collection' }
 
-  # assert_extends($obj, $type, $msg?) -- test whether $obj directly extends $type
-  test assert_extends     { assert_extends Mock::Bag->new(), 'Mock::Bag' }
-  # Aliases for assert_extends
+  # assert_does($obj, $role, $msg?) -- test whether $obj uses the $role role
+  test assert_does    { assert_does Mock::Bag->new(), 'Mock::Enumerable' }
+
+  # assert_kind_of($obj, $type, $msg?) -- test whether $obj either inherits from
+  # $type or performs the $type role
+  test assert_kind_of_with_class { assert_kind_of Mock::Bag->new(), 'Mock::Collection' }
+  test assert_kind_of_with_role  { assert_kind_of Mock::Bag->new(), 'Mock::Enumerable' }
+
+  # assert_instance_of($obj, $type, $msg?) -- test whether $obj is an instance
+  # of $type
   test assert_instance_of { assert_instance_of Mock::Bag->new(), 'Mock::Bag' }
+
+  # assert_match($pattern, $string, $msg?) -- test whether $pattern matches
+  # $string
+  test assert_match { assert_match qr/test/, 'a test string' }
+
+  # assert_undef($obj, $msg?) -- test that $obj is not defined
+  test assert_undef { assert_undef []->[0] }
 }
 
-class Mock::Collection { }
-class Mock::Bag extends Mock::Collection
+role Mock::Enumerable
 {
   method is_empty()         { 1 }
   method items()            { 0 }
   method contains(Any $obj) { $obj eq 'a' }
 }
+
+class Mock::Collection { }
+class Mock::Bag extends Mock::Collection with Mock::Enumerable {}
