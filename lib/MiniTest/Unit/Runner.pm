@@ -27,7 +27,7 @@ class MiniTest::Unit::Runner {
     ],
   );
 
-  has '_exit_code' => (accessor => 'exit_code', default => 255);
+  has '_exit_code' => (accessor => 'exit_code', default => 0);
 
 
   # class_has file => (
@@ -49,6 +49,8 @@ class MiniTest::Unit::Runner {
   method run_test_suite()
   {
     my @testcases = MiniTest::Unit::TestCase->meta->subclasses;
+    $self->exit_code(255) unless @testcases;
+
     for my $tc ($self->randomize(@testcases)) {
       my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
       $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
@@ -59,6 +61,7 @@ class MiniTest::Unit::Runner {
 
   method run_test_case(ClassName $tc, @tests)
   {
+    $self->exit_code(127) unless @tests;
     $self->run_test($tc, $_) for $self->randomize(@tests);
   }
 
@@ -95,6 +98,6 @@ class MiniTest::Unit::Runner {
     return $retval;
   }
 
-  # after fail(@)  { $self->exit_code(3) }
-  # after error(@) { $self->exit_code(3) }
+  after fail(@)  { $self->exit_code(1) unless $self->exit_code > 1 }
+  after error(@) { $self->exit_code(1) unless $self->exit_code > 1 }
 }

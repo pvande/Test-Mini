@@ -34,6 +34,8 @@ class MiniTest::Unit::TestCase with MiniTest::Unit::Assertions
       $self->setup() if $self->can('setup');
       $self->$test();
       $self->passed(1);
+
+      die 'No assertions called' unless $self->count_assertions();
     };
     if ($e = Exception::Class->caught()) {
       $self->passed(0);
@@ -51,7 +53,7 @@ class MiniTest::Unit::TestCase with MiniTest::Unit::Assertions
 
     eval {
       $self->teardown() if $self->can('teardown');
-      $runner->pass(__PACKAGE__, $self->name()) if $self->passed();
+      $runner->pass(ref $self, $self->name()) if $self->passed();
     };
     if ($e = Exception::Class->caught()) {
       $runner->error(ref $self, $test, $e);

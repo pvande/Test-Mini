@@ -12,7 +12,7 @@ role MiniTest::Unit::Logger is dirty
 
   method puts(@msg)
   {
-    print STDOUT (join("\n", @msg), "\n")
+    $self->print(join("\n", @msg), "\n")
   }
 
   clean;
@@ -24,8 +24,8 @@ role MiniTest::Unit::Logger is dirty
   method finish_test_case(@)  { }
   method finish_test_suite(@) { }
 
-  method pass(ClassName $tc, Str $test)            { }
-  method fail(ClassName $tc, Str $test, Str $msg)  { }
-  method skip(ClassName $tc, Str $test, Str $msg)  { }
-  method error(ClassName $tc, Str $test, Str $msg) { }
+  method pass(ClassName $tc, Str $test)        { }
+  method fail(ClassName $tc, Str $test, $msg)  { }
+  method skip(ClassName $tc, Str $test, $msg)  { }
+  method error(ClassName $tc, Str $test, $msg) { }
 }
