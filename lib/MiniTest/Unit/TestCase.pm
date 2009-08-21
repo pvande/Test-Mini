@@ -1,8 +1,8 @@
 use MooseX::Declare;
 
-use Mini::Unit::Assertions;
+use MiniTest::Unit::Assertions;
 
-class Mini::Unit::TestCase with Mini::Unit::Assertions
+class MiniTest::Unit::TestCase with MiniTest::Unit::Assertions
 {
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
@@ -14,16 +14,16 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions
 
     eval {
       local $SIG{__DIE__} = sub {
-        package Mini::Unit::SIGDIE;
+        package MiniTest::Unit::SIGDIE;
         (my $msg = join "\n",@_) =~ s/ at .*? line \d+\.\n$//;
 
-        $error = Mini::Unit::Error->new(
+        $error = MiniTest::Unit::Error->new(
           message        => "$msg\n",
-          ignore_package => [qw/ Mini::Unit::SIGDIE Carp /],
+          ignore_package => [qw/ MiniTest::Unit::SIGDIE Carp /],
         );
 
         my $me = $error->trace->frame(0);
-        if ($me->{subroutine} eq 'Mini::Unit::TestCase::__ANON__') {
+        if ($me->{subroutine} eq 'MiniTest::Unit::TestCase::__ANON__') {
           $me->{subroutine} = 'die';
           $me->{args} = [ $msg ];
         }
@@ -38,10 +38,10 @@ class Mini::Unit::TestCase with Mini::Unit::Assertions
     if ($e = Exception::Class->caught()) {
       $self->passed(0);
 
-      if ($e = Exception::Class->caught('Mini::Unit::Skip')) {
+      if ($e = Exception::Class->caught('MiniTest::Unit::Skip')) {
         $runner->skip(ref $self, $test, $e);
       }
-      elsif ($e = Exception::Class->caught('Mini::Unit::Assert')) {
+      elsif ($e = Exception::Class->caught('MiniTest::Unit::Assert')) {
         $runner->fail(ref $self, $test, $e);
       }
       else {

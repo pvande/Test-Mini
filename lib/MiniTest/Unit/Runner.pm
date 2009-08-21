@@ -1,17 +1,18 @@
 use MooseX::Declare;
 
-class Mini::Unit::Runner {
+class MiniTest::Unit::Runner {
   use TryCatch;
+  use MiniTest::Unit::TestCase;
 
   with 'MooseX::Getopt';
   has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
   has 'filter'  => (is => 'rw', isa => 'Str', default => '');
-  has 'logger'  => (is => 'rw', isa => 'Str', default => 'Mini::Unit::Logger::XUnit');
+  has 'logger'  => (is => 'rw', isa => 'Str', default => 'MiniTest::Unit::Logger::XUnit');
   has 'seed'    => (is => 'rw', isa => 'Int', default => int(rand(64_000_000)));
 
   has '_logger' => (
     writer => 'set_logger',
-    does => 'Mini::Unit::Logger',
+    does => 'MiniTest::Unit::Logger',
     handles => [
       (map {
         (
@@ -26,7 +27,7 @@ class Mini::Unit::Runner {
     ],
   );
 
-  has '_exit_code' => (accessor => 'exit_code', default => 1);
+  has '_exit_code' => (accessor => 'exit_code', default => 255);
 
 
   # class_has file => (
@@ -47,7 +48,7 @@ class Mini::Unit::Runner {
 
   method run_test_suite()
   {
-    my @testcases = Mini::Unit::TestCase->meta->subclasses;
+    my @testcases = MiniTest::Unit::TestCase->meta->subclasses;
     for my $tc ($self->randomize(@testcases)) {
       my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
       $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
@@ -77,21 +78,23 @@ class Mini::Unit::Runner {
     $self->begin_test_suite(@args);
     my $retval = $self->$orig(@args);
     $self->finish_test_suite(@args, $retval);
+    return $retval;
   }
 
   around run_test_case(@args) {
     $self->begin_test_case(@args);
     my $retval = $self->$orig(@args);
     $self->finish_test_case(@args, $retval);
+    return $retval;
   }
 
   around run_test(@args) {
     $self->begin_test(@args);
     my $retval = $self->$orig(@args);
     $self->finish_test(@args, $retval);
+    return $retval;
   }
 
-  before run_test($tc, $test)    { $self->exit_code(0) }
-  after  fail(@)  { $self->exit_code(1) }
-  after  error(@) { $self->exit_code(1) }
+  # after fail(@)  { $self->exit_code(3) }
+  # after error(@) { $self->exit_code(3) }
 }

@@ -1,15 +1,15 @@
 use MooseX::Declare;
 
 use Exception::Class
-  'Mini::Unit::Error', => {  },
-  'Mini::Unit::Assert' => { isa => 'Mini::Unit::Error' },
-  'Mini::Unit::Skip'   => { isa => 'Mini::Unit::Assert' },
+  'MiniTest::Unit::Error', => {  },
+  'MiniTest::Unit::Assert' => { isa => 'MiniTest::Unit::Error' },
+  'MiniTest::Unit::Skip'   => { isa => 'MiniTest::Unit::Assert' },
 ;
 
-role Mini::Unit::Assertions is dirty
+role MiniTest::Unit::Assertions is dirty
 {
   use Moose::Autobox;
-  use Mini::Unit::Autobox;
+  use MiniTest::Unit::Autobox;
   use Data::Inspect ();
   use Data::Dumper;
   use List::Util qw/ min /;
@@ -53,7 +53,7 @@ role Mini::Unit::Assertions is dirty
     $assertion_count += 1;
     $msg = $msg->() if ref $msg eq 'CODE';
 
-    Mini::Unit::Assert->throw(
+    MiniTest::Unit::Assert->throw(
       message        => $msg,
       ignore_package => [__PACKAGE__, 'Moose::Exporter'],
     ) unless $test;
@@ -165,7 +165,7 @@ role Mini::Unit::Assertions is dirty
   method skip($class: $msg = 'Test skipped; no message given.')
   {
     $msg = $msg->() if ref $msg eq 'CODE';
-    Mini::Unit::Skip->throw(
+    MiniTest::Unit::Skip->throw(
       message        => $msg,
       ignore_package => [__PACKAGE__, 'Moose::Exporter'],
     );

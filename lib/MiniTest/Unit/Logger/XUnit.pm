@@ -1,18 +1,18 @@
 use MooseX::Declare;
 
-class Mini::Unit::Logger::XUnit is dirty
+class MiniTest::Unit::Logger::XUnit is dirty
 {
   with qw/
-    Mini::Unit::Logger
-    Mini::Unit::Logger::Roles::Timings
-    Mini::Unit::Logger::Roles::Statistics
+    MiniTest::Unit::Logger
+    MiniTest::Unit::Logger::Roles::Timings
+    MiniTest::Unit::Logger::Roles::Statistics
   /;
 
   sub clean_backtrace
   {
     my $error = shift;
 
-    my @context = grep { ?? .. $_->package =~ /Mini::Unit::TestCase/ } $error->trace->frames();
+    my @context = grep { ?? .. $_->package =~ /MiniTest::Unit::TestCase/ } $error->trace->frames();
     pop @context;
     reset;
 

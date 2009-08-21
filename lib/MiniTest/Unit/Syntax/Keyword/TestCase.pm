@@ -1,9 +1,9 @@
 use MooseX::Declare;
 
-class Mini::Unit::Syntax::Keyword::TestCase
+class MiniTest::Unit::Syntax::Keyword::TestCase
 {
-  use aliased 'Mini::Unit::Syntax::Keyword::Test';
-  use aliased 'Mini::Unit::Syntax::Keyword::Advice';
+  use aliased 'MiniTest::Unit::Syntax::Keyword::Test';
+  use aliased 'MiniTest::Unit::Syntax::Keyword::Advice';
 
   Moose::with __PACKAGE__, qw(
       MooseX::Declare::Syntax::MooseSetup
@@ -25,7 +25,7 @@ class Mini::Unit::Syntax::Keyword::TestCase
 
   after add_optional_customizations($ctx, $package)
   {
-    $ctx->add_scope_code_parts("Moose::extends $package => 'Mini::Unit::TestCase'");
-    $ctx->add_scope_code_parts("use Mini::Unit::Assertions");
+    $ctx->add_scope_code_parts("Moose::extends $package => 'MiniTest::Unit::TestCase'");
+    $ctx->add_scope_code_parts("use MiniTest::Unit::Assertions");
   }
 }

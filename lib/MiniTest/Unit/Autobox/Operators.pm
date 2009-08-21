@@ -1,10 +1,10 @@
 use MooseX::Declare;
 use Moose::Autobox;
 
-role Mini::Unit::Autobox::Operators {}
+role MiniTest::Unit::Autobox::Operators {}
 
 Moose::Autobox->mixin_additional_role('ARRAY', role {
-  with 'Mini::Unit::Autobox::Operators';
+  with 'MiniTest::Unit::Autobox::Operators';
 
   method equals($self: Any $test)
   {
@@ -22,7 +22,7 @@ Moose::Autobox->mixin_additional_role('ARRAY', role {
 }->name());
 
 Moose::Autobox->mixin_additional_role('SCALAR', role {
-  with 'Mini::Unit::Autobox::Operators';
+  with 'MiniTest::Unit::Autobox::Operators';
 
   use Scalar::Util qw/ looks_like_number /;
   method equals($self: $test)

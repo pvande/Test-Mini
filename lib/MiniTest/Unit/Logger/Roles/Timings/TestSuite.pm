@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-role Mini::Unit::Logger::Roles::Timings::TestSuite
+role MiniTest::Unit::Logger::Roles::Timings::TestSuite
 {
   requires qw/
     begin_test_suite

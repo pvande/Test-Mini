@@ -1,11 +1,11 @@
 use MooseX::Declare;
 
-role Mini::Unit::Logger::Roles::Timings
+role MiniTest::Unit::Logger::Roles::Timings
 {
   with qw/
-    Mini::Unit::Logger::Roles::Timings::TestSuite
-    Mini::Unit::Logger::Roles::Timings::TestCase
-    Mini::Unit::Logger::Roles::Timings::Test
+    MiniTest::Unit::Logger::Roles::Timings::TestSuite
+    MiniTest::Unit::Logger::Roles::Timings::TestCase
+    MiniTest::Unit::Logger::Roles::Timings::Test
   /;
 
   use MooseX::AttributeHelpers;

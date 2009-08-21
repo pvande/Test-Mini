@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-role Mini::Unit::Logger::Roles::Statistics
+role MiniTest::Unit::Logger::Roles::Statistics
 {
   use MooseX::AttributeHelpers;
 
@@ -19,6 +19,7 @@ role Mini::Unit::Logger::Roles::Statistics
 
   method statistics
   {
+    # TODO: Handle statistics output formatting in the XUnit Logger
     join(', ',
       "@{[$self->test_count()]} tests",
       "@{[$self->assertion_count()]} assertions",

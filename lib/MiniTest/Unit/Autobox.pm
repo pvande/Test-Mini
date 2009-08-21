@@ -1,6 +1,6 @@
 package Mini::Unit::Autobox;
 
-use Mini::Unit::Autobox::Container;
-use Mini::Unit::Autobox::Operators;
+use MiniTest::Unit::Autobox::Container;
+use MiniTest::Unit::Autobox::Operators;
 
 1;

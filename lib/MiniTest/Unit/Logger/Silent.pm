@@ -1,3 +1,3 @@
 use MooseX::Declare;
 
-class Mini::Unit::Logger::Silent with Mini::Unit::Logger {}
+class MiniTest::Unit::Logger::Silent with MiniTest::Unit::Logger {}
