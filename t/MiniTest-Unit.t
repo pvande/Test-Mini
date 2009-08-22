@@ -1,30 +1,26 @@
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 use strict;
 use warnings;
 
 use B;
-use B::Deparse;
 
 my $END;
 
 { package Mock::TestCase; 1; }
 {
   package Mock::Logger;
+  use Moose;
   with 'MiniTest::Unit::Logger';
-
-  push @ARGV, qw/ --logger Mock::Logger /;
-
   1;
 }
 
+sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 
 {
   diag "Test: when run with no test modules, exits with 255";
 
-  $? = 0;
-  $END->();
-  is $?, 255, 'Exit code';
+  is run_tests(), 255, 'Exit code';
 }
 
 {
@@ -32,9 +28,7 @@ my $END;
 
   @Mock::TestCase::ISA = qw/ MiniTest::Unit::TestCase /;
 
-  $? = 0;
-  $END->();
-  is $?, 127, 'Exit code';
+  is run_tests(), 127, 'Exit code';
 }
 
 {
@@ -45,10 +39,7 @@ my $END;
 
   'Mock::TestCase'->meta->add_method('test_method' => sub { $tests_called++ });
 
-  $? = 0;
-  $END->();
-  is $?, 1, 'Exit code';
-
+  is run_tests(), 1, 'Exit code';
   is $tests_called, 1, 'test_method called';
 }
 
@@ -59,10 +50,7 @@ my $END;
 
   'Mock::TestCase'->meta->add_method('test_method' => sub { $tests_called++; die 'oops'; });
 
-  $? = 0;
-  $END->();
-  is $?, 1, 'Exit code';
-
+  is run_tests(), 1, 'Exit code';
   is $tests_called, 1, 'test_method called';
 }
 
@@ -73,10 +61,7 @@ my $END;
 
   'Mock::TestCase'->meta->add_method('test_method' => sub { $tests_called++; shift->assert(0); });
 
-  $? = 0;
-  $END->();
-  is $?, 1, 'Exit code';
-
+  is run_tests(), 1, 'Exit code';
   is $tests_called, 1, 'test_method called';
 }
 
@@ -87,13 +72,19 @@ my $END;
 
   'Mock::TestCase'->meta->add_method('test_method' => sub { $tests_called++; shift->assert(1); });
 
-  $? = 0;
-  $END->();
-  is $?, 0, 'Exit code';
-
+  is run_tests(), 0, 'Exit code';
   is $tests_called, 1, 'test_method called';
 }
 
+{
+  diag "Test: installed END block exits with result from MT::U::Runner#run";
+
+  MiniTest::Unit::Runner->meta->make_mutable();
+  MiniTest::Unit::Runner->meta->add_method(run => sub { return 42 });
+
+  $END->();
+  is $?, 42;
+}
 
 BEGIN {
   use_ok 'MiniTest::Unit';
