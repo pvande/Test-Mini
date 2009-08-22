@@ -27,16 +27,14 @@ class MiniTest::Unit is dirty
       $keyword->setup_for($caller, %args, provided_by => $class);
     }
   }
-}
 
+  use MiniTest::Unit::Runner;
 
-use MiniTest::Unit::Runner;
-# $Carp::CarpLevel = 'Infinity';
-
-END {
-  $| = 1;
-  return if $?;
-  $? = MiniTest::Unit::Runner->new_with_options()->run();
+  END {
+    $| = 1;
+    return if $?;
+    $? = MiniTest::Unit::Runner->new_with_options()->run();
+  }
 }
 
 __END__
