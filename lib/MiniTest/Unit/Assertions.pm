@@ -61,11 +61,9 @@ role MiniTest::Unit::Assertions is dirty
     return 1;
   }
 
-  method assert_block($class: $msg_or_block, $block?)
+  method assert_block($class: $block, $msg?)
   {
-    my $msg = $msg_or_block if $block;
-    $block ||= $msg_or_block;
-
+    ($msg, $block) = ($block, $msg) if $msg && ref $block ne 'CODE';
     $msg = message('Expected block to return true value', $msg);
     $class->assert_instance_of($block, 'CODE');
     $class->assert($block->(), $msg);
