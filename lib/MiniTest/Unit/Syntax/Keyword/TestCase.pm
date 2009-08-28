@@ -25,7 +25,7 @@ class MiniTest::Unit::Syntax::Keyword::TestCase
 
   after add_optional_customizations($ctx, $package)
   {
-    $ctx->add_scope_code_parts("Moose::extends $package => 'MiniTest::Unit::TestCase'");
+    $ctx->add_scope_code_parts("__PACKAGE__->meta->superclasses('MiniTest::Unit::TestCase')");
     $ctx->add_scope_code_parts("use MiniTest::Unit::Assertions");
   }
 }
