@@ -1,6 +1,6 @@
 use MiniTest::Unit;
 
-role Mock::Collection
+role Mock::Enumerable
 {
   has is_empty  => (is => 'ro');
   has _equals   => (is => 'ro', init_arg => 'equals');
@@ -11,7 +11,8 @@ role Mock::Collection
 }
 
 class Mock::Dummy { }
-class Mock::Bag with Mock::Collection { }
+class Mock::Collection with Mock::Enumerable { }
+class Mock::Bag extends Mock::Collection { }
 
 testcase MiniTest::Unit::Assertions::Test
 {
@@ -133,18 +134,18 @@ testcase MiniTest::Unit::Assertions::Test
   test assert_does
   {
     assert_passes {
-      Assertions->assert_does('Mock::Bag', 'Mock::Collection');
-    } '"Mock::Bag" does "Mock::Collection"';
+      Assertions->assert_does('Mock::Bag', 'Mock::Enumerable');
+    } '"Mock::Bag" does "Mock::Enumerable"';
     assert_passes {
-      Assertions->assert_does(Mock::Bag->new(), 'Mock::Collection');
-    } 'Mock::Bag->new() does "Mock::Collection"';
+      Assertions->assert_does(Mock::Bag->new(), 'Mock::Enumerable');
+    } 'Mock::Bag->new() does "Mock::Enumerable"';
 
     assert_fails {
-      Assertions->assert_does('Mock::Dummy', 'Mock::Collection');
-    } '"Mock::Dummy" does "Mock::Collection"';
+      Assertions->assert_does('Mock::Dummy', 'Mock::Enumerable');
+    } '"Mock::Dummy" does "Mock::Enumerable"';
     assert_fails {
-      Assertions->assert_does(Mock::Dummy->new(), 'Mock::Collection')
-    } 'Mock::Dummy->new() does "Mock::Collection"';
+      Assertions->assert_does(Mock::Dummy->new(), 'Mock::Enumerable')
+    } 'Mock::Dummy->new() does "Mock::Enumerable"';
   }
 
   test assert_empty
@@ -186,121 +187,210 @@ testcase MiniTest::Unit::Assertions::Test
   test assert_equal
   {
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal(3, 3.00);
+      Assertions->assert_equal(3, 3.00);
     } '3 equals 3.00';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal('foo', lc('FOO'));
+      Assertions->assert_equal('foo', lc('FOO'));
     } '"foo" equals lc("FOO")';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal('inf', 'INFINITY');
+      Assertions->assert_equal('inf', 'INFINITY');
     } '"inf" equals "INFINITY"';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal([ 1, 2 ], [ qw/ 1 2 / ]);
+      Assertions->assert_equal([ 1, 2 ], [ qw/ 1 2 / ]);
     } '[ 1, 2 ] equals [qw/ 1 2 /]';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal({ a => 1 }, { 'a', 1 });
+      Assertions->assert_equal({ a => 1 }, { 'a', 1 });
     } '{ a => 1} equals { "a", 1 }';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal(Mock::Bag->new(equals => 1), 'anything');
+      Assertions->assert_equal(Mock::Bag->new(equals => 1), 'anything');
     } 'Mock::Bag->new(equals => 1)';
     assert_passes {
-      MiniTest::Unit::Assertions->assert_equal(undef, []->[0]);
+      Assertions->assert_equal(undef, []->[0]);
     } 'undef equals []->[0]';
     assert_passes {
-        my $c = {};
-        $c->{loop} = $c;
-        MiniTest::Unit::Assertions->assert_equal($c, $c);
+      my $c = {};
+      $c->{loop} = $c;
+      Assertions->assert_equal($c, $c);
     } '<circular reference> equals <circular reference>';
     assert_passes {
       my $thing = "THING";
-      MiniTest::Unit::Assertions->assert_equal(\\\$thing, \\\$thing);
+      Assertions->assert_equal(\\\$thing, \\\$thing);
     } '<deep reference> equals <deep reference>';
     assert_passes {
       my $c = {};
       $c->{loop} = $c;
 
-      MiniTest::Unit::Assertions->assert_equal(
+      Assertions->assert_equal(
         [ { a => undef, b => Mock::Bag->new(equals => 1), c => \$c }, 'abcde' ],
         [ { a => undef, b => Mock::Bag->new()           , c => \$c }, 'abcde' ],
       );
     } '<complex nested object> equals <complex nested object>';
 
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal(3, 3.001);
+      Assertions->assert_equal(3, 3.001);
     } '3 equals 3.001';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal('foo', lc('FO0'));
+      Assertions->assert_equal('foo', lc('FO0'));
     } '"foo" equals lc("FO0")';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal('information', 'INFINITY');
+      Assertions->assert_equal('information', 'INFINITY');
     } '"information" equals "INFINITY"';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal([ 1, 2 ], [ qw/ 1 b / ]);
+      Assertions->assert_equal([ 1, 2 ], [ qw/ 1 b / ]);
     } '[ 1, 2 ] equals [ qw/ 1 b / ]';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal({ a => 1 }, { 'a', 2 });
+      Assertions->assert_equal({ a => 1 }, { 'a', 2 });
     } '{ a => 1 } equals { "a", 2 }';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal(Mock::Bag->new(equals => 0), 'nothing');
+      Assertions->assert_equal(Mock::Bag->new(equals => 0), 'nothing');
     } 'Mock::Bag->new(equals => 0)';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal(undef, 0);
+      Assertions->assert_equal(undef, 0);
     } 'undef equals 0';
     assert_fails {
       my $c = {};
       $c->{loop} = $c;
 
-      MiniTest::Unit::Assertions->assert_equal(
+      Assertions->assert_equal(
         [ { a => undef, b => Mock::Bag->new(equals => 0), c => $c }, 'abcde' ],
         [ { a => undef, b => Mock::Bag->new()           , c => $c }, 'abcde' ],
       );
     } '<complex nested object> equals <different complex nested object>';
     assert_fails {
-      MiniTest::Unit::Assertions->assert_equal(
+      Assertions->assert_equal(
         [ 1, 'abcde',         ],
         [ 1, 'abcde', 3.14159 ],
       );
     } '[ 1, "abcde" ] equals [ 1, "abcde", 3.14159 ]';
     assert_fails {
       my $thing = "THING";
-      MiniTest::Unit::Assertions->assert_equal(\\$thing, \\\$thing);
+      Assertions->assert_equal(\\$thing, \\\$thing);
     } '<deep reference> equals <deeper reference>';
   }
 
-  assert_in_delta: {
-    test assert_in_delta_passes
-    {
-      assert_passes {
-        MiniTest::Unit::Assertions->assert_in_delta(-1, 1, 2);
-      };
-    }
+  test assert_kind_of
+  {
+    assert_passes {
+      Assertions->assert_kind_of(Mock::Bag->new(), 'Mock::Collection');
+    } 'Mock::Bag->new() is a kind of "Mock::Collection"';
+    assert_passes {
+      Assertions->assert_kind_of(Mock::Bag->new(), 'Mock::Enumerable');
+    } 'Mock::Bag->new() is a kind of "Mock::Enumerable"';
+    assert_passes {
+      Assertions->assert_kind_of('Mock::Bag', 'Mock::Collection');
+    } '"Mock::Bag" is a kind of "Mock::Collection"';
+    assert_passes {
+      Assertions->assert_kind_of('Mock::Bag', 'Mock::Enumerable');
+    } '"Mock::Bag" is a kind of "Mock::Enumerable"';
 
-    test assert_in_delta_passes_with_reversed_arguments
-    {
-      assert_passes {
-        MiniTest::Unit::Assertions->assert_in_delta(1, -1, 2);
-      };
-    }
+    assert_fails {
+      Assertions->assert_kind_of(Mock::Dummy->new(), 'Mock::Collection');
+    } 'Mock::Dummy->new() is a kind of "Mock::Collection"';
+    assert_fails {
+      Assertions->assert_kind_of(Mock::Dummy->new(), 'Mock::Enumerable');
+    } 'Mock::Dummy->new() is a kind of "Mock::Enumerable"';
+    assert_fails {
+      Assertions->assert_kind_of('Mock::Dummy', 'Mock::Collection');
+    } '"Mock::Dummy" is a kind of "Mock::Collection"';
+    assert_fails {
+      Assertions->assert_kind_of('Mock::Dummy', 'Mock::Enumerable');
+    } '"Mock::Dummy" is a kind of "Mock::Enumerable"';
 
-    test assert_in_delta_fails
-    {
-      assert_fails {
-        MiniTest::Unit::Assertions->assert_in_delta(-1, 1, 1.8);
-      };
-    }
+    assert_error {
+      Assertions->assert_kind_of([], 'Mock::Collection');
+    } '[] is a kind of "Mock::Collection"';
   }
 
-  assert_in_epsilon: {
-    test assert_in_epsilon
-    {
-      assert_passes {
-        MiniTest::Unit::Assertions->assert_in_epsilon(10000, 9999);
-      };
+  test assert_in_delta
+  {
+    assert_passes {
+      Assertions->assert_in_delta(-1, 1, 2);
+    } '(-1) - 1 <= 2';
+    assert_passes {
+      Assertions->assert_in_delta(1, -1, 2);
+    } '1 - (-1) <= 2';
 
-      assert_fails {
-        MiniTest::Unit::Assertions->assert_in_epsilon(10000, 9999, 0.0001);
-      }
-    }
+    assert_fails {
+      Assertions->assert_in_delta(-1, 1, 1.8);
+    } '(-1) - 1 <= 1.8';
   }
 
+  test assert_in_epsilon
+  {
+    assert_passes {
+      Assertions->assert_in_epsilon(10000, 9999);
+    } '9999 is within 0.1% of 10000';
+
+    assert_fails {
+      Assertions->assert_in_epsilon(10000, 9999, 0.0001);
+    } '9999 is within 0.01% of 10000';
+  }
+
+  test assert_instance_of
+  {
+    assert_passes {
+      Assertions->assert_instance_of(Mock::Bag->new(), 'Mock::Bag');
+    } 'Mock::Bag->new() is an instance of Mock::Bag';
+
+    assert_fails {
+      Assertions->assert_instance_of(Mock::Bag->new(), 'Mock::Collection');
+    } 'Mock::Bag->new() is an instance of Mock::Collection';
+  }
+
+  test assert_isa
+  {
+    assert_passes {
+      Assertions->assert_isa('Mock::Bag', 'Mock::Bag');
+    } 'Mock::Bag is a Mock::Bag';
+    assert_passes {
+      Assertions->assert_isa('Mock::Bag', 'Mock::Collection');
+    } 'Mock::Bag is a Mock::Collection';
+    assert_passes {
+      Assertions->assert_isa(Mock::Bag->new(), 'Mock::Bag');
+    } 'Mock::Bag->new() is a Mock::Bag';
+    assert_passes {
+      Assertions->assert_isa(Mock::Bag->new(), 'Mock::Collection');
+    } 'Mock::Bag->new() is a Mock::Collection';
+
+    assert_fails {
+      Assertions->assert_isa(Mock::Bag->new(), 'Mock::Enumerable');
+    } 'Mock::Bag->new() is a Mock::Enumerable';
+    assert_fails {
+      Assertions->assert_isa(Mock::Bag->new(), 'Mock::Dummy');
+    } 'Mock::Bag->new() is a Mock::Dummy';
+  }
+
+  test assert_match
+  {
+    assert_passes {
+      Assertions->assert_match(qr/score/, 'Four score and seven years ago...');
+    } '/score/ matches "Four score and seven years ago..."';
+
+    assert_fails {
+      Assertions->assert_match(qr/awesome/, 'Four score and seven years ago...');
+    } '/awesome/ matches "Four score and seven years ago..."';
+  }
+
+  test assert_undef
+  {
+    assert_passes {
+      Assertions->assert_undef({}->{key});
+    } '{}->{key} is undefined';
+    assert_passes {
+      Assertions->assert_undef([]->[0]);
+    } '[]->[0] is undefined';
+    assert_passes {
+      Assertions->assert_undef(undef);
+    } 'undef is undefined';
+
+    assert_fails {
+      Assertions->assert_undef(0);
+    } '0 is undefined';
+    assert_fails {
+      Assertions->assert_undef('');
+    } '"" is undefined';
+    assert_fails {
+      Assertions->assert_undef('NaN');
+    } 'NaN is undefined';
+  }
 }

@@ -125,11 +125,12 @@ C<assert_includes>.
 C<assert_does> validates that the given C<$obj> does the given Moose Role
 C<$role>.
 
-  assert_does 'MyApp::Person', 'MyApp::Role::Mammal';
-  assert_does $employee, 'MyApp::Role::Manager';
+  assert_does 'MyApp::Person', 'MyApp::Role::Mammal'  # if MyApp::Person->does('MyApp::Role::Mammal');
+  assert_does $employee, 'MyApp::Role::Manager'  # if $employee->does('MyApp::Role::Manager');
 =cut
   method assert_does($class: Any $obj, $role, $msg?)
   {
+    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to perform the role of $role", $msg);
     $class->assert($obj->does($role), $msg);
   }
@@ -137,7 +138,7 @@ C<$role>.
 =item X<assert_empty>(C<$collection, $msg?>)
 The C<assert_empty> method takes a C<$collection> and validates its emptiness.
 Valid collections include I<ARRAY>s, I<HASH>es, strings, and any object that
-reponds to the B<is_empty> method.
+reponds to B<is_empty>.
 
   assert_empty [];
   assert_empty {};
@@ -230,43 +231,95 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
   }
   alias assert_equal => 'assert_eq';
 
+=item X<assert_kind_of>(C<$obj, $type, $msg?>)
+The C<assert_kind_of> method validates that C<$obj> either I<isa> or I<does>
+the given C<$type>.
+
+  assert_kind_of List->new(), 'Collection',  # if List->isa('Collection')
+  assert_kind_of List->new(), 'Enumerable'  # if List->does('Enumerable')
+  assert_kind_of 'List', 'Collection',  # if List->isa('Collection')
+  assert_kind_of 'List', 'Enumerable'  # if List->does('Enumerable')
+=cut
   method assert_kind_of($class: Any $obj, $type, $msg?)
   {
+    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
     $class->assert($obj->isa($type) || $obj->does($type), $msg);
   }
 
-  method assert_in_delta($class: $expected, $actual, $delta, $msg?)
+=item X<assert_in_delta>(C<$expected, $actual, $delta = 0.001, $msg?>)
+C<assert_in_delta> checks that the difference between C<$expected> and
+C<$actual> is less than $delta (default 0.001).
+
+  assert_in_delta 1, 1.001
+  assert_in_delta 100, 104, 5
+=cut
+  method assert_in_delta($class: $expected, $actual, $delta = 0.001, $msg?)
   {
     my $n = abs($expected - $actual);
     $msg = message("Expected $expected - $actual ($n) to be < $delta", $msg);
     $class->assert($delta >= $n, $msg);
   }
 
+=item X<assert_in_epsilon>(C<$a, $b, $epsilon = 0.001, $msg?>)
+Like L<assert_in_delta>, but better at dealing with errors proportional to C<$a>
+and C<$b>.
+
+  assert_in_epsilon 200, 220, 0.10
+  assert_in_epsilon Math::Trig::pi, 22.0 / 7.0
+=cut
   method assert_in_epsilon($class: $a, $b, $epsilon = 0.001, $msg?)
   {
-    $class->assert_in_delta($a, $b, min($a, $b) * $epsilon, $msg);
+    $class->assert_in_delta($a, $b, min(abs($a), abs($b)) * $epsilon, $msg);
   }
 
+=item X<assert_instance_of>(C<$obj, $type, $msg?>)
+C<assert_instance_of> validates that the given C<$obj> is an instance of
+C<$type>.  For inheritance checks, see L<assert_isa>.
+
+  assert_instance_of MyApp::Person->new(), 'MyApp::Person'
+=cut
   method assert_instance_of($class: Any $obj, $type, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} to be an instance of $type, not @{[ref $obj]}", $msg);
     $class->assert(ref $obj eq $type, $msg);
   }
 
+=item X<assert_isa>(C<$obj, $type, $msg?>)
+=item X<assert_is_a>(C<$obj, $type, $msg?>)
+C<assert_isa> validates that C<$obj> inherits from C<$type>.  Aliased as
+C<assert_is_a>.
+
+  assert_isa 'MyApp::Employee', 'MyApp::Employee'
+  assert_isa MyApp::Employee->new(), 'MyApp::Employee'
+  assert_isa 'MyApp::Employee', 'MyApp::Person';  # if MyApp::Employee->isa('MyApp::Person')
+  assert_isa MyApp::Employee->new(), 'MyApp::Person'  # if MyApp::Employee->isa('MyApp::Person')
+=cut
   method assert_isa($class: Any $obj, $type, $msg?)
   {
+    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
     $class->assert($obj->isa($type), $msg);
   }
   alias assert_isa => 'assert_is_a';
 
+=item X<assert_match>(C<$pattern, $string, $msg?>)
+C<assert_match> validates that the given C<$string> matches the given
+C<$pattern>.
+
+  assert_match qr/score/, 'Four score and seven years ago...'
+=cut
   method assert_match($class: $pattern, $string, $msg?)
   {
     $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
     $class->assert(scalar($string =~ $pattern), $msg);
   }
 
+=item X<assert_undef>(C<$obj, $msg?>)
+C<assert_undef> ensures that the given C<$obj> is undefined.
+
+  assert_undef $value  # if not defined $value
+=cut
   method assert_undef($class: Any $obj, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} to be undef", $msg);
