@@ -45,7 +45,7 @@ class MiniTest::Unit::Logger::XUnit is dirty
   {
     $self->print('Loaded Suite');
     $self->print(" (Filtered to /$filter/)") if $filter;
-    $self->puts("\nSeeded with @{[$self->runner->seed]}\n");
+    $self->say("\nSeeded with @{[$self->runner->seed]}\n");
   }
 
   method begin_test(ClassName $tc, Str $test)
@@ -57,19 +57,19 @@ class MiniTest::Unit::Logger::XUnit is dirty
   {
     $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
     $self->print($self->result() || ());
-    $self->puts() if $self->verbose();
+    $self->say() if $self->verbose();
   }
 
   method finish_test_suite(@)
   {
-    $self->puts() unless $self->verbose();
-    $self->puts('', "Finished in @{[$self->total_time()]} seconds.");
+    $self->say() unless $self->verbose();
+    $self->say('', "Finished in @{[$self->total_time()]} seconds.");
 
     my $i = 1;
-    $self->puts(sprintf("\n%3d) %s", $i++, $_)) for @{ $self->report() };
+    $self->say(sprintf("\n%3d) %s", $i++, $_)) for @{ $self->report() };
 
-    $self->puts();
-    $self->puts($self->statistics());
+    $self->say();
+    $self->say($self->statistics());
   }
 
 
