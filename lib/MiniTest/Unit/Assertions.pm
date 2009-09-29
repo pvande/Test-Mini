@@ -8,20 +8,26 @@ use Exception::Class
 
 role MiniTest::Unit::Assertions is dirty
 {
-  use Moose::Autobox;
-  use MiniTest::Unit::Autobox;
-  use Data::Inspect ();
   use Scalar::Util qw/ looks_like_number /;
-  use Data::Dumper;
-  use List::Util qw/ min /;
-  use Sub::Install qw/ install_sub /;
-  no warnings 'closure';
+  use List::Util   qw/ min /;
 
   requires 'run';
 
-  my $assertion_count = 0;
-  method count_assertions { return $assertion_count }
-  after run(@) { $assertion_count = 0; }
+  use Moose::Autobox;
+  Moose::Autobox->mixin_additional_role('ARRAY', role {
+    method is_empty($self:)          { $self->length == 0 }
+    method contains($self: Any $obj) { $self->any() eq $obj }
+  }->name());
+
+  Moose::Autobox->mixin_additional_role('HASH', role {
+    method is_empty($self:)          { $self->keys->length == 0 }
+    method contains($self: Any $obj) { [%$self]->contains($obj) }
+  }->name());
+
+  Moose::Autobox->mixin_additional_role('SCALAR', role {
+    method is_empty($self:)          { $self->length == 0 }
+    method contains($self: Any $obj) { $self->index($obj) != -1 }
+  }->name());
 
   sub message {
     my ($default, $msg) = @_;
@@ -37,15 +43,31 @@ role MiniTest::Unit::Assertions is dirty
     }
   }
 
-  sub inspect {
-    my $i = Data::Inspect->new();
-    $i->set_option('truncate_strings', 16);
-    $i->inspect(@_);
+  {
+    use Data::Inspect;
+    sub inspect {
+      my $i = Data::Inspect->new();
+      $i->set_option('truncate_strings', 16);
+      $i->inspect(@_);
+    }
   }
 
-  sub alias {
-    install_sub { code => $_[0], as => $_[1] }
+  {
+    use Sub::Install qw/ install_sub /;
+    sub alias {
+      install_sub { code => $_[0], as => $_[1] }
+    }
   }
+
+  {
+    no warnings 'closure';
+    my $assertion_count = 0;
+    method count_assertions       { return $assertion_count }
+    sub increment_assertion_count { $assertion_count += 1   }
+    sub reset_assertion_count     { $assertion_count = 0    }
+  }
+
+  after run(@) { reset_assertion_count(); }
 
   clean;
 
@@ -58,7 +80,7 @@ optional method.
 =cut
   method assert($class: Any $test, $msg = 'Assertion failed; no message given.')
   {
-    $assertion_count += 1;
+    increment_assertion_count();
     $msg = $msg->() if ref $msg eq 'CODE';
 
     MiniTest::Unit::Assert->throw(
@@ -158,20 +180,6 @@ C<assert_equal> checks two given objects for equality.  Aliased as C<assert_eq>.
 
 This assertion, while not the most basic, ends up being one of the most
 fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
-
-=over
-=item Non-References
-=over
-=item If both values appear to be numbers, equality is determined numerically.
-=item Otherwise, string equality is tested.
-=back
-=item References
-=over
-=item If both values are ArrayRefs, equality is tested iteratively.
-=item If C<$expected->can('equals')>, equality is derived appropriately.
-=item Otherwise, string equality is tested against the (M<Data::Dumper>) serialized object graph.
-=back
-=back
 
   assert_equal 3, 3.000;
   assert_equal 'foo', lc('FOO');
