@@ -7,7 +7,7 @@ class MiniTest::Unit::Runner {
   with 'MooseX::Getopt';
   has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
   has 'filter'  => (is => 'rw', isa => 'Str', default => '');
-  has 'logger'  => (is => 'rw', isa => 'Str', default => 'MiniTest::Unit::Logger::XUnit');
+  has 'logger'  => (is => 'rw', isa => 'Str', default => 'MiniTest::Unit::Logger::TAP');
   has 'seed'    => (is => 'rw', isa => 'Int', default => int(rand(64_000_000)));
 
   has '_logger' => (
