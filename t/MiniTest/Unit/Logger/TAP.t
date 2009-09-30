@@ -1,13 +1,11 @@
 use MiniTest::Unit;
 
-use MiniTest::Unit::Logger::TAP;
-
 class MyClass { }
 
 testcase MiniTest::Unit::Logger::TAP::Test
 {
   use IO::Scalar;
-  use aliased 'MiniTest::Unit::Logger::TAP';
+  use aliased 'MiniTest::Unit::Logger::TAP' => 'TAPLogger';
 
   has 'logger' => (is => 'rw');
   has 'buffer' => (is => 'rw');
@@ -15,7 +13,7 @@ testcase MiniTest::Unit::Logger::TAP::Test
   method setup
   {
     $self->logger(
-      TAP->new(
+      TAPLogger->new(
         runner => undef,
         buffer => my $buffer = IO::Scalar->new(),
       )
