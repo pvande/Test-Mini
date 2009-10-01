@@ -38,22 +38,22 @@ class MiniTest::Unit::Runner {
   method run
   {
     Class::MOP::load_class($self->logger);
-    my $logger = $self->logger->new(runner => $self, verbose => $self->verbose);
+    my $logger = $self->logger->new(verbose => $self->verbose);
     $self->set_logger($logger);
 
     srand($self->seed);
 
-    return $self->run_test_suite();
+    return $self->run_test_suite(filter => $self->filter, seed => $self->seed);
   }
 
-  method run_test_suite()
+  method run_test_suite(:$filter, :$seed)
   {
     my @testcases = MiniTest::Unit::TestCase->meta->subclasses;
     $self->exit_code(255) unless @testcases;
 
     for my $tc ($self->randomize(@testcases)) {
       my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
-      $self->run_test_case($tc, grep { qr/^test_@{[$self->filter]}/ } @tests);
+      $self->run_test_case($tc, grep { qr/$filter/ } @tests);
     }
 
     return $self->exit_code;

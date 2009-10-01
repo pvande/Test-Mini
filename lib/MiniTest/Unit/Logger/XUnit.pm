@@ -41,11 +41,11 @@ class MiniTest::Unit::Logger::XUnit is dirty
     },
   );
 
-  method begin_test_suite($filter?)
+  method begin_test_suite(:$filter, :$seed)
   {
     $self->print('Loaded Suite');
     $self->print(" (Filtered to /$filter/)") if $filter;
-    $self->say("\nSeeded with @{[$self->runner->seed]}\n");
+    $self->say("\nSeeded with $seed\n");
   }
 
   method begin_test(ClassName $tc, Str $test)

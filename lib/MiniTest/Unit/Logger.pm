@@ -4,7 +4,6 @@ role MiniTest::Unit::Logger is dirty
 {
   has 'verbose' => (is => 'ro', default => 0);
   has 'buffer'  => (is => 'ro', default => sub { *STDOUT{IO} });
-  has 'runner'  => (is => 'ro', required => 1);
 
   method print(@msg)
   {

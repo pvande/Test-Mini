@@ -14,8 +14,8 @@ testcase MiniTest::Unit::Logger::TAP::Test
   {
     $self->logger(
       TAPLogger->new(
-        runner => undef,
-        buffer => my $buffer = IO::Scalar->new(),
+        buffer  => my $buffer = IO::Scalar->new(),
+        verbose => 0,
       )
     );
     $self->buffer($buffer);
@@ -126,5 +126,4 @@ not ok 1 - method1
 # It's final
 TAP
   }
-
 }
