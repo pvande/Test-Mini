@@ -10,7 +10,7 @@ testcase MiniTest::Unit::Logger::TAP::Test
   has 'logger' => (is => 'rw');
   has 'buffer' => (is => 'rw');
 
-  method setup
+  setup
   {
     $self->logger(
       TAPLogger->new(

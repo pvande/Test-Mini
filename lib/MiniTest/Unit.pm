@@ -2,19 +2,11 @@ use MooseX::Declare;
 
 our $VERSION = '0.5';
 
-class MiniTest::Unit is dirty
+class MiniTest::Unit
 {
   use aliased 'MooseX::Declare::Syntax::Keyword::Class',   'ClassKeyword';
   use aliased 'MooseX::Declare::Syntax::Keyword::Role',    'RoleKeyword';
   use aliased 'MiniTest::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
-
-  sub keywords {
-    ClassKeyword->new(identifier => 'class'),
-    RoleKeyword->new(identifier => 'role'),
-    TestCaseKeyword->new(identifier => 'testcase'),
-  }
-
-  clean;
 
   method import(ClassName $class: %args)
   {
@@ -23,7 +15,11 @@ class MiniTest::Unit is dirty
     strict->import;
     warnings->import;
 
-    for my $keyword (keywords()) {
+    for my $keyword (
+      ClassKeyword->new(identifier => 'class'),
+      RoleKeyword->new(identifier => 'role'),
+      TestCaseKeyword->new(identifier => 'testcase'),
+    ) {
       $keyword->setup_for($caller, %args, provided_by => $class);
     }
   }

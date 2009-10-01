@@ -10,7 +10,7 @@ testcase MiniTest::Unit::Logger::TestRB::Test
   has 'logger' => (is => 'rw');
   has 'buffer' => (is => 'rw');
 
-  method setup
+  setup
   {
     $self->logger(
       TestRBLogger->new(
