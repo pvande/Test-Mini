@@ -15,7 +15,6 @@ testcase MiniTest::Unit::Logger::TAP::Test
     $self->logger(
       TAPLogger->new(
         buffer  => my $buffer = IO::Scalar->new(),
-        verbose => 0,
       )
     );
     $self->buffer($buffer);

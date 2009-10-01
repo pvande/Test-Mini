@@ -14,7 +14,6 @@ testcase MiniTest::Unit::Logger::TestRB::Test
   {
     $self->logger(
       TestRBLogger->new(
-        runner => undef,
         buffer => my $buffer = IO::Scalar->new(),
       )
     );

@@ -9,7 +9,6 @@ testcase MiniTest::Unit::Logger::Silent::Test
   test full_test_run_should_remain_silent
   {
     my $logger = SilentLogger->new(
-      runner => undef,
       buffer => my $buffer = IO::Scalar->new(),
     );
 
