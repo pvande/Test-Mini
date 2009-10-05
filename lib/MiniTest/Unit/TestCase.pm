@@ -7,6 +7,9 @@ class MiniTest::Unit::TestCase with MiniTest::Unit::Assertions
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
+  method setup { }
+  method teardown { }
+
   method run($runner)
   {
     my $e; my $error;

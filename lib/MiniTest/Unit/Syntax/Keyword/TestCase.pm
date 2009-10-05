@@ -18,8 +18,8 @@ class MiniTest::Unit::Syntax::Keyword::TestCase
     [
       @{$orig->()},
       Test->new(identifier => 'test'),
-      Advice->new(identifier => 'setup'),
-      Advice->new(identifier => 'teardown'),
+      Advice->new(identifier => 'setup',    modifier_type => 'after'),
+      Advice->new(identifier => 'teardown', modifier_type => 'before'),
     ]
   }
 

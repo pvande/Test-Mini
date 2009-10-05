@@ -4,24 +4,17 @@ class MiniTest::Unit::Syntax::Keyword::Test extends MooseX::Declare::Syntax::Key
 {
   around parse($ctx)
   {
-    $ctx->skip_declarator;
-    local $Carp::Internal{'Devel::Declare'} = 1;
+    my $offset = $ctx->offset;
 
-    my $name = $ctx->strip_name();
-    return unless defined $name;
+    $ctx->skip_declarator();
+    $ctx->skipspace();
 
-    my $method = MooseX::Method::Signatures::Meta::Method->wrap(
-      signature    => qq{()},
-      package_name => $ctx->get_curstash_name,
-      name         => "test_$name",
-    );
+    my $linestr = $ctx->get_linestr(); # <identifier> foo_bar { ... }
+    substr($linestr, $ctx->offset(), 0, 'test_');
+    $ctx->set_linestr($linestr); # <identifier> test_foo_bar { ... }
 
-    $ctx->inject_if_block($ctx->scope_injector_call() . $method->injectable_code);
+    $ctx->_dd_context->{Offset} = $offset;
 
-    $ctx->shadow(sub (&) {
-      my $class = caller();
-      $method->_set_actual_body(shift);
-      return $self->register_method_declaration($class, $method);
-    });
+    $self->$orig($ctx);
   }
 }

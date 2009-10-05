@@ -14,20 +14,23 @@ role MiniTest::Unit::Assertions is dirty
   requires 'run';
 
   use Moose::Autobox;
-  Moose::Autobox->mixin_additional_role('ARRAY', role {
+  my $array_role = role {
     method is_empty($self:)          { $self->length == 0 }
     method contains($self: Any $obj) { $self->any() eq $obj }
-  }->name());
+  };
+  Moose::Autobox->mixin_additional_role('ARRAY', $array_role->name);
 
-  Moose::Autobox->mixin_additional_role('HASH', role {
+  my $hash_role = role {
     method is_empty($self:)          { $self->keys->length == 0 }
     method contains($self: Any $obj) { [%$self]->contains($obj) }
-  }->name());
+  };
+  Moose::Autobox->mixin_additional_role('HASH', $hash_role->name);
 
-  Moose::Autobox->mixin_additional_role('SCALAR', role {
+  my $scalar_role = role {
     method is_empty($self:)          { $self->length == 0 }
     method contains($self: Any $obj) { $self->index($obj) != -1 }
-  }->name());
+  };
+  Moose::Autobox->mixin_additional_role('SCALAR', $scalar_role->name);
 
   sub message {
     my ($default, $msg) = @_;

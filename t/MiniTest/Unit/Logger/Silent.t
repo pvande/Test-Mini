@@ -4,6 +4,7 @@ class MyClass { }
 
 testcase MiniTest::Unit::Logger::Silent::Test
 {
+  use IO::Scalar;
   use aliased 'MiniTest::Unit::Logger::Silent' => 'SilentLogger';
 
   test full_test_run_should_remain_silent

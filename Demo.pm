@@ -50,6 +50,12 @@ use Math::Trig ();
 # Assertion Test
 testcase Assertions
 {
+  setup { print "Runs before tests.\n" }
+  setup { print "Runs before tests, but after the other setup block.\n" }
+
+  teardown { print "Runs after tests.\n" }
+  teardown { print "Runs after tests, but before the other teardown block.\n" }
+
   # assert($test, $msg?) -- test the truthiness of $test
   test assert { assert 1 }
 
@@ -92,7 +98,7 @@ testcase Assertions
   test assert_can_with_reference { assert_can [], 'length' }  # Thanks Autobox!
   test assert_can_with_undef     { assert_can undef, 'can' }
   # Aliases for assert_can
-  test assert_respond_to         { assert_respond_to Mock::Bag->new, 'items' }
+  test assert_responds_to        { assert_responds_to Mock::Bag->new, 'items' }
 
   # assert_contains($container, $obj, $msg?) -- test whether $container has at
   # least one instance of $obj; anything implementing 'contains' may be a
