@@ -1,2 +1,11 @@
-Makefile
-blib/*
+/.author
+.*.sw[op]
+/blib*
+/Makefile
+/Makefile.old
+/MANIFEST.bak
+/pm_to_blib*
+/MiniTest-*
+/MYMETA.yml
+/META.yml
+/inc

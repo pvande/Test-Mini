@@ -1,9 +1,11 @@
 use MooseX::Declare;
 
-our $VERSION = '0.5';
+use 5.008009;
 
 class MiniTest::Unit
 {
+  our $VERSION = '0.5';
+
   use aliased 'MooseX::Declare::Syntax::Keyword::Class',   'ClassKeyword';
   use aliased 'MooseX::Declare::Syntax::Keyword::Role',    'RoleKeyword';
   use aliased 'MiniTest::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
