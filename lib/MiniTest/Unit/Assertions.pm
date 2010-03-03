@@ -64,10 +64,10 @@ role MiniTest::Unit::Assertions is dirty
 
   {
     no warnings 'closure';
-    my $assertion_count = 0;
+    our $assertion_count = 0;
     method count_assertions       { return $assertion_count }
     sub increment_assertion_count { $assertion_count += 1   }
-    sub reset_assertion_count     { $assertion_count = 0    }
+    sub reset_assertion_count     { $assertion_count  = 0   }
   }
 
   after run(@) { reset_assertion_count(); }

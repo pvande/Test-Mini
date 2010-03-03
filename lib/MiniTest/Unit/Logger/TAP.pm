@@ -2,16 +2,14 @@ use MooseX::Declare;
 
 class MiniTest::Unit::Logger::TAP with MiniTest::Unit::Logger
 {
-  use MooseX::AttributeHelpers;
-
   has 'test_counter' => (
-    metaclass => 'Counter',
-    is        => 'rw',
-    isa       => 'Int',
-    default   => 0,
-    provides  => {
-      inc   => 'inc_counter',
-      reset => 'reset_counter',
+    traits  => [ 'Counter' ],
+    is      => 'rw',
+    isa     => 'Int',
+    default => 0,
+    handles => {
+      inc_counter   => 'inc',
+      reset_counter => 'reset',
     },
   );
 

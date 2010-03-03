@@ -8,30 +8,28 @@ role MiniTest::Unit::Logger::Roles::Timings
     MiniTest::Unit::Logger::Roles::Timings::Test
   /;
 
-  use MooseX::AttributeHelpers;
-
   has 'start_times' => (
-    metaclass => 'Collection::Hash',
-    is        => 'ro',
-    isa       => 'HashRef',
-    default   => sub { {} },
-    provides  => { get => 'started_at' },
-    curries   => {
-      set => {
-        start => sub { $_[1]->($_[0], $_[2], time()) },
-      },
+    traits  => [ 'Hash' ],
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+      started_at => 'get',
+      start      => [
+        set => sub { $_[1]->($_[0], $_[2], time()) },
+      ],
     },
   );
   has 'end_times' => (
-    metaclass => 'Collection::Hash',
-    is        => 'ro',
-    isa       => 'HashRef',
-    default   => sub { {} },
-    provides  => { get => 'ended_at' },
-    curries   => {
-      set => {
-        stop => sub { $_[1]->($_[0], $_[2], time()) },
-      },
+    traits  => [ 'Hash' ],
+    is      => 'ro',
+    isa     => 'HashRef',
+    default => sub { {} },
+    handles => {
+      ended_at => 'get',
+      stop     => [
+        set => sub { $_[1]->($_[0], $_[2], time()) },
+      ],
     },
   );
 

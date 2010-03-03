@@ -28,16 +28,14 @@ class MiniTest::Unit::Logger::TestRB is dirty
 
   clean;
 
-  use MooseX::AttributeHelpers;
-
   has 'result' => (is => 'rw', isa => 'Str');
   has 'report' => (
-    metaclass => 'Collection::Array',
-    is        => 'ro',
-    isa       => 'ArrayRef',
-    default   => sub { [] },
-    provides  => {
-      push => 'add_to_report',
+    traits  => [ 'Array' ],
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+      add_to_report => 'push',
     },
   );
 
