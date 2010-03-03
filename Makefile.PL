@@ -2,7 +2,7 @@ use inc::Module::Install;
 
 use 5.008009;
 
-name     'MinTest-Unit';
+name     'MiniTest-Unit';
 all_from 'lib/MiniTest/Unit.pm';
 author   'Pieter Vande Bruggen <pvande@local>';
 
