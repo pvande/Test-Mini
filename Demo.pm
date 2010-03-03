@@ -1,4 +1,4 @@
-use MiniTest::Unit;
+use Test::Mini::Unit;
 use Math::Trig ();
 
 # # Classic-style Example

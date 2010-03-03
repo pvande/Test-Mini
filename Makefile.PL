@@ -2,8 +2,8 @@ use inc::Module::Install;
 
 use 5.008009;
 
-name     'MiniTest-Unit';
-all_from 'lib/MiniTest/Unit.pm';
+name     'Test-Mini-Unit';
+all_from 'lib/Test/Mini/Unit.pm';
 author   'Pieter Vande Bruggen <pvande@local>';
 
 requires 'B::Hooks::OP::Check' => '0.18';
