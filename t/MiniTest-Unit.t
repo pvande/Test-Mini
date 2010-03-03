@@ -18,13 +18,13 @@ my $END;
 sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 
 {
-  # Test: when run with no test modules, exits with 255
+  note 'Test: when run with no test modules, exits with 255';
 
   is run_tests(), 255, 'Exit code';
 }
 
 {
-  # Test: when run with an empty test module, exits with 127
+  note 'Test: when run with an empty test module, exits with 127';
 
   @Mock::TestCase::ISA = qw/ MiniTest::Unit::TestCase /;
 
@@ -32,10 +32,9 @@ sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 {
-  # Test: when run with an empty (no assertions) test, exits with 1
+  note 'Test: when run with an empty (no assertions) test, exits with 1';
 
   my $tests_called = 0;
-  my @error;
 
   'Mock::TestCase'->meta->add_method('test_method' => sub { $tests_called++ });
 
@@ -44,7 +43,7 @@ sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 {
-  # Test: when run with an erroneous test, exits with 1
+  note 'Test: when run with an erroneous test, exits with 1';
 
   my $tests_called = 0;
 
@@ -55,7 +54,7 @@ sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 {
-  # Test: when run with an failing test, exits with 1
+  note 'Test: when run with an failing test, exits with 1';
 
   my $tests_called = 0;
 
@@ -66,7 +65,7 @@ sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 {
-  # Test: when run with a passing test, exits with 0
+  note 'Test: when run with a passing test, exits with 0';
 
   my $tests_called = 0;
 
@@ -77,7 +76,7 @@ sub run_tests { MiniTest::Unit::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 {
-  # Test: installed END block exits with result from MT::U::Runner#run
+  note 'Test: installed END block exits with result from MT::U::Runner#run';
 
   MiniTest::Unit::Runner->meta->make_mutable();
   MiniTest::Unit::Runner->meta->add_method(run => sub { return 42 });
