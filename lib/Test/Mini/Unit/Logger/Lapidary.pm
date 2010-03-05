@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Logger::TestRB is dirty
+class Test::Mini::Unit::Logger::Lapidary is dirty
 {
   with qw/
     Test::Mini::Unit::Logger
@@ -50,32 +50,31 @@ class Test::Mini::Unit::Logger::TestRB is dirty
   # {
   #   $self->print("$tc#$test: ") if $self->verbose();
   # }
-  # 
+  #
   # method finish_test(ClassName $tc, Str $test, @)
   # {
   #   $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
   #   $self->print($self->result() || ());
   #   $self->say() if $self->verbose();
   # }
-  # 
+  #
   # method finish_test_suite(@)
   # {
   #   $self->say() unless $self->verbose();
   #   $self->say('', "Finished in @{[$self->total_time()]} seconds.");
-  # 
+  #
   #   my $i = 1;
   #   $self->say(sprintf("\n%3d) %s", $i++, $_)) for @{ $self->report() };
-  # 
+  #
   #   $self->say();
   #   $self->say($self->statistics());
   # }
-  # 
-  # 
+  #
   # method pass(ClassName $tc, Str $test)
   # {
   #   $self->result('.');
   # }
-  # 
+  #
   # method fail(ClassName $tc, Str $test, $e)
   # {
   #   $self->result('F');
@@ -89,7 +88,7 @@ class Test::Mini::Unit::Logger::TestRB is dirty
   #     )
   #   );
   # }
-  # 
+  #
   # method skip(ClassName $tc, Str $test, $e)
   # {
   #   $self->result('S');
@@ -103,7 +102,7 @@ class Test::Mini::Unit::Logger::TestRB is dirty
   #     )
   #   );
   # }
-  # 
+  #
   # method error(ClassName $tc, Str $test, $e)
   # {
   #   my $msg = $e;
@@ -112,7 +111,7 @@ class Test::Mini::Unit::Logger::TestRB is dirty
   #     @trace = map { '  ' . $_->as_string } @trace; # TODO: Use friendlier @_ dump
   #     $msg = $e->message . join "\n", @trace;
   #   }
-  # 
+  #
   #   $self->result('E');
   #   $self->add_to_report(
   #     sprintf(

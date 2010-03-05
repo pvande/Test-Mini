@@ -2,10 +2,10 @@ use Test::Mini::Unit;
 
 class MyClass { }
 
-testcase Test::Mini::Unit::Logger::TestRB::Test
+testcase Test::Mini::Unit::Logger::Lapidary::Test
 {
   use aliased 'IO::Scalar' => 'Buffer';
-  use aliased 'Test::Mini::Unit::Logger::TestRB' => 'Logger';
+  use aliased 'Test::Mini::Unit::Logger::Lapidary' => 'Logger';
 
   use Text::Outdent 'outdent';
 
@@ -21,21 +21,21 @@ testcase Test::Mini::Unit::Logger::TestRB::Test
   test begin_test_suite_without_filter
   {
     $self->logger->begin_test_suite(seed => 'SEED');
-    assert_equal outdent(<<"    TestRB"), $buffer
+    assert_equal outdent(<<'    Lapidary'), $buffer
       Loaded Suite
       Seeded with SEED
 
-    TestRB
+    Lapidary
   }
 
   test begin_test_suite_with_filter
   {
     $self->logger->begin_test_suite(seed => 'SEED', filter => 'FILTER');
-    assert_equal outdent(<<"    TestRB"), $buffer
+    assert_equal outdent(<<'    Lapidary'), $buffer
       Loaded Suite (Filtered to /FILTER/)
       Seeded with SEED
 
-    TestRB
+    Lapidary
   }
 
   # TODO: Finish Tests
