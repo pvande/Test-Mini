@@ -17,6 +17,8 @@ requires 'MooseX::Declare'     => '0.31';
 requires 'MooseX::Getopt'      => '0.22';
 requires 'Scalar::Util'        => '1.21';
 requires 'TryCatch'            => '1.002000';
+requires 'Text::Outdent'       => '0.01';
+requires 'IO-stringy'          => '2.110';
 
 auto_provides_class;
 

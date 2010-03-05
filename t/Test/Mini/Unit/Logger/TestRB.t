@@ -4,40 +4,38 @@ class MyClass { }
 
 testcase Test::Mini::Unit::Logger::TestRB::Test
 {
-  use IO::Scalar;
-  use aliased 'Test::Mini::Unit::Logger::TestRB' => 'TestRBLogger';
+  use aliased 'IO::Scalar' => 'Buffer';
+  use aliased 'Test::Mini::Unit::Logger::TestRB' => 'Logger';
 
-  has 'logger' => (is => 'rw');
-  has 'buffer' => (is => 'rw');
+  use Text::Outdent 'outdent';
 
-  setup
-  {
-    $self->logger(
-      TestRBLogger->new(
-        buffer => my $buffer = IO::Scalar->new(),
-      )
-    );
-    $self->buffer($buffer);
-  }
+  my $buffer;
+  has 'logger' => (
+    is => 'rw',
+    lazy => 1,
+    default => sub {
+      return Logger->new(buffer => Buffer->new(\($buffer = '')));
+    },
+  );
 
   test begin_test_suite_without_filter
   {
     $self->logger->begin_test_suite(seed => 'SEED');
-    assert_equal <<TestRB, "@{[$self->buffer]}"
-Loaded Suite
-Seeded with SEED
+    assert_equal outdent(<<"    TestRB"), $buffer
+      Loaded Suite
+      Seeded with SEED
 
-TestRB
+    TestRB
   }
 
   test begin_test_suite_with_filter
   {
     $self->logger->begin_test_suite(seed => 'SEED', filter => 'FILTER');
-    assert_equal <<TestRB, "@{[$self->buffer]}"
-Loaded Suite (Filtered to /FILTER/)
-Seeded with SEED
+    assert_equal outdent(<<"    TestRB"), $buffer
+      Loaded Suite (Filtered to /FILTER/)
+      Seeded with SEED
 
-TestRB
+    TestRB
   }
 
   # TODO: Finish Tests
