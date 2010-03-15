@@ -133,5 +133,7 @@ class ::Lapidary extends ::Base is dirty
   }
 
   with '::Roles::Timings';
+  with '::Roles::Timings::SpecificTest';
+  with '::Roles::Timings::TestSuite';
   with '::Roles::Statistics';
 }

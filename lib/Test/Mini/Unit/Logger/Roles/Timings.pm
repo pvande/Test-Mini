@@ -2,12 +2,6 @@ use MooseX::Declare;
 
 role Test::Mini::Unit::Logger::Roles::Timings
 {
-  with qw/
-    Test::Mini::Unit::Logger::Roles::Timings::TestSuite
-    Test::Mini::Unit::Logger::Roles::Timings::TestCase
-    Test::Mini::Unit::Logger::Roles::Timings::SpecificTest
-  /;
-
   has 'start_times' => (
     traits  => [ 'Hash' ],
     is      => 'ro',
