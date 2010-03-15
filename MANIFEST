@@ -11,15 +11,14 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 lib/Test/Mini/Unit.pm
 lib/Test/Mini/Unit/Assertions.pm
-lib/Test/Mini/Unit/Logger.pm
 lib/Test/Mini/Unit/Logger/Roles/Statistics.pm
 lib/Test/Mini/Unit/Logger/Roles/Timings.pm
 lib/Test/Mini/Unit/Logger/Roles/Timings/Test.pm
 lib/Test/Mini/Unit/Logger/Roles/Timings/TestCase.pm
 lib/Test/Mini/Unit/Logger/Roles/Timings/TestSuite.pm
-lib/Test/Mini/Unit/Logger/Silent.pm
+lib/Test/Mini/Unit/Logger/Base.pm
+lib/Test/Mini/Unit/Logger/Lapidary.pm
 lib/Test/Mini/Unit/Logger/TAP.pm
-lib/Test/Mini/Unit/Logger/TestRB.pm
 lib/Test/Mini/Unit/Runner.pm
 lib/Test/Mini/Unit/Syntax/Keyword/Advice.pm
 lib/Test/Mini/Unit/Syntax/Keyword/Test.pm
@@ -32,6 +31,6 @@ META.yml
 README
 t/01-Test-Mini-Unit.t
 t/Test/Mini/Unit/Assertions.t
-t/Test/Mini/Unit/Logger/Silent.t
+t/Test/Mini/Unit/Logger/Base.t
+t/Test/Mini/Unit/Logger/Lapidary.t
 t/Test/Mini/Unit/Logger/TAP.t
-t/Test/Mini/Unit/Logger/TestRB.t
