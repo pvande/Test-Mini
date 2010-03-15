@@ -50,7 +50,6 @@ role Test::Mini::Unit::Assertions is dirty
     use Data::Inspect;
     sub inspect {
       my $i = Data::Inspect->new();
-      $i->set_option('truncate_strings', 16);
       $i->inspect(@_);
     }
   }
@@ -192,7 +191,7 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
 =cut
   method assert_equal($class: Any $expected, Any $actual, $msg?)
   {
-    $msg = message("Expected @{[inspect($expected)]}, not @{[inspect($actual)]}", $msg);
+    $msg = message("Expected @{[inspect($expected)]}\n     not @{[inspect($actual)]}", $msg);
 
     my %seen = ();
     my @expected = ($expected);
