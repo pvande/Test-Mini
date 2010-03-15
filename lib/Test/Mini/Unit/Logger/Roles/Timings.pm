@@ -15,9 +15,6 @@ role Test::Mini::Unit::Logger::Roles::Timings
     default => sub { {} },
     handles => {
       started_at => 'get',
-      start      => [
-        set => sub { $_[1]->($_[0], $_[2], time()) },
-      ],
     },
   );
   has 'end_times' => (
@@ -27,11 +24,18 @@ role Test::Mini::Unit::Logger::Roles::Timings
     default => sub { {} },
     handles => {
       ended_at => 'get',
-      stop     => [
-        set => sub { $_[1]->($_[0], $_[2], time()) },
-      ],
     },
   );
+
+  method start(@keys)
+  {
+      $self->start_times->{join '#', @keys} = time();
+  }
+
+  method stop(@keys)
+  {
+      $self->end_times->{join '#', @keys} = time();
+  }
 
   method time_for(@keys)
   {

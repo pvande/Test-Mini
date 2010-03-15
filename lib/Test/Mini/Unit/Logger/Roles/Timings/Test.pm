@@ -9,11 +9,11 @@ role Test::Mini::Unit::Logger::Roles::Timings::Test
 
   before begin_test($tc, $test, @)
   {
-    $self->start("$tc#$test");
+    $self->start($tc => $test);
   }
 
   after finish_test($tc, $test, @)
   {
-    $self->stop("$tc#$test");
+    $self->stop($tc => $test);
   }
 }
