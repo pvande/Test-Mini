@@ -50,4 +50,15 @@ class ::TAP extends ::Base
     $self->say("not ok @{[$self->test_counter]} - $test");
     $self->diag($msg);
   }
+
+  method skip(ClassName $tc, $test, $msg)
+  {
+    $self->print("ok @{[$self->test_counter]} - $test # SKIP");
+    if ($msg =~ /\n/) {
+      $self->say();
+      $self->diag($msg);
+    } else {
+      $self->say(": $msg");
+    }
+  }
 }

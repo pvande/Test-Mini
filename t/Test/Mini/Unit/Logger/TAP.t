@@ -123,4 +123,38 @@ testcase Test::Mini::Unit::Logger::TAP::Test
       # It's final
     TAP
   }
+
+  test skip
+  {
+    $self->logger->begin_test('MyClass', 'method1');
+    $self->logger->skip('MyClass', 'method1', "School's boring");
+    assert_equal outdent(<<'    TAP'), $buffer;
+      ok 1 - method1 # SKIP: School's boring
+    TAP
+  }
+
+  test two_skips
+  {
+    $self->logger->begin_test('MyClass', 'method1');
+    $self->logger->skip('MyClass', 'method1', 'One, two...');
+
+    $self->logger->begin_test('MyClass', 'method2');
+    $self->logger->skip('MyClass', 'method2', '... to my Lou');
+
+    assert_equal outdent(<<'    TAP'), $buffer;
+      ok 1 - method1 # SKIP: One, two...
+      ok 2 - method2 # SKIP: ... to my Lou
+    TAP
+  }
+
+  test skip_with_multiline_reason
+  {
+    $self->logger->begin_test('MyClass', 'method1');
+    $self->logger->skip('MyClass', 'method1', "School's Cool\nDon't be a fool");
+    assert_equal outdent(<<'    TAP'), $buffer;
+      ok 1 - method1 # SKIP
+      # School's Cool
+      # Don't be a fool
+    TAP
+  }
 }
