@@ -3,6 +3,7 @@ use MooseX::Declare;
 class Test::Mini::Unit::Runner {
   use TryCatch;
   use Test::Mini::Unit::TestCase;
+  use List::Util qw/ shuffle /;
 
   with 'MooseX::Getopt';
   has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
@@ -51,7 +52,7 @@ class Test::Mini::Unit::Runner {
     my @testcases = Test::Mini::Unit::TestCase->meta->subclasses;
     $self->exit_code(255) unless @testcases;
 
-    for my $tc ($self->randomize(@testcases)) {
+    for my $tc (shuffle @testcases) {
       my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
       $self->run_test_case($tc, grep { qr/$filter/ } @tests);
     }
@@ -62,7 +63,7 @@ class Test::Mini::Unit::Runner {
   method run_test_case(ClassName $tc, @tests)
   {
     $self->exit_code(127) unless @tests;
-    $self->run_test($tc, $_) for $self->randomize(@tests);
+    $self->run_test($tc, $_) for shuffle @tests;
   }
 
   method run_test(ClassName $tc, Str $test)
