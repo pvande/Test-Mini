@@ -22,26 +22,22 @@ testcase Test::Mini::Unit::Logger::Lapidary::Test
 
   setup
   {
-    my %starts = (
-      __SUITE__ => 0,
-      'MyClass' => 0,
-      'MyClass#method1' => 0,
-      'MyClass#method2' => 0,
-      'MyClass#method3' => 0,
-      'MyClass#method4' => 0,
-    );
-
     my %ends = (
-      __SUITE__ => 314,
-      'MyClass' => 15,
+      'MyClass'         => 15,
       'MyClass#method1' => 1,
       'MyClass#method2' => 2,
       'MyClass#method3' => 4,
       'MyClass#method4' => 8,
     );
 
-    $self->logger->start_times->{$_} = $starts{$_} for keys %starts;
-    $self->logger->end_times->{$_} = $ends{$_} for keys %ends;
+    my $mock = $self->meta->create(Logger . '::__MOCK__',
+      superclasses => [Logger],
+      methods => {
+        started_at => sub { return 0   },
+        ended_at   => sub { return $ends{$_[1]} || 314 },
+      },
+    );
+    $mock->rebless_instance($self->logger);
   }
 
   test begin_test_suite_without_filter
@@ -153,7 +149,7 @@ testcase Test::Mini::Unit::Logger::Lapidary::Test
       method2(MyClass):
       Error Message
         Exception::Class::Base::new('Test::Mini::Unit::Error', 'message', 'Error Message^J') called at t/Test/Mini/Unit/Logger/Lapidary.t line 21
-        Test::Mini::Unit::Logger::Lapidary::Test::error at t/Test/Mini/Unit/Logger/Lapidary.t line 139
+        Test::Mini::Unit::Logger::Lapidary::Test::error at t/Test/Mini/Unit/Logger/Lapidary.t line 135
 
       2 tests, 3 assertions, 0 failures, 2 errors, 0 skips
     Lapidary

@@ -5,17 +5,20 @@ role Test::Mini::Unit::Logger::Roles::Timings::TestSuite
   requires qw/
     begin_test_suite
     finish_test_suite
+    time_for
   /;
+
+  my $SUITE = '__SUITE__' . rand();
 
   before begin_test_suite(@)
   {
-    $self->start('__SUITE__');
+    $self->start($SUITE);
   }
 
   after finish_test_suite(@)
   {
-    $self->stop('__SUITE__');
+    $self->stop($SUITE);
   }
 
-  method total_time() { $self->time_for('__SUITE__') }
+  method total_time() { $self->time_for($SUITE) }
 }
