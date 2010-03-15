@@ -338,7 +338,7 @@ C<assert_undef> ensures that the given C<$obj> is undefined.
 
   method refute($class: $test, $msg = 'Refutation failed; no message given.')
   {
-    return not $class->assert(!$test, $msg);
+    return not __PACKAGE__->assert(!$test, $msg);
   }
 
   method skip($class: $msg = 'Test skipped; no message given.')
