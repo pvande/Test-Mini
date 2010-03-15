@@ -11,8 +11,8 @@ class Test::Mini::Unit::Runner {
   has 'seed'    => (is => 'rw', isa => 'Int', default => int(rand(64_000_000)));
 
   has '_logger' => (
-    writer => 'set_logger',
-    does => 'Test::Mini::Unit::Logger',
+    writer  => 'set_logger',
+    isa     => 'Test::Mini::Unit::Logger::Base',
     handles => [
       (map {
         (

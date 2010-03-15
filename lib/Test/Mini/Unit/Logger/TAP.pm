@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Logger::TAP with Test::Mini::Unit::Logger
+class Test::Mini::Unit::Logger::TAP extends Test::Mini::Unit::Logger::Base
 {
   has 'test_counter' => (
     traits  => [ 'Counter' ],

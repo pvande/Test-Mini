@@ -1,9 +1,8 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Logger::Lapidary is dirty
+class Test::Mini::Unit::Logger::Lapidary extends Test::Mini::Unit::Logger::Base is dirty
 {
   with qw/
-    Test::Mini::Unit::Logger
     Test::Mini::Unit::Logger::Roles::Timings
     Test::Mini::Unit::Logger::Roles::Statistics
   /;
