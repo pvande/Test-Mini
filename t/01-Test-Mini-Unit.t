@@ -82,18 +82,20 @@ sub run_tests { Test::Mini::Unit::Runner->new(logger => 'Mock::Logger')->run() }
   Test::Mini::Unit::Runner->meta->add_method(run => sub { return 42 });
 
   $END->();
-  is $?, 42;
+  is $?, 42, 'Checking $?';
 }
 
 BEGIN {
   use_ok 'Test::Mini::Unit';
+  use List::Util qw/ first /;
+  use B qw/ end_av /;
 
-  # Fetch the first END block, which should be ours.
-  #   $CVref will keep the coderef from being garbage collected.
-  my $CVref = B::end_av()->ARRAYelt(0);
-  $END = $CVref->object_2svref();
+  my $index = first {
+    end_av->ARRAYelt($_)->STASH->NAME eq 'Test::Mini::Unit'
+  } 0..(end_av->MAX);
 
-  # Verify that the coderef is ours and uninstall it.
-  shift @{ B::end_av()->object_2svref() }
-    if is $CVref->GV->STASH->NAME, 'Test::Mini::Unit', 'END hook installed';
+  ok defined($index), 'END hook installed';
+
+  $END = end_av->ARRAYelt($index)->object_2svref();
+  splice(@{ end_av()->object_2svref() }, $index, 1);
 }
