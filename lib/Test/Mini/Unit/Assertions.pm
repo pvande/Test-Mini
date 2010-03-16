@@ -1,9 +1,8 @@
 use MooseX::Declare;
 
 use Exception::Class
-  'Test::Mini::Unit::Assert', => {  },
-#   'Test::Mini::Unit::Error', => {  },
-#   'Test::Mini::Unit::Assert' => { isa => 'Test::Mini::Unit::Error' },
+  'Test::Mini::Unit::Error', => {  },
+  'Test::Mini::Unit::Assert' => { isa => 'Test::Mini::Unit::Error' },
   'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
 ;
 
