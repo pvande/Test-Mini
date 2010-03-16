@@ -1,7 +1,7 @@
 use MooseX::Declare;
 
 class Test::Mini::Unit::Runner {
-  use TryCatch;
+#   use TryCatch;
   use Test::Mini::Unit::TestCase;
   use List::Util qw/ shuffle /;
 
@@ -31,19 +31,19 @@ class Test::Mini::Unit::Runner {
   has '_exit_code' => (accessor => 'exit_code', default => 0);
 
 
-  # class_has file => (
-  #   is      => 'ro',
-  #   default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
-  # );
+#   # class_has file => (
+#   #   is      => 'ro',
+#   #   default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
+#   # );
 
   method run
   {
-    Class::MOP::load_class($self->logger);
+#     Class::MOP::load_class($self->logger);
     my $logger = $self->logger->new(verbose => $self->verbose);
     $self->set_logger($logger);
-
-    srand($self->seed);
-
+#
+#     srand($self->seed);
+#
     return $self->run_test_suite(filter => $self->filter, seed => $self->seed);
   }
 
@@ -72,33 +72,33 @@ class Test::Mini::Unit::Runner {
     return $instance->run($self);
   }
 
-  method randomize(@list)
-  {
-    return sort { int(rand(3)) - 1 } @list;
-  }
-
-
-  around run_test_suite(@args) {
-    $self->begin_test_suite(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test_suite(@args, $retval);
-    return $retval;
-  }
-
-  around run_test_case(@args) {
-    $self->begin_test_case(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test_case(@args, $retval);
-    return $retval;
-  }
-
-  around run_test(@args) {
-    $self->begin_test(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test(@args, $retval);
-    return $retval;
-  }
-
-  after fail(@)  { $self->exit_code(1) unless $self->exit_code > 1 }
+#   method randomize(@list)
+#   {
+#     return sort { int(rand(3)) - 1 } @list;
+#   }
+#
+#
+#   around run_test_suite(@args) {
+#     $self->begin_test_suite(@args);
+#     my $retval = $self->$orig(@args);
+#     $self->finish_test_suite(@args, $retval);
+#     return $retval;
+#   }
+#
+#   around run_test_case(@args) {
+#     $self->begin_test_case(@args);
+#     my $retval = $self->$orig(@args);
+#     $self->finish_test_case(@args, $retval);
+#     return $retval;
+#   }
+#
+#   around run_test(@args) {
+#     $self->begin_test(@args);
+#     my $retval = $self->$orig(@args);
+#     $self->finish_test(@args, $retval);
+#     return $retval;
+#   }
+#
+#   after fail(@)  { $self->exit_code(1) unless $self->exit_code > 1 }
   after error(@) { $self->exit_code(1) unless $self->exit_code > 1 }
 }

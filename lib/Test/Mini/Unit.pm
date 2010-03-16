@@ -1,36 +1,36 @@
 use MooseX::Declare;
-
-use 5.008009;
-
+#
+# use 5.008009;
+#
 class Test::Mini::Unit
 {
-  our $VERSION = '0.5';
-
-  use aliased 'MooseX::Declare::Syntax::Keyword::Class',     'ClassKeyword';
-  use aliased 'MooseX::Declare::Syntax::Keyword::Role',      'RoleKeyword';
-  use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
-
-  method import(ClassName $class: %args)
-  {
-    my $caller = caller();
-
-    strict->import;
-    warnings->import;
-
-    for my $keyword (
-      ClassKeyword->new(identifier => 'class'),
-      RoleKeyword->new(identifier => 'role'),
-      TestCaseKeyword->new(identifier => 'testcase'),
-    ) {
-      $keyword->setup_for($caller, %args, provided_by => $class);
-    }
-  }
+#   our $VERSION = '0.5';
+#
+#   use aliased 'MooseX::Declare::Syntax::Keyword::Class',     'ClassKeyword';
+#   use aliased 'MooseX::Declare::Syntax::Keyword::Role',      'RoleKeyword';
+#   use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
+#
+#   method import(ClassName $class: %args)
+#   {
+#     my $caller = caller();
+#
+#     strict->import;
+#     warnings->import;
+#
+#     for my $keyword (
+#       ClassKeyword->new(identifier => 'class'),
+#       RoleKeyword->new(identifier => 'role'),
+#       TestCaseKeyword->new(identifier => 'testcase'),
+#     ) {
+#       $keyword->setup_for($caller, %args, provided_by => $class);
+#     }
+#   }
 
   use Test::Mini::Unit::Runner;
 
   END {
-    $| = 1;
-    return if $?;
+#     $| = 1;
+#     return if $?;
     $? = Test::Mini::Unit::Runner->new_with_options()->run();
   }
 }
