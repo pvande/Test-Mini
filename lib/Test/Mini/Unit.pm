@@ -8,23 +8,23 @@ class Test::Mini::Unit
 #
 #   use aliased 'MooseX::Declare::Syntax::Keyword::Class',     'ClassKeyword';
 #   use aliased 'MooseX::Declare::Syntax::Keyword::Role',      'RoleKeyword';
-#   use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
-#
-#   method import(ClassName $class: %args)
-#   {
-#     my $caller = caller();
-#
+  use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
+
+  method import(ClassName $class: %args)
+  {
+    my $caller = caller();
+
 #     strict->import;
 #     warnings->import;
-#
-#     for my $keyword (
+
+    for my $keyword (
 #       ClassKeyword->new(identifier => 'class'),
 #       RoleKeyword->new(identifier => 'role'),
-#       TestCaseKeyword->new(identifier => 'testcase'),
-#     ) {
-#       $keyword->setup_for($caller, %args, provided_by => $class);
-#     }
-#   }
+      TestCaseKeyword->new(identifier => 'testcase'),
+    ) {
+      $keyword->setup_for($caller, %args, provided_by => $class);
+    }
+  }
 
   use Test::Mini::Unit::Runner;
 

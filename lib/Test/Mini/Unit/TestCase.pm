@@ -7,8 +7,8 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
-#   method setup { }
-#   method teardown { }
+  method setup { }
+  method teardown { }
 
   method run($runner)
   {
