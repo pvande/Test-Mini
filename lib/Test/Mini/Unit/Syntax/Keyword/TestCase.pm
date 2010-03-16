@@ -10,7 +10,7 @@ class Test::Mini::Unit::Syntax::Keyword::TestCase
       MooseX::Declare::Syntax::RoleApplication
   );
 
-#   around imported_moose_symbols { $orig->(@_), qw( has inner ) }
+  around imported_moose_symbols { $orig->(@_), qw( has inner ) }
 #   sub auto_make_immutable  { 1 }
 
   around default_inner

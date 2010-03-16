@@ -176,30 +176,30 @@ optional method.
 #     $class->assert_can($collection, 'is_empty');
 #     $class->assert($collection->is_empty(), $msg);
 #   }
-#
-# =item X<assert_equal>(C<$expected, $actual, $msg?>)
-# =item X<assert_eq>(C<$expected, $actual, $msg?>)
-# C<assert_equal> checks two given objects for equality.  Aliased as C<assert_eq>.
-#
-# This assertion, while not the most basic, ends up being one of the most
-# fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
-#
-#   assert_equal 3, 3.000;
-#   assert_equal 'foo', lc('FOO');
-#   assert_equal [ 1, 2, 3 ], [qw/ 1 2 3 /];
-#   assert_equal { a => 'eh' }, { a => 'eh' };
-#   assert_equal $expected, Class->new();  # if $expected->equals(Class->new())
-# =cut
-#   method assert_equal($class: Any $expected, Any $actual, $msg?)
-#   {
+
+=item X<assert_equal>(C<$expected, $actual, $msg?>)
+=item X<assert_eq>(C<$expected, $actual, $msg?>)
+C<assert_equal> checks two given objects for equality.  Aliased as C<assert_eq>.
+
+This assertion, while not the most basic, ends up being one of the most
+fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
+
+  assert_equal 3, 3.000;
+  assert_equal 'foo', lc('FOO');
+  assert_equal [ 1, 2, 3 ], [qw/ 1 2 3 /];
+  assert_equal { a => 'eh' }, { a => 'eh' };
+  assert_equal $expected, Class->new();  # if $expected->equals(Class->new())
+=cut
+  method assert_equal($class: Any $expected, Any $actual, $msg?)
+  {
 #     $msg = message("Expected @{[inspect($expected)]}\n     not @{[inspect($actual)]}", $msg);
 #
 #     my %seen = ();
 #     my @expected = ($expected);
 #     my @actual   = ($actual);
-#
-#     my $passed = 1;
-#
+
+    my $passed = 1;
+
 #     while ($passed && (@expected || @actual)) {
 #       ($expected, $actual) = (shift(@expected), shift(@actual));
 #
@@ -237,9 +237,9 @@ optional method.
 #         $passed = !(defined $expected || defined $actual);
 #       }
 #     }
-#
-#     $class->assert($passed, $msg);
-#   }
+
+    $class->assert($passed, $msg);
+  }
 #   alias assert_equal => 'assert_eq';
 #
 # =item X<assert_kind_of>(C<$obj, $type, $msg?>)
