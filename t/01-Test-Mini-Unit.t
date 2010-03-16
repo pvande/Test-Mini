@@ -91,7 +91,8 @@ BEGIN {
   use B qw/ end_av /;
 
   my $index = first {
-    end_av->ARRAYelt($_)->STASH->NAME eq 'Test::Mini::Unit'
+    my $cv = end_av->ARRAYelt($_);
+    ref $cv eq 'B::CV' && $cv->STASH->NAME eq 'Test::Mini::Unit';
   } 0..(end_av->MAX);
 
   ok defined($index), 'END hook installed';
