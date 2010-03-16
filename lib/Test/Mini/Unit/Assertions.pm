@@ -4,7 +4,7 @@ use Exception::Class
   'Test::Mini::Unit::Assert', => {  },
 #   'Test::Mini::Unit::Error', => {  },
 #   'Test::Mini::Unit::Assert' => { isa => 'Test::Mini::Unit::Error' },
-#   'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
+  'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
 ;
 
 role Test::Mini::Unit::Assertions is dirty
@@ -336,30 +336,30 @@ optional method.
 #     $msg = message("Expected @{[inspect($obj)]} to be undef", $msg);
 #     $class->assert_equal($obj, undef, $msg);
 #   }
-#
-#   method refute($class: $test, $msg = 'Refutation failed; no message given.')
-#   {
-#     return not __PACKAGE__->assert(!$test, $msg);
-#   }
-#
-#   method skip($class: $msg = 'Test skipped; no message given.')
-#   {
+
+  method refute($class: $test, $msg = 'Refutation failed; no message given.')
+  {
+    return not __PACKAGE__->assert(!$test, $msg);
+  }
+
+  method skip($class: $msg = 'Test skipped; no message given.')
+  {
 #     $msg = $msg->() if ref $msg eq 'CODE';
-#     Test::Mini::Unit::Skip->throw(
+    Test::Mini::Unit::Skip->throw(
 #       message        => $msg,
 #       ignore_package => [__PACKAGE__, 'Moose::Exporter'],
-#     );
-#   }
-#
+    );
+  }
+
 #   method flunk($class: $msg = 'Epic failure')
 #   {
 #     $class->assert(0, $msg);
 #   }
-#
-#   use Moose::Exporter;
-#   Moose::Exporter->setup_import_methods(
-#     with_caller => [
-#       grep { /^(assert|refute|skip$|flunk$)/ } __PACKAGE__->meta->get_method_list(),
-#     ],
-#   );
+
+  use Moose::Exporter;
+  Moose::Exporter->setup_import_methods(
+    with_caller => [
+      grep { /^(assert|refute|skip$|flunk$)/ } __PACKAGE__->meta->get_method_list(),
+    ],
+  );
 }

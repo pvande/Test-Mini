@@ -43,15 +43,15 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
     if ($e = Exception::Class->caught()) {
 #       $self->passed(0);
 #
-#       if ($e = Exception::Class->caught('Test::Mini::Unit::Skip')) {
+      if ($e = Exception::Class->caught('Test::Mini::Unit::Skip')) {
 #         $runner->skip(ref $self, $test, $e);
-#       }
+      }
 #       elsif ($e = Exception::Class->caught('Test::Mini::Unit::Assert')) {
 #         $runner->fail(ref $self, $test, $e);
 #       }
-#       else {
+      else {
         $runner->error(ref $self, $test, $error);
-#       }
+      }
     }
 #
 #     eval {

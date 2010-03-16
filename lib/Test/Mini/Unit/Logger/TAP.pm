@@ -1,9 +1,9 @@
-# use MooseX::Declare;
-#
-# namespace Test::Mini::Unit::Logger;
-#
-# class ::TAP extends ::Base
-# {
+use MooseX::Declare;
+
+namespace Test::Mini::Unit::Logger;
+
+class ::TAP extends ::Base
+{
 #   has 'test_counter' => (
 #     traits  => [ 'Counter' ],
 #     is      => 'rw',
@@ -61,4 +61,4 @@
 #       $self->say(": $msg");
 #     }
 #   }
-# }
+}

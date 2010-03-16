@@ -38,7 +38,7 @@ class Test::Mini::Unit::Runner {
 
   method run
   {
-#     Class::MOP::load_class($self->logger);
+    Class::MOP::load_class($self->logger);
     my $logger = $self->logger->new(verbose => $self->verbose);
     $self->set_logger($logger);
 #
