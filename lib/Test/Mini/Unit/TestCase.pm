@@ -34,7 +34,7 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
 #         die @_;
       # };
 
-#       $self->setup() if $self->can('setup');
+      $self->setup() if $self->can('setup');
       $self->$test();
       # $self->passed(1);
 
