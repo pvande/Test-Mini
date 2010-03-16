@@ -195,14 +195,14 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
 #     $msg = message("Expected @{[inspect($expected)]}\n     not @{[inspect($actual)]}", $msg);
 #
 #     my %seen = ();
-#     my @expected = ($expected);
-#     my @actual   = ($actual);
+    my @expected = ($expected);
+    my @actual   = ($actual);
 
     my $passed = 1;
 
-#     while ($passed && (@expected || @actual)) {
-#       ($expected, $actual) = (shift(@expected), shift(@actual));
-#
+    while ($passed && (@expected || @actual)) {
+      ($expected, $actual) = (shift(@expected), shift(@actual));
+
 #       if (ref $expected && $seen{"$expected"}) {
 #         next;
 #       } elsif (ref $expected) {
@@ -212,11 +212,12 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
 #       if (UNIVERSAL::can($expected, 'equals')) {
 #         $passed = $expected->equals($actual);
 #       }
-#       elsif (ref $expected eq 'ARRAY' && ref $actual eq 'ARRAY') {
-#         $passed = ($expected->length == $actual->length);
-#         unshift @expected, @$expected;
-#         unshift @actual, @$actual;
-#       }
+#       els
+      if (ref $expected eq 'ARRAY' && ref $actual eq 'ARRAY') {
+        $passed = ($expected->length == $actual->length);
+        unshift @expected, @$expected;
+        unshift @actual, @$actual;
+      }
 #       elsif (ref $expected eq 'HASH' && ref $actual eq 'HASH') {
 #         $passed = ($expected->keys->length == $actual->keys->length);
 #         unshift @expected, %$expected;
@@ -227,8 +228,7 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
 #         unshift @expected, $$expected;
 #         unshift @actual, $$actual;
 #       }
-#       els
-      if (looks_like_number($expected) && looks_like_number($actual)) {
+      elsif (looks_like_number($expected) && looks_like_number($actual)) {
         $passed = ($expected == $actual);
       }
       elsif (defined $expected && defined $actual) {
@@ -237,7 +237,7 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
       else {
         $passed = !(defined $expected || defined $actual);
       }
-#     }
+    }
 
     $class->assert($passed, $msg);
   }
