@@ -133,6 +133,11 @@ testcase Assertions
 
   # assert_undef($obj, $msg?) -- test that $obj is not defined
   test assert_undef { assert_undef []->[0] }
+
+  # assert_dies($sub, $error?, $msg?) -- test that $sub dies, optionally with
+  # the given $error message
+  test assert_dies                 { assert_dies sub { die } }
+  test assert_dies_matches_message { assert_dies sub { die 'OH EM GEE' } => 'EM' }
 }
 
 role Mock::Enumerable

@@ -145,6 +145,25 @@ C<assert_includes>.
   }
   alias assert_contains => 'assert_includes';
 
+=item X<assert_dies>(C<$sub, $error?, $msg?>)
+C<assert_dies> succeeds if C<$sub> fails, and fails if C<$sub> succeeds.  If
+C<$error> is provided, the error message from C<$@> must contain it.
+
+  assert_dies sub { die 'LAGHLAGHLAGHL' };
+  assert_dies sub { die 'Failure on line 27 in Foo.pm'}, 'line 27';
+=cut
+method assert_dies($class: CodeRef $sub, $error='', $msg?)
+{
+  $msg = message("Expected @{[inspect($sub)]} to die matching /$error/", $msg);
+  my ($full_error, $dies);
+  {
+    local $@;
+    $dies = not eval { $sub->(); return 1; };
+    $full_error = $@;
+  }
+  $class->assert($dies, $msg);
+  $class->assert_contains($full_error, $error);
+}
 =item X<assert_does>(C<$obj, $role, $msg?>)
 C<assert_does> validates that the given C<$obj> does the given Moose Role
 C<$role>.

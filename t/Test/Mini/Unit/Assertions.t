@@ -29,7 +29,7 @@ testcase Test::Mini::Unit::Assertions::Test
     });
 
     $code->();
-    refute($failures, ($msg || '') . 'test should have passed');
+    assert(!$failures, ($msg || '') . 'test should have passed');
   }
 
   sub assert_fails(&;$)
@@ -82,6 +82,26 @@ testcase Test::Mini::Unit::Assertions::Test
     assert_error {
       Assertions->assert_block('assert_block');
     } '$msg';
+  }
+
+  test assert_dies
+  {
+      assert_passes {
+          Assertions->assert_dies(sub { die 'OMG!' });
+      } "sub { die 'OMG!' } dies";
+      assert_passes {
+          Assertions->assert_dies(sub { die 'Error on line 26!' }, 'line');
+      } "sub { die 'Error on line 26!' } does not die with substring 'line'";
+
+      assert_fails {
+          Assertions->assert_dies(sub { 'Pretty flowers...' });
+      } "sub { 'Pretty flowers...' } doesn't die";
+      assert_fails {
+          Assertions->assert_dies(sub { 0 });
+      } "sub { 0 } doesn't die";
+      assert_fails {
+          Assertions->assert_dies(sub { die 'Error on line 26!' }, 'grob');
+      } "sub { die 'Error on line 26!' } dies with substring 'grob'";
   }
 
   test assert_can
