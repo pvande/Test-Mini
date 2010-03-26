@@ -2,14 +2,43 @@ use MooseX::Declare;
 
 class Test::Mini::Unit::Runner {
   use TryCatch;
-  use Test::Mini::Unit::TestCase;
+  use MooseX::Attribute::ENV;
+  use aliased 'Test::Mini::Unit::TestCase';
   use List::Util qw/ shuffle /;
 
   with 'MooseX::Getopt';
-  has 'verbose' => (is => 'rw', isa => 'Bool', default => 0);
-  has 'filter'  => (is => 'rw', isa => 'Str', default => '');
-  has 'logger'  => (is => 'rw', isa => 'Str', default => 'Test::Mini::Unit::Logger::TAP');
-  has 'seed'    => (is => 'rw', isa => 'Int', default => int(rand(64_000_000)));
+
+  has 'verbose' => (
+    traits     => ['ENV'],
+    is         => 'rw',
+    isa        => 'Bool',
+    env_prefix => 'TEST_MINI',
+    default    => 0,
+  );
+
+  has 'filter' => (
+    traits     => ['ENV'],
+    is         => 'rw',
+    isa        => 'Str',
+    env_prefix => 'TEST_MINI',
+    default    => '',
+  );
+
+  has 'logger' => (
+    traits     => ['ENV'],
+    is         => 'rw',
+    isa        => 'Str',
+    env_prefix => 'TEST_MINI',
+    default    => 'Test::Mini::Unit::Logger::TAP',
+  );
+
+  has 'seed' => (
+    traits     => ['ENV'],
+    is         => 'rw',
+    isa        => 'Int',
+    env_prefix => 'TEST_MINI',
+    default    => int(rand(64_000_000)),
+  );
 
   has '_logger' => (
     writer  => 'set_logger',
@@ -38,8 +67,18 @@ class Test::Mini::Unit::Runner {
 
   method run
   {
-    Class::MOP::load_class($self->logger);
-    my $logger = $self->logger->new(verbose => $self->verbose);
+    my $logger = $self->logger;
+    try
+    {
+        Class::MOP::load_class($logger);
+    }
+    catch
+    {
+        $logger = "Test::Mini::Unit::Logger::$logger";
+        Class::MOP::load_class($logger);
+    };
+
+    $logger = $logger->new(verbose => $self->verbose);
     $self->set_logger($logger);
 
     srand($self->seed);
@@ -49,7 +88,7 @@ class Test::Mini::Unit::Runner {
 
   method run_test_suite(:$filter, :$seed)
   {
-    my @testcases = Test::Mini::Unit::TestCase->meta->subclasses;
+    my @testcases = TestCase->meta->subclasses;
     $self->exit_code(255) unless @testcases;
 
     for my $tc (shuffle @testcases) {
