@@ -106,8 +106,8 @@ value was I<truthy>.
   {
     ($msg, $block) = ($block, $msg) if $msg && ref $block ne 'CODE';
     $msg = message('Expected block to return true value', $msg);
-    $class->assert_instance_of($block, 'CODE');
-    $class->assert($block->(), $msg);
+    __PACKAGE__->assert_instance_of($block, 'CODE');
+    __PACKAGE__->assert($block->(), $msg);
   }
 
 =item X<assert_can>(C<$obj, $method, $msg?>)
@@ -121,7 +121,7 @@ given C<$method> name.  Aliased as C<assert_responds_to>.
   method assert_can($class: Any $obj, $method, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
-    $class->assert($obj->can($method), $msg);
+    __PACKAGE__->assert($obj->can($method), $msg);
   }
   alias assert_can => 'assert_responds_to';
 
@@ -140,8 +140,8 @@ C<assert_includes>.
   method assert_contains($class: Any $collection, Any $obj, $msg?)
   {
     $msg = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $msg);
-    $class->assert_can($collection, 'contains');
-    $class->assert($collection->contains($obj), $msg);
+    __PACKAGE__->assert_can($collection, 'contains');
+    __PACKAGE__->assert($collection->contains($obj), $msg);
   }
   alias assert_contains => 'assert_includes';
 
@@ -156,7 +156,7 @@ C<$role>.
   {
     no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to perform the role of $role", $msg);
-    $class->assert($obj->does($role), $msg);
+    __PACKAGE__->assert($obj->does($role), $msg);
   }
 
 =item X<assert_empty>(C<$collection, $msg?>)
@@ -172,8 +172,8 @@ reponds to B<is_empty>.
   method assert_empty($class: Any $collection, $msg?)
   {
     $msg = message("Expected @{[inspect($collection)]} to be empty", $msg);
-    $class->assert_can($collection, 'is_empty');
-    $class->assert($collection->is_empty(), $msg);
+    __PACKAGE__->assert_can($collection, 'is_empty');
+    __PACKAGE__->assert($collection->is_empty(), $msg);
   }
 
 =item X<assert_equal>(C<$expected, $actual, $msg?>)
@@ -237,7 +237,7 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
       }
     }
 
-    $class->assert($passed, $msg);
+    __PACKAGE__->assert($passed, $msg);
   }
   alias assert_equal => 'assert_eq';
 
@@ -254,7 +254,7 @@ the given C<$type>.
   {
     no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
-    $class->assert($obj->isa($type) || $obj->does($type), $msg);
+    __PACKAGE__->assert($obj->isa($type) || $obj->does($type), $msg);
   }
 
 =item X<assert_in_delta>(C<$expected, $actual, $delta = 0.001, $msg?>)
@@ -268,7 +268,7 @@ C<$actual> is less than $delta (default 0.001).
   {
     my $n = abs($expected - $actual);
     $msg = message("Expected $expected - $actual ($n) to be < $delta", $msg);
-    $class->assert($delta >= $n, $msg);
+    __PACKAGE__->assert($delta >= $n, $msg);
   }
 
 =item X<assert_in_epsilon>(C<$a, $b, $epsilon = 0.001, $msg?>)
@@ -280,7 +280,7 @@ and C<$b>.
 =cut
   method assert_in_epsilon($class: $a, $b, $epsilon = 0.001, $msg?)
   {
-    $class->assert_in_delta($a, $b, min(abs($a), abs($b)) * $epsilon, $msg);
+    __PACKAGE__->assert_in_delta($a, $b, min(abs($a), abs($b)) * $epsilon, $msg);
   }
 
 =item X<assert_instance_of>(C<$obj, $type, $msg?>)
@@ -292,7 +292,7 @@ C<$type>.  For inheritance checks, see L<assert_isa>.
   method assert_instance_of($class: Any $obj, $type, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} to be an instance of $type, not @{[ref $obj]}", $msg);
-    $class->assert(ref $obj eq $type, $msg);
+    __PACKAGE__->assert(ref $obj eq $type, $msg);
   }
 
 =item X<assert_isa>(C<$obj, $type, $msg?>)
@@ -309,7 +309,7 @@ C<assert_is_a>.
   {
     no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
-    $class->assert($obj->isa($type), $msg);
+    __PACKAGE__->assert($obj->isa($type), $msg);
   }
   alias assert_isa => 'assert_is_a';
 
@@ -322,7 +322,7 @@ C<$pattern>.
   method assert_match($class: $pattern, $string, $msg?)
   {
     $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
-    $class->assert(scalar($string =~ $pattern), $msg);
+    __PACKAGE__->assert(scalar($string =~ $pattern), $msg);
   }
 
 =item X<assert_undef>(C<$obj, $msg?>)
@@ -333,7 +333,7 @@ C<assert_undef> ensures that the given C<$obj> is undefined.
   method assert_undef($class: Any $obj, $msg?)
   {
     $msg = message("Expected @{[inspect($obj)]} to be undef", $msg);
-    $class->assert_equal($obj, undef, $msg);
+    __PACKAGE__->assert_equal($obj, undef, $msg);
   }
 
   method refute($class: $test, $msg = 'Refutation failed; no message given.')
@@ -352,7 +352,7 @@ C<assert_undef> ensures that the given C<$obj> is undefined.
 
   method flunk($class: $msg = 'Epic failure')
   {
-    $class->assert(0, $msg);
+    __PACKAGE__->assert(0, $msg);
   }
 
   use Moose::Exporter;
