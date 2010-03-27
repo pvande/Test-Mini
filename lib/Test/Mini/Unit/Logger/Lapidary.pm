@@ -1,8 +1,7 @@
 use MooseX::Declare;
 
-namespace Test::Mini::Unit::Logger;
-
-class ::Lapidary extends ::Base is dirty
+class Test::Mini::Unit::Logger::Lapidary
+    extends Test::Mini::Unit::Logger::Base is dirty
 {
   sub clean_backtrace
   {
