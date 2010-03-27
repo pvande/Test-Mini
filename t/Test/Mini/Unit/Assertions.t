@@ -205,17 +205,17 @@ testcase Test::Mini::Unit::Assertions::Test
   test assert_equal
   {
     assert_passes {
-      Assertions->assert_equal(3, 3.00);
-    } '3 equals 3.00';
+      Assertions->assert_equal(3.00, 3);
+    } '3.00 equals 3';
     assert_passes {
-      Assertions->assert_equal('foo', lc('FOO'));
-    } '"foo" equals lc("FOO")';
+      Assertions->assert_equal(lc('FOO'), 'foo');
+    } 'lc("FOO") equals "foo"';
     assert_passes {
-      Assertions->assert_equal('inf', 'INFINITY');
-    } '"inf" equals "INFINITY"';
+      Assertions->assert_equal('INFINITY', 'inf');
+    } '"INFINITY" equals "inf"';
     assert_passes {
-      Assertions->assert_equal([ 1, 2 ], [ qw/ 1 2 / ]);
-    } '[ 1, 2 ] equals [qw/ 1 2 /]';
+      Assertions->assert_equal([ qw/ 1 2 / ], [ 1, 2 ]);
+    } '[qw/ 1 2 /] equals [ 1, 2 ]';
     assert_passes {
       Assertions->assert_equal({ a => 1 }, { 'a', 1 });
     } '{ a => 1} equals { "a", 1 }';
@@ -223,8 +223,8 @@ testcase Test::Mini::Unit::Assertions::Test
       Assertions->assert_equal(Mock::Bag->new(equals => 1), 'anything');
     } 'Mock::Bag->new(equals => 1)';
     assert_passes {
-      Assertions->assert_equal(undef, []->[0]);
-    } 'undef equals []->[0]';
+      Assertions->assert_equal([]->[0], undef);
+    } '[]->[0] equals undef';
     assert_passes {
       my $c = {};
       $c->{loop} = $c;
@@ -245,26 +245,26 @@ testcase Test::Mini::Unit::Assertions::Test
     } '<complex nested object> equals <complex nested object>';
 
     assert_fails {
-      Assertions->assert_equal(3, 3.001);
-    } '3 equals 3.001';
+      Assertions->assert_equal(3.001, 3);
+    } '3.001 equals 3';
     assert_fails {
-      Assertions->assert_equal('foo', lc('FO0'));
-    } '"foo" equals lc("FO0")';
+      Assertions->assert_equal(lc('FO0'), 'foo');
+    } 'lc("FO0") equals "foo"';
     assert_fails {
-      Assertions->assert_equal('information', 'INFINITY');
-    } '"information" equals "INFINITY"';
+      Assertions->assert_equal('INFINITY', 'information');
+    } '"INFINITY" equals "information"';
     assert_fails {
-      Assertions->assert_equal([ 1, 2 ], [ qw/ 1 b / ]);
-    } '[ 1, 2 ] equals [ qw/ 1 b / ]';
+      Assertions->assert_equal([ qw/ 1 b / ], [ 1, 2 ]);
+    } '[ qw/ 1 b / ] equals [ 1, 2 ]';
     assert_fails {
-      Assertions->assert_equal({ a => 1 }, { 'a', 2 });
-    } '{ a => 1 } equals { "a", 2 }';
+      Assertions->assert_equal({ 'a', 2 }, { a => 1 });
+    } '{ "a", 2 } equals { a => 1 }';
     assert_fails {
       Assertions->assert_equal(Mock::Bag->new(equals => 0), 'nothing');
     } 'Mock::Bag->new(equals => 0)';
     assert_fails {
-      Assertions->assert_equal(undef, 0);
-    } 'undef equals 0';
+      Assertions->assert_equal(0, undef);
+    } '0 equals undef';
     assert_fails {
       my $c = {};
       $c->{loop} = $c;
@@ -336,11 +336,11 @@ testcase Test::Mini::Unit::Assertions::Test
   test assert_in_epsilon
   {
     assert_passes {
-      Assertions->assert_in_epsilon(10000, 9999);
+      Assertions->assert_in_epsilon(9999, 10000);
     } '9999 is within 0.1% of 10000';
 
     assert_fails {
-      Assertions->assert_in_epsilon(10000, 9999, 0.0001);
+      Assertions->assert_in_epsilon(9999, 10000, 0.0001);
     } '9999 is within 0.01% of 10000';
   }
 
@@ -381,11 +381,11 @@ testcase Test::Mini::Unit::Assertions::Test
   test assert_match
   {
     assert_passes {
-      Assertions->assert_match(qr/score/, 'Four score and seven years ago...');
+      Assertions->assert_match('Four score and seven years ago...', qr/score/);
     } '/score/ matches "Four score and seven years ago..."';
 
     assert_fails {
-      Assertions->assert_match(qr/awesome/, 'Four score and seven years ago...');
+      Assertions->assert_match('Four score and seven years ago...', qr/awesome/);
     } '/awesome/ matches "Four score and seven years ago..."';
   }
 

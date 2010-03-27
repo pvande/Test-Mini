@@ -188,20 +188,20 @@ reponds to B<is_empty>.
     __PACKAGE__->assert($collection->is_empty(), $msg);
   }
 
-=item X<assert_equal>(C<$expected, $actual, $msg?>)
-=item X<assert_eq>(C<$expected, $actual, $msg?>)
+=item X<assert_equal>(C<$actual, $expected, $msg?>)
+=item X<assert_eq>(C<$actual, $expected, $msg?>)
 C<assert_equal> checks two given objects for equality.  Aliased as C<assert_eq>.
 
 This assertion, while not the most basic, ends up being one of the most
 fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
 
-  assert_equal 3, 3.000;
-  assert_equal 'foo', lc('FOO');
-  assert_equal [ 1, 2, 3 ], [qw/ 1 2 3 /];
+  assert_equal 3.000, 3;
+  assert_equal lc('FOO'), 'foo';
+  assert_equal [qw/ 1 2 3 /], [ 1, 2, 3 ];
   assert_equal { a => 'eh' }, { a => 'eh' };
-  assert_equal $expected, Class->new();  # if $expected->equals(Class->new())
+  assert_equal Class->new(), $expected;  # if $expected->equals(Class->new())
 =cut
-  method assert_equal($class: Any $expected, Any $actual, $msg?)
+  method assert_equal($class: Any $actual, Any $expected, $msg?)
   {
     $msg = message("Expected @{[inspect($expected)]}\n     not @{[inspect($actual)]}", $msg);
 
@@ -273,10 +273,10 @@ the given C<$type>.
 C<assert_in_delta> checks that the difference between C<$expected> and
 C<$actual> is less than $delta (default 0.001).
 
-  assert_in_delta 1, 1.001
-  assert_in_delta 100, 104, 5
+  assert_in_delta 1.001, 1;
+  assert_in_delta 104, 100, 5;
 =cut
-  method assert_in_delta($class: $expected, $actual, $delta = 0.001, $msg?)
+  method assert_in_delta($class: $actual, $expected, $delta = 0.001, $msg?)
   {
     my $n = abs($expected - $actual);
     $msg = message("Expected $expected - $actual ($n) to be < $delta", $msg);
@@ -287,12 +287,17 @@ C<$actual> is less than $delta (default 0.001).
 Like L<assert_in_delta>, but better at dealing with errors proportional to C<$a>
 and C<$b>.
 
-  assert_in_epsilon 200, 220, 0.10
-  assert_in_epsilon Math::Trig::pi, 22.0 / 7.0
+  assert_in_epsilon 220, 200, 0.10
+  assert_in_epsilon 22.0 / 7.0, Math::Trig::pi;
 =cut
-  method assert_in_epsilon($class: $a, $b, $epsilon = 0.001, $msg?)
+  method assert_in_epsilon($class: $actual, $expected, $epsilon = 0.001, $msg?)
   {
-    __PACKAGE__->assert_in_delta($a, $b, min(abs($a), abs($b)) * $epsilon, $msg);
+    __PACKAGE__->assert_in_delta(
+        $actual,
+        $expected,
+        min(abs($actual), abs($expected)) * $epsilon,
+        $msg,
+    );
   }
 
 =item X<assert_instance_of>(C<$obj, $type, $msg?>)
@@ -331,7 +336,7 @@ C<$pattern>.
 
   assert_match qr/score/, 'Four score and seven years ago...'
 =cut
-  method assert_match($class: $pattern, $string, $msg?)
+  method assert_match($class: $string, $pattern, $msg?)
   {
     $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
     __PACKAGE__->assert(scalar($string =~ $pattern), $msg);
