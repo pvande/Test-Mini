@@ -56,7 +56,6 @@ testcase Test::Mini::Unit::Assertions::Test
     assert(Exception::Class->caught(), ($msg || '') . "test should have raised error");
   }
 
-
   test assert_block
   {
     assert_passes {
