@@ -7,7 +7,7 @@ testcase Test::Mini::Unit::Logger::TAP::Test
   use aliased 'IO::Scalar' => 'Buffer';
   use aliased 'Test::Mini::Unit::Logger::TAP' => 'Logger';
 
-  use Text::Outdent 'outdent';
+  use Text::Outdent 0.01 'outdent';
 
   my $buffer;
   has 'logger' => (

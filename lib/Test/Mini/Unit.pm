@@ -1,6 +1,6 @@
-use MooseX::Declare;
+use MooseX::Declare 0.31;
 
-use 5.008009;
+use 5.008;
 
 class Test::Mini::Unit
 {

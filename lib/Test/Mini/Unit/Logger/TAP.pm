@@ -1,8 +1,7 @@
 use MooseX::Declare;
 
-namespace Test::Mini::Unit::Logger;
-
-class ::TAP extends ::Base
+class Test::Mini::Unit::Logger::TAP
+    extends Test::Mini::Unit::Logger::Base
 {
   has 'test_counter' => (
     traits  => [ 'Counter' ],

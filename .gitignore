@@ -1,11 +1,12 @@
 /.author
-.*.sw[op]
 /blib*
+/.build
+/inc
 /Makefile
 /Makefile.old
 /MANIFEST.bak
-/pm_to_blib*
-/MiniTest-Unit-*
-/MYMETA.yml
 /META.yml
-/inc
+/MYMETA.yml
+/pm_to_blib*
+.*.sw[op]
+/Test-Mini-*
