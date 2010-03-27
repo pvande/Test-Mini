@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-use Exception::Class
+use Exception::Class 1.29
   'Test::Mini::Unit::Error', => {  },
   'Test::Mini::Unit::Assert' => { isa => 'Test::Mini::Unit::Error' },
   'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
@@ -8,8 +8,8 @@ use Exception::Class
 
 role Test::Mini::Unit::Assertions is dirty
 {
-  use Scalar::Util qw/ looks_like_number /;
-  use List::Util   qw/ min /;
+  use Scalar::Util 1.21 qw/ looks_like_number /;
+  use List::Util   1.21 qw/ min /;
 
   requires 'run';
 

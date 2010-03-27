@@ -1,7 +1,7 @@
 use MooseX::Declare;
 
 class Test::Mini::Unit::Runner {
-  use TryCatch;
+  use TryCatch 1.002000;
   use Test::Mini::Unit::TestCase;
   use List::Util qw/ shuffle /;
 
