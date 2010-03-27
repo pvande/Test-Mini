@@ -8,7 +8,7 @@ use Exception::Class 1.29
 
 role Test::Mini::Unit::Assertions is dirty
 {
-  use Scalar::Util 1.21 qw/ looks_like_number /;
+  use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
   use List::Util   1.21 qw/ min /;
 
   requires 'run';
@@ -44,6 +44,15 @@ role Test::Mini::Unit::Assertions is dirty
         "$default."
       }
     }
+  }
+
+  sub deref {
+    my ($ref) = @_;use Data::Dumper;
+    return %$ref if reftype($ref) eq 'HASH';
+    return @$ref if reftype($ref) eq 'ARRAY';
+    return $$ref if reftype($ref) eq 'SCALAR';
+    return $$ref if reftype($ref) eq 'REF';
+    return refaddr($ref);
   }
 
   {
@@ -164,18 +173,19 @@ C<$error> is provided, the error message from C<$@> must contain it.
   assert_dies sub { die 'LAGHLAGHLAGHL' };
   assert_dies sub { die 'Failure on line 27 in Foo.pm'}, 'line 27';
 =cut
-method assert_dies($class: CodeRef $sub, $error='', $msg?)
-{
-  $msg = message("Expected @{[inspect($sub)]} to die matching /$error/", $msg);
-  my ($full_error, $dies);
+  method assert_dies($class: CodeRef $sub, $error='', $msg?)
   {
-    local $@;
-    $dies = not eval { $sub->(); return 1; };
-    $full_error = $@;
+    $msg = message("Expected @{[inspect($sub)]} to die matching /$error/", $msg);
+    my ($full_error, $dies);
+    {
+      local $@;
+      $dies = not eval { $sub->(); return 1; };
+      $full_error = $@;
+    }
+    $class->assert($dies, $msg);
+    $class->assert_contains($full_error, $error);
   }
-  $class->assert($dies, $msg);
-  $class->assert_contains($full_error, $error);
-}
+
 =item X<assert_does>(C<$obj, $role, $msg?>)
 C<assert_does> validates that the given C<$obj> does the given Moose Role
 C<$role>.
@@ -224,7 +234,6 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
   {
     $msg = message("Expected @{[inspect($expected)]}\n     not @{[inspect($actual)]}", $msg);
 
-    my %seen = ();
     my @expected = ($expected);
     my @actual   = ($actual);
 
@@ -233,11 +242,8 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
     while ($passed && (@expected || @actual)) {
       ($expected, $actual) = (shift(@expected), shift(@actual));
 
-      if (ref $expected && $seen{"$expected"}) {
-        next;
-      } elsif (ref $expected) {
-        $seen{"$expected"}++;
-      }
+      next if ref $expected && ref $actual &&
+              refaddr($expected) == refaddr($actual);
 
       if (UNIVERSAL::can($expected, 'equals')) {
         $passed = $expected->equals($actual);
@@ -254,8 +260,8 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
       }
       elsif (ref $expected && ref $actual) {
         $passed = (ref $expected eq ref $actual);
-        unshift @expected, $$expected;
-        unshift @actual, $$actual;
+        unshift @expected, [ deref($expected) ];
+        unshift @actual,   [ deref($actual)   ];
       }
       elsif (looks_like_number($expected) && looks_like_number($actual)) {
         $passed = ($expected == $actual);

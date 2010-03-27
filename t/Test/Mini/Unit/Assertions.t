@@ -29,7 +29,7 @@ testcase Test::Mini::Unit::Assertions::Test
     });
 
     $code->();
-    assert(!$failures, ($msg || '') . 'test should have passed');
+    refute($failures, ($msg || '') . 'test should have passed');
   }
 
   sub assert_fails(&;$)
@@ -240,6 +240,15 @@ testcase Test::Mini::Unit::Assertions::Test
       Assertions->assert_equal({ a => 1 }, { 'a', 1 });
     } '{ a => 1} equals { "a", 1 }';
     assert_passes {
+      Assertions->assert_equal(Mock::Dummy->new(), Mock::Dummy->new());
+    } 'Mock::Dummy->new()';
+    assert_passes {
+      Assertions->assert_equal(
+        bless([1, 2, 3], 'Mock::Dummy'),
+        bless([1, 2, 3], 'Mock::Dummy'),
+      );
+    } 'blessed [1, 2, 3] equals blessed [1, 2, 3]';
+    assert_passes {
       Assertions->assert_equal(Mock::Bag->new(equals => 1), 'anything');
     } 'Mock::Bag->new(equals => 1)';
     assert_passes {
@@ -282,6 +291,17 @@ testcase Test::Mini::Unit::Assertions::Test
     assert_fails {
       Assertions->assert_equal(Mock::Bag->new(equals => 0), 'nothing');
     } 'Mock::Bag->new(equals => 0)';
+    assert_fails {
+      my $dummy = Mock::Dummy->new();
+      $dummy->{key} = "value";
+      Assertions->assert_equal($dummy, Mock::Dummy->new());
+    } 'Mock::Dummy->new()';
+    assert_fails {
+      Assertions->assert_equal(
+        bless([1, 2, 3], 'Mock::Dummy'),
+        bless([1, 2, 4], 'Mock::Dummy'),
+      );
+    } 'blessed [1, 2, 3] equals blessed [1, 2, 4]';
     assert_fails {
       Assertions->assert_equal(0, undef);
     } '0 equals undef';
