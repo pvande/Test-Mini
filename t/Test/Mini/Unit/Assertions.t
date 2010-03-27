@@ -56,6 +56,25 @@ testcase Test::Mini::Unit::Assertions::Test
     assert(Exception::Class->caught(), ($msg || '') . "test should have raised error");
   }
 
+  test refute {
+    assert_passes {
+      Assertions->refute(0);
+    } '$false_value';
+
+    assert_passes {
+      Assertions->refute(undef, 'Undef is a falsey value');
+    } '$false_value, $msg';
+
+    assert_fails {
+      Assertions->refute(1);
+    } '$true_value';
+
+    assert_fails {
+      Assertions->refute('truthy', '"truthy" is truthy');
+    } '$true_value, $msg';
+  }
+
+
   test assert_block
   {
     assert_passes {

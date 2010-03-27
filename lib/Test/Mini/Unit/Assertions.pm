@@ -93,6 +93,18 @@ optional method.
     return 1;
   }
 
+=item X<refute>(C<$test, $msg?>)
+The C<refute> method takes a value to be tested for I<truthiness>, and an
+optional method.
+
+    refute 0;
+    refute undef, 'Deny the untruths';
+=cut
+  method refute($class: Any $test, $msg = 'Refutation failed; no message given.')
+  {
+      return __PACKAGE__->assert(!$test, $msg);
+  }
+
 =item X<assert_block>(C<$block, $msg?>)
 The C<assert_block> method takes a coderef (C<$block>) and an optional message
 (in arbitrary order), evaluates the coderef, and L<assert>s that the returned
@@ -334,11 +346,6 @@ C<assert_undef> ensures that the given C<$obj> is undefined.
   {
     $msg = message("Expected @{[inspect($obj)]} to be undef", $msg);
     __PACKAGE__->assert_equal($obj, undef, $msg);
-  }
-
-  method refute($class: $test, $msg = 'Refutation failed; no message given.')
-  {
-    return not __PACKAGE__->assert(!$test, $msg);
   }
 
   method skip($class: $msg = 'Test skipped; no message given.')
