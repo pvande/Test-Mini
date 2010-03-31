@@ -294,7 +294,7 @@ the given C<$type>.
     __PACKAGE__->assert($obj->isa($type) || $obj->does($type), $msg);
   }
 
-=item X<assert_in_delta>(C<$expected, $actual, $delta = 0.001, $msg?>)
+=item X<assert_in_delta>(C<$actual, $expected, $delta = 0.001, $msg?>)
 C<assert_in_delta> checks that the difference between C<$expected> and
 C<$actual> is less than $delta (default 0.001).
 
@@ -303,8 +303,8 @@ C<$actual> is less than $delta (default 0.001).
 =cut
   method assert_in_delta($class: $actual, $expected, $delta = 0.001, $msg?)
   {
-    my $n = abs($expected - $actual);
-    $msg = message("Expected $expected - $actual ($n) to be < $delta", $msg);
+    my $n = abs($actual - $expected);
+    $msg = message("Expected $actual - $expected ($n) to be < $delta", $msg);
     __PACKAGE__->assert($delta >= $n, $msg);
   }
 
