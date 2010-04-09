@@ -12,15 +12,17 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
 
   method run($runner)
   {
-    my $e; my $error;
+    my $e;
     my $test = $self->name();
 
     eval {
       local $SIG{__DIE__} = sub {
         package Test::Mini::Unit::SIGDIE;
-        (my $msg = join "\n",@_) =~ s/ at .*? line \d+\.\n$//;
 
-        $error = Test::Mini::Unit::Error->new(
+        die $@ if UNIVERSAL::isa($@, 'Test::Mini::Unit::Error');
+
+        (my $msg = "@_") =~ s/ at .*? line \d+\.\n$//;
+        my $error = Test::Mini::Unit::Error->new(
           message        => "$msg\n",
           ignore_package => [qw/ Test::Mini::Unit::SIGDIE Carp /],
         );
@@ -31,7 +33,7 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
           $me->{args} = [ $msg ];
         }
 
-        die @_;
+        die $error;
       };
 
       $self->setup() if $self->can('setup');
@@ -49,8 +51,8 @@ class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
       elsif ($e = Exception::Class->caught('Test::Mini::Unit::Assert')) {
         $runner->fail(ref $self, $test, $e);
       }
-      else {
-        $runner->error(ref $self, $test, $error);
+      elsif ($e = Exception::Class->caught('Test::Mini::Unit::Error')) {
+        $runner->error(ref $self, $test, $e);
       }
     }
 

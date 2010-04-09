@@ -183,7 +183,7 @@ C<$error> is provided, the error message from C<$@> must contain it.
       $full_error = $@;
     }
     $class->assert($dies, $msg);
-    $class->assert_contains($full_error, $error);
+    $class->assert_contains("$full_error", $error);
   }
 
 =item X<assert_does>(C<$obj, $role, $msg?>)
