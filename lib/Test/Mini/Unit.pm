@@ -4,8 +4,6 @@ use 5.008;
 
 class Test::Mini::Unit
 {
-  our $VERSION = '0.5';
-
   use aliased 'MooseX::Declare::Syntax::Keyword::Class',     'ClassKeyword';
   use aliased 'MooseX::Declare::Syntax::Keyword::Role',      'RoleKeyword';
   use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
