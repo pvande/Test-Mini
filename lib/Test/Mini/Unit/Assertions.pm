@@ -10,27 +10,9 @@ role Test::Mini::Unit::Assertions is dirty
 {
   use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
   use List::Util   1.21 qw/ min /;
+  use List::MoreUtils   qw/ any /;
 
   requires 'run';
-
-  use Moose::Autobox;
-  my $array_role = role {
-    method is_empty($self:)          { $self->length == 0 }
-    method contains($self: Any $obj) { $self->any() eq $obj }
-  };
-  Moose::Autobox->mixin_additional_role('ARRAY', $array_role->name);
-
-  my $hash_role = role {
-    method is_empty($self:)          { $self->keys->length == 0 }
-    method contains($self: Any $obj) { [%$self]->contains($obj) }
-  };
-  Moose::Autobox->mixin_additional_role('HASH', $hash_role->name);
-
-  my $scalar_role = role {
-    method is_empty($self:)          { $self->length == 0 }
-    method contains($self: Any $obj) { $self->index($obj) != -1 }
-  };
-  Moose::Autobox->mixin_additional_role('SCALAR', $scalar_role->name);
 
   sub message {
     my ($default, $msg) = @_;
@@ -158,11 +140,23 @@ C<assert_includes>.
   assert_contains 'expectorate', 'xp';
   assert_contains Collection->new(1, 2, 3), 2;  # if Collection->contains(2)
 =cut
-  method assert_contains($class: Any $collection, Any $obj, $msg?)
+  method assert_contains($class: Any $collection, Any $obj, $m?)
   {
-    $msg = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $msg);
-    __PACKAGE__->assert_can($collection, 'contains');
-    __PACKAGE__->assert($collection->contains($obj), $msg);
+    my $msg = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $m);
+    if (ref $collection eq 'ARRAY') {
+      my $search = any {defined $obj ? $_ eq $obj : defined $_ } @$collection;
+      __PACKAGE__->assert($search, $msg);
+    }
+    elsif (ref $collection eq 'HASH') {
+      __PACKAGE__->assert_contains([%$collection], $obj, $m);
+    }
+    elsif (ref $collection) {
+      __PACKAGE__->assert_can($collection, 'contains');
+      __PACKAGE__->assert($collection->contains($obj), $msg);
+    }
+    else {
+      __PACKAGE__->assert(index($collection, $obj) != -1, $msg);
+    }
   }
   alias assert_contains => 'assert_includes';
 
@@ -195,7 +189,6 @@ C<$role>.
 =cut
   method assert_does($class: Any $obj, $role, $msg?)
   {
-    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to perform the role of $role", $msg);
     __PACKAGE__->assert($obj->does($role), $msg);
   }
@@ -213,8 +206,19 @@ reponds to B<is_empty>.
   method assert_empty($class: Any $collection, $msg?)
   {
     $msg = message("Expected @{[inspect($collection)]} to be empty", $msg);
-    __PACKAGE__->assert_can($collection, 'is_empty');
-    __PACKAGE__->assert($collection->is_empty(), $msg);
+    if (ref $collection eq 'ARRAY') {
+      __PACKAGE__->refute(scalar @$collection, $msg);
+    }
+    elsif (ref $collection eq 'HASH') {
+      __PACKAGE__->refute(scalar keys %$collection, $msg);
+    }
+    elsif (ref $collection) {
+      __PACKAGE__->assert_can($collection, 'is_empty');
+      __PACKAGE__->assert($collection->is_empty(), $msg);
+    }
+    else {
+      __PACKAGE__->refute(length $collection, $msg);
+    }
   }
 
 =item X<assert_equal>(C<$actual, $expected, $msg?>)
@@ -249,12 +253,12 @@ fundamental to most testing strategies.  Sadly, its nuance is not as unobtuse.
         $passed = $expected->equals($actual);
       }
       elsif (ref $expected eq 'ARRAY' && ref $actual eq 'ARRAY') {
-        $passed = ($expected->length == $actual->length);
+        $passed = (@$expected == @$actual);
         unshift @expected, @$expected;
         unshift @actual, @$actual;
       }
       elsif (ref $expected eq 'HASH' && ref $actual eq 'HASH') {
-        $passed = ($expected->keys->length == $actual->keys->length);
+        $passed = (keys %$expected == keys %$actual);
         unshift @expected, %$expected;
         unshift @actual, %$actual;
       }
@@ -289,7 +293,6 @@ the given C<$type>.
 =cut
   method assert_kind_of($class: Any $obj, $type, $msg?)
   {
-    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to be a kind of $type", $msg);
     __PACKAGE__->assert($obj->isa($type) || $obj->does($type), $msg);
   }
@@ -349,7 +352,6 @@ C<assert_is_a>.
 =cut
   method assert_isa($class: Any $obj, $type, $msg?)
   {
-    no Moose::Autobox;
     $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
     __PACKAGE__->assert($obj->isa($type), $msg);
   }
