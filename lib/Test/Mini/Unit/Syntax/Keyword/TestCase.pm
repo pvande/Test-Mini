@@ -26,6 +26,6 @@ class Test::Mini::Unit::Syntax::Keyword::TestCase
   after add_optional_customizations($ctx, $package)
   {
     $ctx->add_scope_code_parts("__PACKAGE__->meta->superclasses('Test::Mini::Unit::TestCase')");
-    $ctx->add_scope_code_parts("use Test::Mini::Unit::Assertions");
+    $ctx->add_scope_code_parts("use Test::Mini::Assertions");
   }
 }

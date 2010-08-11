@@ -14,9 +14,9 @@ class Mock::Dummy { }
 class Mock::Collection with Mock::Enumerable { }
 class Mock::Bag extends Mock::Collection { }
 
-testcase Test::Mini::Unit::Assertions::Test
+testcase Test::Mini::Assertions::Test
 {
-  use aliased 'Test::Mini::Unit::Assertions';
+  use aliased 'Test::Mini::Assertions';
   sub assert_passes(&;$)
   {
     my ($code, $msg) = @_;

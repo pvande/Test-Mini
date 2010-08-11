@@ -1,6 +1,6 @@
 package VintageTest;
 
-use Test::Mini::Unit::Assertions;
+use Test::Mini::Assertions;
 use base 'Test::Mini::Unit::TestCase';
 
 sub setup    { 'This runs before each test...' }

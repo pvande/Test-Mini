@@ -1,8 +1,8 @@
 use MooseX::Declare;
 
-use Test::Mini::Unit::Assertions;
+# require Test::Mini::Assertions;
 
-class Test::Mini::Unit::TestCase with Test::Mini::Unit::Assertions
+class Test::Mini::Unit::TestCase with Test::Mini::Assertions
 {
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);

@@ -6,7 +6,7 @@ use Exception::Class 1.29
   'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
 ;
 
-role Test::Mini::Unit::Assertions is dirty
+role Test::Mini::Assertions is dirty
 {
   use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
   use List::Util   1.21 qw/ min /;

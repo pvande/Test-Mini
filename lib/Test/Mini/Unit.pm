@@ -49,7 +49,7 @@ Real Documentation is coming.  In the meantime, enjoy the montage!
   package TraditionalTest;
 
   use Test::Mini::Unit;
-  use Test::Mini::Unit::Assertions;
+  use Test::Mini::Assertions;
 
   sub setup    { 'This runs before each test...' }
   sub teardown { 'This runs after each test...' }
@@ -66,7 +66,7 @@ Real Documentation is coming.  In the meantime, enjoy the montage!
 
   class ClassicalTest extends Test::Mini::Unit::TestCase
   {
-    use Test::Mini::Unit::Assertions;
+    use Test::Mini::Assertions;
 
     method setup()    { 'This runs before each test...' }
     method teardown() { 'This runs after each test...' }
