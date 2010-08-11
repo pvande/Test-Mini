@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-role Test::Mini::Unit::Logger::Roles::Timings::TestCase
+role Test::Mini::Logger::Roles::Timings::TestCase
 {
   requires qw/
     begin_test_case

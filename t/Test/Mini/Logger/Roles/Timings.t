@@ -1,7 +1,7 @@
 use Test::Mini::Unit;
-namespace Test::Mini::Unit::Logger::Roles;
+namespace Test::Mini::Logger::Roles;
 
-class DummyLogger extends Test::Mini::Unit::Logger::Base with ::Timings {}
+class DummyLogger extends Test::Mini::Logger::Base with ::Timings {}
 
 testcase ::Timings::Test
 {

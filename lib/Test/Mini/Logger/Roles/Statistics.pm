@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-role Test::Mini::Unit::Logger::Roles::Statistics
+role Test::Mini::Logger::Roles::Statistics
 {
   requires qw/
     finish_test

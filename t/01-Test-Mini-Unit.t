@@ -11,7 +11,7 @@ my $END;
 {
   package Mock::Logger;
   use Moose;
-  extends 'Test::Mini::Unit::Logger::Base';
+  extends 'Test::Mini::Logger::Base';
   1;
 }
 

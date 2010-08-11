@@ -1,5 +1,5 @@
 use Test::Mini::Unit;
-namespace Test::Mini::Unit::Logger::Roles;
+namespace Test::Mini::Logger::Roles;
 
 class MockLogger with ::Statistics
 {

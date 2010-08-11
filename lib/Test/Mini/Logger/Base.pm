@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Logger::Base is dirty
+class Test::Mini::Logger::Base is dirty
 {
   has 'verbose' => (is => 'ro', default => 0);
   has 'buffer'  => (is => 'ro', default => sub { *STDOUT{IO} });

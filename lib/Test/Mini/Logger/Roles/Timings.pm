@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-role Test::Mini::Unit::Logger::Roles::Timings
+role Test::Mini::Logger::Roles::Timings
 {
   has 'start_times' => (
     traits  => [ 'Hash' ],

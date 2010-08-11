@@ -2,10 +2,10 @@ use Test::Mini::Unit;
 
 class MyClass { }
 
-testcase Test::Mini::Unit::Logger::Lapidary::Test
+testcase Test::Mini::Logger::Lapidary::Test
 {
   use aliased 'IO::Scalar' => 'Buffer';
-  use aliased 'Test::Mini::Unit::Logger::Lapidary' => 'Logger';
+  use aliased 'Test::Mini::Logger::Lapidary' => 'Logger';
 
   use Text::Outdent 0.01 'outdent';
 
@@ -109,11 +109,11 @@ testcase Test::Mini::Unit::Logger::Lapidary::Test
       Finished in 314 seconds.
 
         1) Failure:
-      method1(MyClass) [t/Test/Mini/Unit/Logger/Lapidary.t:21]:
+      method1(MyClass) [t/Test/Mini/Logger/Lapidary.t:21]:
       Error Message
 
         2) Failure:
-      method2(MyClass) [t/Test/Mini/Unit/Logger/Lapidary.t:21]:
+      method2(MyClass) [t/Test/Mini/Logger/Lapidary.t:21]:
       Error Message
 
       2 tests, 3 assertions, 2 failures, 0 errors, 0 skips
@@ -148,8 +148,8 @@ testcase Test::Mini::Unit::Logger::Lapidary::Test
         2) Error:
       method2(MyClass):
       Error Message
-        Exception::Class::Base::new('Test::Mini::Unit::Error', 'message', 'Error Message^J') called at t/Test/Mini/Unit/Logger/Lapidary.t line 21
-        Test::Mini::Unit::Logger::Lapidary::Test::error at t/Test/Mini/Unit/Logger/Lapidary.t line 135
+        Exception::Class::Base::new('Test::Mini::Unit::Error', 'message', 'Error Message^J') called at t/Test/Mini/Logger/Lapidary.t line 21
+        Test::Mini::Logger::Lapidary::Test::error at t/Test/Mini/Logger/Lapidary.t line 135
 
       2 tests, 3 assertions, 0 failures, 2 errors, 0 skips
     Lapidary
@@ -178,11 +178,11 @@ testcase Test::Mini::Unit::Logger::Lapidary::Test
       Finished in 314 seconds.
 
         1) Skipped:
-      method1(MyClass) [t/Test/Mini/Unit/Logger/Lapidary.t:21]:
+      method1(MyClass) [t/Test/Mini/Logger/Lapidary.t:21]:
       Error Message
 
         2) Skipped:
-      method2(MyClass) [t/Test/Mini/Unit/Logger/Lapidary.t:21]:
+      method2(MyClass) [t/Test/Mini/Logger/Lapidary.t:21]:
       Error Message
 
       2 tests, 3 assertions, 0 failures, 0 errors, 2 skips

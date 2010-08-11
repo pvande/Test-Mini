@@ -2,10 +2,10 @@ use Test::Mini::Unit;
 
 class MyClass { }
 
-testcase Test::Mini::Unit::Logger::TAP::Test
+testcase Test::Mini::Logger::TAP::Test
 {
   use aliased 'IO::Scalar' => 'Buffer';
-  use aliased 'Test::Mini::Unit::Logger::TAP' => 'Logger';
+  use aliased 'Test::Mini::Logger::TAP' => 'Logger';
 
   use Text::Outdent 0.01 'outdent';
 

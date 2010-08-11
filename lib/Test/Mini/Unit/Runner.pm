@@ -29,7 +29,7 @@ class Test::Mini::Unit::Runner {
     is         => 'rw',
     isa        => 'Str',
     env_prefix => 'TEST_MINI',
-    default    => 'Test::Mini::Unit::Logger::TAP',
+    default    => 'Test::Mini::Logger::TAP',
   );
 
   has 'seed' => (
@@ -42,7 +42,7 @@ class Test::Mini::Unit::Runner {
 
   has '_logger' => (
     writer  => 'set_logger',
-    isa     => 'Test::Mini::Unit::Logger::Base',
+    isa     => 'Test::Mini::Logger::Base',
     handles => [
       (map {
         (
@@ -74,7 +74,7 @@ class Test::Mini::Unit::Runner {
     }
     catch
     {
-        $logger = "Test::Mini::Unit::Logger::$logger";
+        $logger = "Test::Mini::Logger::$logger";
         Class::MOP::load_class($logger);
     };
 

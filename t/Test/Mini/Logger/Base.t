@@ -2,10 +2,10 @@ use Test::Mini::Unit;
 
 class MyClass { }
 
-testcase Test::Mini::Unit::Logger::Base::Test
+testcase Test::Mini::Logger::Base::Test
 {
   use aliased 'IO::Scalar' => 'Buffer';
-  use aliased 'Test::Mini::Unit::Logger::Base' => 'Logger';
+  use aliased 'Test::Mini::Logger::Base' => 'Logger';
 
   my $buffer;
   has 'logger' => (

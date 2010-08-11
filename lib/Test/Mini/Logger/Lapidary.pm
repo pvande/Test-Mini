@@ -1,7 +1,7 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Logger::Lapidary
-    extends Test::Mini::Unit::Logger::Base is dirty
+class Test::Mini::Logger::Lapidary
+    extends Test::Mini::Logger::Base is dirty
 {
   sub clean_backtrace
   {
@@ -131,8 +131,8 @@ class Test::Mini::Unit::Logger::Lapidary
     );
   }
 
-  with 'Test::Mini::Unit::Logger::Roles::Timings';
-  with 'Test::Mini::Unit::Logger::Roles::Timings::SpecificTest';
-  with 'Test::Mini::Unit::Logger::Roles::Timings::TestSuite';
-  with 'Test::Mini::Unit::Logger::Roles::Statistics';
+  with 'Test::Mini::Logger::Roles::Timings';
+  with 'Test::Mini::Logger::Roles::Timings::SpecificTest';
+  with 'Test::Mini::Logger::Roles::Timings::TestSuite';
+  with 'Test::Mini::Logger::Roles::Statistics';
 }
