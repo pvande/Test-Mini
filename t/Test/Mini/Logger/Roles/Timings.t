@@ -1,9 +1,8 @@
 use Test::Mini::Unit;
-namespace Test::Mini::Logger::Roles;
 
-class DummyLogger extends Test::Mini::Logger with ::Timings {}
+class DummyLogger extends Test::Mini::Logger with Test::Mini::Logger::Roles::Timings {}
 
-testcase ::Timings::Test
+testcase Test::Mini::Logger::Roles::Timings::Test
 {
   has logger => (is => 'rw');
 

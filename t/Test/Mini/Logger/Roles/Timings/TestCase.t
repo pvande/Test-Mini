@@ -1,9 +1,8 @@
 use Test::Mini::Unit;
-namespace Test::Mini::Logger::Roles;
 
 class MyClass { }
 
-class MockLogger with ::Timings::TestCase
+class MockLogger with Test::Mini::Logger::Roles::Timings::TestCase
 {
   has start => (is => 'rw');
   has stop  => (is => 'rw');
@@ -12,7 +11,7 @@ class MockLogger with ::Timings::TestCase
   method finish_test_case(@) { }
 }
 
-testcase ::Timings::TestCase::Test
+testcase Test::Mini::Logger::Roles::Timings::TestCase::Test
 {
   has logger => (is => 'rw');
 

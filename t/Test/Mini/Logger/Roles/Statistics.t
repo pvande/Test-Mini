@@ -1,7 +1,6 @@
 use Test::Mini::Unit;
-namespace Test::Mini::Logger::Roles;
 
-class MockLogger with ::Statistics
+class MockLogger with Test::Mini::Logger::Roles::Statistics
 {
   method finish_test(@) { }
   method fail()         { }
@@ -9,7 +8,7 @@ class MockLogger with ::Statistics
   method skip()         { }
 }
 
-testcase ::Timings::Test
+testcase Test::Mini::Logger::Roles::Timings::Test
 {
   has logger => (is => 'rw');
 
