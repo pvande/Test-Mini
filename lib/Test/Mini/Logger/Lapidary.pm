@@ -1,10 +1,14 @@
-use MooseX::Declare;
+package Test::Mini::Logger::Lapidary;
+use base 'Test::Mini::Logger';
+use strict;
+use warnings;
 
-class Test::Mini::Logger::Lapidary
-    extends Test::Mini::Logger is dirty
-{
-  sub clean_backtrace
-  {
+sub new {
+    my ($self, %args) = @_;
+    return $self->SUPER::new(result => '', report => [], %args);
+}
+
+sub clean_backtrace {
     my $error = shift;
 
     my @context = grep { ?? .. $_->package =~ /Test::Mini::Unit::TestCase/ } $error->trace->frames();
@@ -12,60 +16,68 @@ class Test::Mini::Logger::Lapidary
     reset;
 
     return @context;
-  }
+}
 
-  sub location
-  {
+sub location {
     my @trace = clean_backtrace(@_);
     my $frame = $trace[0];
     return "@{[$frame->filename]}:@{[$frame->line]}"
-  }
+}
 
-  method statistics
-  {
-    join(', ',
-      "@{[$self->test_count()]} tests",
-      "@{[$self->assertion_count()]} assertions",
-      "@{[$self->failure_count()]} failures",
-      "@{[$self->error_count()]} errors",
-      "@{[$self->skip_count()]} skips",
+sub statistics {
+    my ($self) = @_;
+    return join(', ',
+      "@{[$self->count('test')]} tests",
+      "@{[$self->count('assertions')]} assertions",
+      "@{[$self->count('fail')]} failures",
+      "@{[$self->count('error')]} errors",
+      "@{[$self->count('skip')]} skips",
     );
-  }
+}
 
-  clean;
+sub result {
+    my ($self, $value) = @_;
+    return $self->{result} unless defined $value;
+    $self->{result} = $value;
+}
 
-  has 'result' => (is => 'rw', isa => 'Str');
-  has 'report' => (
-    traits  => [ 'Array' ],
-    is      => 'ro',
-    isa     => 'ArrayRef',
-    default => sub { [] },
-    handles => { add_to_report => 'push' },
-  );
+sub report {
+    my ($self) = @_;
+    return $self->{report};
+}
 
-  method begin_test_suite(:$filter, :$seed!)
-  {
+sub add_to_report {
+    my ($self, $value) = @_;
+    push @{$self->{report}}, $value;
+}
+
+sub begin_test_suite {
+    my ($self, %args) = @_;
+    $self->SUPER::begin_test_suite(%args);
     $self->print('Loaded Suite');
-    $self->print(" (Filtered to /$filter/)") if $filter;
-    $self->say("\nSeeded with $seed\n");
-  }
+    $self->print(" (Filtered to /$args{filter}/)") if exists $args{filter};
+    $self->say("\nSeeded with $args{seed}\n");
+}
 
-  method begin_test(ClassName $tc, Str $test)
-  {
+sub begin_test {
+    my ($self, $tc, $test) = @_;
+    $self->SUPER::begin_test($tc, $test);
     $self->print("$tc#$test: ") if $self->verbose();
-  }
+}
 
-  method finish_test(ClassName $tc, Str $test, @)
-  {
-    $self->print("@{[ $self->time_for($tc, $test) ]} s: ") if $self->verbose();
+sub finish_test {
+    my ($self, $tc, $test, $assertion_count) = @_;
+    $self->SUPER::finish_test($tc, $test, $assertion_count);
+    $self->print("@{[ $self->time(qq($tc#$test)) ]} s: ") if $self->verbose();
     $self->print($self->result() || ());
     $self->say() if $self->verbose();
-  }
+}
 
-  method finish_test_suite(@)
-  {
+sub finish_test_suite {
+    my ($self) = @_;
+    $self->SUPER::finish_test_suite();
     $self->say() unless $self->verbose();
-    $self->say('', "Finished in @{[$self->total_time()]} seconds.", '');
+    $self->say('', "Finished in @{[ $self->time() ]} seconds.", '');
 
     my $i = 1;
     for my $item (@{ $self->report() }) {
@@ -74,29 +86,32 @@ class Test::Mini::Logger::Lapidary
     }
 
     $self->say($self->statistics());
-  }
+}
 
-  method pass(ClassName $tc, Str $test)
-  {
+sub pass {
+    my ($self, @args) = @_;
+    $self->SUPER::pass(@args);
     $self->result('.');
-  }
+}
 
-  method fail(ClassName $tc, Str $test, $e)
-  {
+sub fail {
+    my ($self, $tc, $test, $e) = @_;
+    $self->SUPER::fail($tc, $test, $e);
     $self->result('F');
     $self->add_to_report(
-      sprintf(
-        "Failure:\n%s(%s) [%s]:\n%s",
-        $test,
-        $tc,
-        location($e),
-        $e->message,
-      )
+        sprintf(
+          "Failure:\n%s(%s) [%s]:\n%s",
+            $test,
+            $tc,
+            location($e),
+            $e->message,
+        )
     );
-  }
+}
 
-  method skip(ClassName $tc, Str $test, $e)
-  {
+sub skip {
+    my ($self, $tc, $test, $e) = @_;
+    $self->SUPER::skip($tc, $test, $e);
     $self->result('S');
     $self->add_to_report(
       sprintf(
@@ -107,32 +122,30 @@ class Test::Mini::Logger::Lapidary
         $e->message,
       )
     );
-  }
+}
 
-  method error(ClassName $tc, Str $test, $e)
-  {
+sub error {
+    my ($self, $tc, $test, $e) = @_;
+    $self->SUPER::error($tc, $test, $e);
     my $msg = $e;
     if (ref $e) {
-      my @trace = clean_backtrace($e);
-      @trace = map { '  ' . $_->as_string } @trace; # TODO: Use friendlier @_ dump
-      $msg = $e->message . join "\n", @trace;
-    } else {
-      $e .= "\n";
+        my @trace = clean_backtrace($e);
+        @trace = map { '  ' . $_->as_string } @trace; # TODO: Use friendlier @_ dump
+        $msg = $e->message . join "\n", @trace;
+    }
+    else {
+        $e .= "\n";
     }
 
     $self->result('E');
     $self->add_to_report(
-      sprintf(
-        "Error:\n%s(%s):\n%s",
-        $test,
-        $tc,
-        $msg,
-      )
+        sprintf(
+            "Error:\n%s(%s):\n%s",
+            $test,
+            $tc,
+            $msg,
+        )
     );
-  }
-
-  with 'Test::Mini::Logger::Roles::Timings';
-  with 'Test::Mini::Logger::Roles::Timings::SpecificTest';
-  with 'Test::Mini::Logger::Roles::Timings::TestSuite';
-  with 'Test::Mini::Logger::Roles::Statistics';
 }
+
+1;

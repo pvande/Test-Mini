@@ -30,21 +30,16 @@ testcase Test::Mini::Logger::Lapidary::Test
       'MyClass#method4' => 8,
     );
 
-    my $mock = $self->meta->create(Logger . '::__MOCK__',
-      superclasses => [Logger],
-      methods => {
-        started_at => sub { return 0   },
-        ended_at   => sub { return $ends{$_[1]} || 314 },
-      },
-    );
-    $mock->rebless_instance($self->logger);
+    no strict 'refs';
+    no warnings 'redefine';
+    *{Logger.'::time'}   = sub { return $ends{$_[-1]} || 314 };
   }
 
   test begin_test_suite_without_filter
   {
     $self->logger->begin_test_suite(seed => 'SEED');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       Loaded Suite
       Seeded with SEED
 
@@ -55,7 +50,7 @@ testcase Test::Mini::Logger::Lapidary::Test
   {
     $self->logger->begin_test_suite(seed => 'SEED', filter => 'FILTER');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       Loaded Suite (Filtered to /FILTER/)
       Seeded with SEED
 
@@ -67,7 +62,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->pass('MyClass', 'method1');
     $self->logger->finish_test('MyClass', 'method1', 1);
 
-    assert_equal '.', $buffer;
+    assert_equal $buffer, '.';
   }
 
   test passing_summary
@@ -78,7 +73,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->finish_test_case('MyClass');
     $self->logger->finish_test_suite('MyClass');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       .
 
       Finished in 314 seconds.
@@ -92,7 +87,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->fail('MyClass', 'method1', error());
     $self->logger->finish_test('MyClass', 'method1', 1);
 
-    assert_equal 'F', $buffer;
+    assert_equal $buffer, 'F';
   }
 
   test failing_summary
@@ -103,7 +98,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->finish_test('MyClass', 'method2', 2);
     $self->logger->finish_test_suite('MyClass');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       FF
 
       Finished in 314 seconds.
@@ -125,7 +120,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->error('MyClass', 'method1', 'Error message');
     $self->logger->finish_test('MyClass', 'method1', 1);
 
-    assert_equal 'E', $buffer;
+    assert_equal $buffer, 'E';
   }
 
   test erroring_summary
@@ -136,7 +131,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->finish_test('MyClass', 'method2', 2);
     $self->logger->finish_test_suite('MyClass');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       EE
 
       Finished in 314 seconds.
@@ -149,7 +144,7 @@ testcase Test::Mini::Logger::Lapidary::Test
       method2(MyClass):
       Error Message
         Exception::Class::Base::new('Test::Mini::Unit::Error', 'message', 'Error Message^J') called at t/Test/Mini/Logger/Lapidary.t line 21
-        Test::Mini::Logger::Lapidary::Test::error at t/Test/Mini/Logger/Lapidary.t line 135
+        Test::Mini::Logger::Lapidary::Test::error at t/Test/Mini/Logger/Lapidary.t line 130
 
       2 tests, 3 assertions, 0 failures, 2 errors, 0 skips
     Lapidary
@@ -161,7 +156,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->skip('MyClass', 'method1', error());
     $self->logger->finish_test('MyClass', 'method1', 1);
 
-    assert_equal 'S', $buffer;
+    assert_equal $buffer, 'S';
   }
 
   test skipping_summary
@@ -172,7 +167,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->finish_test('MyClass', 'method2', 2);
     $self->logger->finish_test_suite('MyClass');
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       SS
 
       Finished in 314 seconds.
@@ -194,7 +189,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->{verbose} = 1;
     $self->logger->begin_test('MyClass', 'method1');
 
-    assert_equal 'MyClass#method1: ', $buffer;
+    assert_equal $buffer, 'MyClass#method1: ';
   }
 
   test finish_test_while_verbose
@@ -209,7 +204,7 @@ testcase Test::Mini::Logger::Lapidary::Test
     $self->logger->skip('MyClass', 'method4', error());
     $self->logger->finish_test('MyClass', 'method4', 1);
 
-    assert_equal outdent(<<'    Lapidary'), $buffer
+    assert_equal $buffer, outdent(<<'    Lapidary')
       1 s: .
       2 s: F
       4 s: E

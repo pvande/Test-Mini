@@ -1,31 +1,85 @@
-use MooseX::Declare;
+package Test::Mini::Logger;
+use strict;
+use warnings;
 
-class Test::Mini::Logger is dirty
-{
-  has 'verbose' => (is => 'ro', default => 0);
-  has 'buffer'  => (is => 'ro', default => sub { *STDOUT{IO} });
-
-  method print(@msg)
-  {
-    print { $self->buffer() } @msg;
-  }
-
-  method say(@msg)
-  {
-    $self->print(join("\n", @msg), "\n")
-  }
-
-  clean;
-
-  method begin_test_suite(@)  { }
-  method begin_test_case(@)   { }
-  method begin_test(@)        { }
-  method finish_test(@)       { }
-  method finish_test_case(@)  { }
-  method finish_test_suite(@) { }
-
-  method pass(ClassName $tc, Str $test)        { }
-  method fail(ClassName $tc, Str $test, $msg)  { }
-  method skip(ClassName $tc, Str $test, $msg)  { }
-  method error(ClassName $tc, Str $test, $msg) { }
+sub new {
+    my ($class, %args) = @_;
+    return bless {
+        verbose => 0,
+        buffer  => *STDOUT{IO},
+        count   => {},
+        times   => {},
+        %args,
+    }, $class;
 }
+
+sub verbose {
+    my ($self) = @_;
+    return $self->{verbose};
+}
+
+sub buffer {
+    my ($self) = @_;
+    return $self->{buffer};
+}
+
+sub count {
+    my ($self, $key) = @_;
+    return ($key ? $self->{count}->{$key} : $self->{count}) || 0;
+}
+
+sub print {
+    my ($self, @msg) = @_;
+    print { $self->buffer() } @msg;
+}
+
+sub say {
+    my ($self, @msg) = @_;
+    $self->print(join("\n", @msg), "\n");
+}
+
+sub begin_test_suite {
+    my ($self) = @_;
+    $self->{times}->{$self} = -time();
+}
+
+sub begin_test_case {
+    my ($self, $tc) = @_;
+    $self->{times}->{$tc} = -time();
+}
+
+sub begin_test {
+    my ($self, $tc, $test) = @_;
+    $self->{times}->{"$tc#$test"} = -time();
+}
+
+sub finish_test {
+    my ($self, $tc, $test, $assertion_count) = @_;
+    $self->{count}->{test}++;
+    $self->{count}->{assertions} += $assertion_count;
+    $self->{times}->{"$tc#$test"} += time();
+}
+
+sub finish_test_case {
+    my ($self, $tc) = @_;
+    $self->{count}->{test_case}++;
+    $self->{times}->{$tc} += time();
+}
+
+sub finish_test_suite {
+    my ($self) = @_;
+    $self->{count}->{test_suite}++;
+    $self->{times}->{$self} += time();
+}
+
+sub pass  { shift->{count}->{pass}++  }
+sub fail  { shift->{count}->{fail}++  }
+sub skip  { shift->{count}->{skip}++  }
+sub error { shift->{count}->{error}++ }
+
+sub time {
+    my ($self) = @_;
+    $self->{times}->{$_[-1]};
+}
+
+1;
