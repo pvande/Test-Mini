@@ -1,9 +1,9 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Syntax::Keyword::TestCase
+class Test::Mini::Unit::Sugar::TestCase
 {
-  use aliased 'Test::Mini::Unit::Syntax::Keyword::Test';
-  use aliased 'Test::Mini::Unit::Syntax::Keyword::Advice';
+  use aliased 'Test::Mini::Unit::Sugar::Test';
+  use aliased 'Test::Mini::Unit::Sugar::Advice';
 
   Moose::with __PACKAGE__, qw(
       MooseX::Declare::Syntax::MooseSetup

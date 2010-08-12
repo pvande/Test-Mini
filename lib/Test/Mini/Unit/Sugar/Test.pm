@@ -1,6 +1,6 @@
 use MooseX::Declare;
 
-class Test::Mini::Unit::Syntax::Keyword::Test extends MooseX::Declare::Syntax::Keyword::Method
+class Test::Mini::Unit::Sugar::Test extends MooseX::Declare::Syntax::Keyword::Method
 {
   around parse($ctx)
   {
