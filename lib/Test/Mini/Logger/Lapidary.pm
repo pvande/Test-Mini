@@ -1,7 +1,7 @@
 use MooseX::Declare;
 
 class Test::Mini::Logger::Lapidary
-    extends Test::Mini::Logger::Base is dirty
+    extends Test::Mini::Logger is dirty
 {
   sub clean_backtrace
   {

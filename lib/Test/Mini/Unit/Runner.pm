@@ -42,7 +42,7 @@ class Test::Mini::Unit::Runner {
 
   has '_logger' => (
     writer  => 'set_logger',
-    isa     => 'Test::Mini::Logger::Base',
+    isa     => 'Test::Mini::Logger',
     handles => [
       (map {
         (
