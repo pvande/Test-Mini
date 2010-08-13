@@ -3,12 +3,32 @@ use MooseX::Declare;
 # require Test::Mini::Assertions;
 
 class Test::Mini::Unit::TestCase with Test::Mini::Assertions
-{
+{ 
   has 'name'   => (is => 'ro');
   has 'passed' => (is => 'rw', default => 0);
 
-  method setup { }
-  method teardown { }
+  {
+    my $class = __PACKAGE__;
+    no strict 'refs';
+    $$class = {
+      setup    => [],
+      teardown => [],
+    };
+  }
+  
+  method setup {
+      no strict 'refs';
+      for my $class (reverse @{ mro::get_linear_isa(ref $self) }) {
+          $_->() for @{ $$class->{setup} }
+      }
+  }
+
+  method teardown {
+      no strict 'refs';
+      for my $class (@{ mro::get_linear_isa(ref $self) }) {
+          $_->() for reverse @{ $$class->{teardown} || [] }
+      }
+  }
 
   method run($runner)
   {
