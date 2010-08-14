@@ -22,7 +22,7 @@ use Test::Mini::Unit::Runner;
 END {
     $| = 1;
     return if $?;
-    $? = Test::Mini::Unit::Runner->new_with_options()->run();
+    $? = Test::Mini::Unit::Runner->new()->run();
 }
 
 1;
