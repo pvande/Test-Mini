@@ -10,7 +10,7 @@ class Test::Mini::Unit::TestCase with Test::Mini::Assertions
   {
     my $class = __PACKAGE__;
     no strict 'refs';
-    $$class = {
+    *$class = {
       setup    => [],
       teardown => [],
     };
@@ -19,14 +19,14 @@ class Test::Mini::Unit::TestCase with Test::Mini::Assertions
   method setup {
       no strict 'refs';
       for my $class (reverse @{ mro::get_linear_isa(ref $self) }) {
-          $_->() for @{ $$class->{setup} }
+          $_->($self) for @{ $$class->{setup} }
       }
   }
 
   method teardown {
       no strict 'refs';
       for my $class (@{ mro::get_linear_isa(ref $self) }) {
-          $_->() for reverse @{ $$class->{teardown} || [] }
+          $_->($self) for reverse @{ $$class->{teardown} || [] }
       }
   }
 

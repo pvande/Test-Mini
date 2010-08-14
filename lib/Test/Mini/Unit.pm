@@ -14,13 +14,7 @@ sub import {
     strict->import;
     warnings->import;
 
-    for my $keyword (
-        ClassKeyword->new(identifier => 'class'),
-        RoleKeyword->new(identifier => 'role'),
-        TestCaseKeyword->new(identifier => 'testcase'),
-    ) {
-        $keyword->setup_for($caller, %args, provided_by => $class);
-    }
+    TestCaseKeyword->import(into => $caller);
 }
 
 use Test::Mini::Unit::Runner;

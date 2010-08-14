@@ -1,3 +1,4 @@
+use MooseX::Declare;
 use Test::Mini::Unit;
 
 class ClassicTest extends Test::Mini::Unit::TestCase

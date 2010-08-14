@@ -1,7 +1,5 @@
 use Test::Mini::Unit;
 
-class MyClass { }
-
 testcase Test::Mini::Logger::TAP::Test
 {
   use aliased 'IO::Scalar' => 'Buffer';
@@ -10,13 +8,14 @@ testcase Test::Mini::Logger::TAP::Test
   use Text::Outdent 0.01 'outdent';
 
   my $buffer;
-  has 'logger' => (
-    is => 'rw',
-    lazy => 1,
-    default => sub {
-      return Logger->new(buffer => Buffer->new(\($buffer = '')));
-    },
-  );
+  setup {
+    $self->{logger} = Logger->new(buffer => Buffer->new(\($buffer = '')));
+  }
+
+  sub logger {
+    my ($self) = @_;
+    return $self->{logger};
+  }
 
   test begin_test_case
   {

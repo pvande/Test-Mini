@@ -1,36 +1,56 @@
 package Test::Mini::Unit::Sugar::Advice;
-use base 'Devel::Declare::MethodInstaller::Simple';
+use base 'Devel::Declare::Context::Simple';
 use strict;
 use warnings;
 
-sub new {
-    my ($class, %args) = @_;
-    return bless \%args, (ref $class || $class);
-}
+use B::Hooks::EndOfScope;
+use Devel::Declare ();
+use Sub::Name;
 
-sub setup_for {
-    my ($self, $package, %options) = @_;
-    $self->install_methodhandler(
-        into => $package,
-        name => $self->{identifier},
-        %options,
+sub import {
+    my ($class, %args) = @_;
+    my $caller = $args{into} || caller;
+
+    {
+        no strict 'refs';
+        *{"$caller\::$args{name}"} = sub (&) {};
+        on_scope_end {
+            no warnings;
+            *{"$caller\::$args{name}"} = \&{"Test::Mini::Unit::TestCase::$args{name}"};
+        }
+    }
+
+    my $ctx = $class->new();
+    Devel::Declare->setup_for(
+        $caller => { $args{name} => { const => sub { $ctx->parser(@_) } } }
     );
 }
 
 sub parser {
     my $self = shift;
     $self->init(@_);
-    $self->skip_declarator();
+
+    $self->skip_declarator;
+
     $self->inject_if_block($self->scope_injector_call());
-    $self->install($self->{name});
+    $self->inject_if_block('my $self = shift;');
+
+    $self->install($self->{Declarator});
+}
+
+sub install {
+    my ($self, $name) = @_;
+    $self->shadow($self->code_for($name));
 }
 
 sub code_for {
-    my ($self, $modifier) = @_;
-    my $class = $self->get_curstash_name();
+    my ($self, $name) = @_;
+
+    my $pkg = $self->get_curstash_name;
     return sub (&) {
+        my $code = shift;
         no strict 'refs';
-        push @{ $$class->{$modifier} }, shift;
+        push @{$$pkg->{$name}}, $code;
     };
 }
 
