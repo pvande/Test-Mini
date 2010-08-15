@@ -62,7 +62,7 @@ sub error {
 sub skip {
     my ($self, undef, $test, $msg) = @_;
     $self->print("ok @{[$self->test_counter]} - $test # SKIP");
-    
+
     if ($msg =~ /\n/) {
       $self->say();
       $self->diag($msg);

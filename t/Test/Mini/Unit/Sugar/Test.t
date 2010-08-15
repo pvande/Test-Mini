@@ -1,6 +1,4 @@
-use Test::More;
-
-plan tests => 6;
+use Test::More tests => 6;
 
 {
     package Foo;

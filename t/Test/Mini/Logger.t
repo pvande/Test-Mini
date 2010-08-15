@@ -1,12 +1,10 @@
 use Test::Mini::Unit;
 
-testcase Test::Mini::Logger::Test
-{
+testcase Test::Mini::Logger::Test {
     use aliased 'IO::Scalar'         => 'Buffer';
     use aliased 'Test::Mini::Logger' => 'Logger';
 
     my $buffer;
-
     setup {
         $self->{logger} = Logger->new(buffer => Buffer->new(\($buffer = '')));
     }
@@ -16,8 +14,7 @@ testcase Test::Mini::Logger::Test
         return $self->{logger};
     }
 
-    test full_test_run_should_remain_silent
-    {
+    test full_test_run_should_remain_silent {
         $self->logger->begin_test_suite();
         $self->logger->begin_test_case('MyClass', qw/ m1 m2 m3 m4 /);
         $self->logger->begin_test('MyClass', 'm1');
@@ -35,6 +32,6 @@ testcase Test::Mini::Logger::Test
         $self->logger->finish_test_case('MyClass', qw/ m1 m2 m3 m4 /);
         $self->logger->finish_test_suite(1);
 
-        assert_equal '', $buffer;
+        assert_equal $buffer, '';
     }
 }

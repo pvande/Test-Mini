@@ -75,7 +75,7 @@ sub run {
 
         die 'No assertions called' unless $self->count_assertions();
     };
-    
+
     if ($e = Exception::Class->caught()) {
         $self->passed(0);
 

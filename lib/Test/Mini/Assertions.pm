@@ -12,6 +12,20 @@ use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
 use List::Util   1.21 qw/ min /;
 use List::MoreUtils   qw/ any /;
 
+sub import {
+    my ($class) = @_;
+    my $caller = caller;
+
+    no strict 'refs';
+    *{"$caller\::count_assertions"} = \&count_assertions;
+
+    my @asserts = grep { /^(assert|refute|skip$|flunk$)/ && defined &{$_} } keys %{"$class\::"};
+
+    for my $assertion (@asserts) {
+        *{"$caller\::$assertion"} = \&{$assertion};
+    }
+}
+
 sub message {
     my ($default, $msg) = @_;
 
@@ -51,8 +65,8 @@ sub deref {
 }
 
 my $assertion_count = 0;
-sub count_assertions          { return $assertion_count }
-sub reset_assertion_count     { $assertion_count  = 0   }
+sub count_assertions      { return $assertion_count }
+sub reset_assertion_count { $assertion_count  = 0   }
 
 =item X<assert>(C<$test, $msg?>)
 The C<assert> method takes a value to be tested for I<truthiness>, and an
@@ -67,7 +81,7 @@ sub assert ($;$) {
     $msg = $msg->() if ref $msg eq 'CODE';
 
     $assertion_count++;
-    
+
     Test::Mini::Unit::Assert->throw(
         message        => $msg,
         ignore_package => [__PACKAGE__],
@@ -162,7 +176,7 @@ C<$error> is provided, the error message from C<$@> must contain it.
 sub assert_dies (&;$$) {
     my ($sub, $error, $msg) = @_;
     $error = '' unless defined $error;
-    
+
     $msg = message("Expected @{[inspect($sub)]} to die matching /$error/", $msg);
     my ($full_error, $dies);
     {
@@ -377,20 +391,6 @@ sub flunk (;$) {
     my ($msg) = @_;
     $msg = 'Epic failure' unless defined $msg;
     assert(0, $msg);
-}
-  
-sub import {
-    my ($class) = @_;
-    my $caller = caller;
-    
-    no strict 'refs';
-    *{"$caller\::count_assertions"} = \&count_assertions;
-    
-    my @asserts = grep { /^(assert|refute|skip$|flunk$)/ && defined &{$_} } keys %{"$class\::"};
-    
-    for my $assertion (@asserts) {
-        *{"$caller\::$assertion"} = \&{$assertion};
-    }
 }
 
 1;
