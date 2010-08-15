@@ -4,7 +4,7 @@ use warnings;
 
 use Getopt::Long;
 use Try::Tiny;
-use MooseX::Attribute::ENV;
+use Class::MOP;
 use aliased 'Test::Mini::Unit::TestCase';
 use List::Util qw/ shuffle /;
 
