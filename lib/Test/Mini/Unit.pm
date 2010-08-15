@@ -15,12 +15,12 @@ sub import {
     TestCaseKeyword->import(into => $caller);
 }
 
-use Test::Mini::Unit::Runner;
+use Test::Mini::Runner;
 
 END {
     $| = 1;
     return if $?;
-    $? = Test::Mini::Unit::Runner->new()->run();
+    $? = Test::Mini::Runner->new()->run();
 }
 
 1;

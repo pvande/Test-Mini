@@ -1,4 +1,4 @@
-package Test::Mini::Unit::Runner;
+package Test::Mini::Runner;
 use strict;
 use warnings;
 

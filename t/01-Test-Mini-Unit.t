@@ -15,7 +15,7 @@ my $END;
     use base 'Test::Mini::Logger';
 }
 
-sub run_tests { Test::Mini::Unit::Runner->new(logger => 'Mock::Logger')->run() }
+sub run_tests { Test::Mini::Runner->new(logger => 'Mock::Logger')->run() }
 
 {
     note 'Test: when run with no test modules, exits with 255';
@@ -106,7 +106,7 @@ sub run_tests { Test::Mini::Unit::Runner->new(logger => 'Mock::Logger')->run() }
     {
         no strict 'refs';
         no warnings 'redefine';
-        *{'Test::Mini::Unit::Runner::run'} = sub { return 42; };
+        *{'Test::Mini::Runner::run'} = sub { return 42; };
     }
 
     $END->();

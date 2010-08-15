@@ -12,5 +12,5 @@ sub test_skip   { skip "I've got better things to do" }
 
 1;
 
-use Test::Mini::Unit::Runner;
-exit Test::Mini::Unit::Runner->new()->run();
+use Test::Mini::Runner;
+exit Test::Mini::Runner->new()->run();
