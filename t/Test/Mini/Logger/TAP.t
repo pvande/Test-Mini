@@ -1,160 +1,149 @@
 use Test::Mini::Unit;
 
-class MyClass { }
+testcase Test::Mini::Logger::TAP::Test{
+    use aliased 'IO::Scalar' => 'Buffer';
+    use aliased 'Test::Mini::Logger::TAP' => 'Logger';
 
-testcase Test::Mini::Logger::TAP::Test
-{
-  use aliased 'IO::Scalar' => 'Buffer';
-  use aliased 'Test::Mini::Logger::TAP' => 'Logger';
+    use Text::Outdent 0.01 'outdent';
 
-  use Text::Outdent 0.01 'outdent';
+    my $buffer;
+    setup {
+        $self->{logger} = Logger->new(buffer => Buffer->new(\($buffer = '')));
+    }
 
-  my $buffer;
-  has 'logger' => (
-    is => 'rw',
-    lazy => 1,
-    default => sub {
-      return Logger->new(buffer => Buffer->new(\($buffer = '')));
-    },
-  );
+    sub error { return Test::Mini::Unit::Error->new(message => "Error Message\n") }
 
-  test begin_test_case
-  {
-    $self->logger->begin_test_case('MyClass', qw/ method1 method2 method3 /);
-    assert_equal outdent(<<'    TAP'), $buffer;
-      1..3
-      # Test Case: MyClass
-    TAP
-  }
+    sub tidy {
+        my ($str) = @_;
+        $str =~ s/^\n| +$//g;
+        return outdent($str);
+    }
 
-  test pass
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->pass('MyClass', 'method1');
-    assert_equal outdent(<<'    TAP'), $buffer;
-      ok 1 - method1
-    TAP
-  }
+    test begin_test_case {
+        $self->{logger}->begin_test_case('MyClass', qw/ method1 method2 method3 /);
+        assert_equal $buffer, tidy(q|
+            1..3
+            # Test Case: MyClass
+        |);
+    }
 
-  test two_passes
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->pass('MyClass', 'method1');
+    test pass {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->pass('MyClass', 'method1');
+        assert_equal $buffer, tidy(q|
+            ok 1 - method1
+        |);
+    }
 
-    $self->logger->begin_test('MyClass', 'method2');
-    $self->logger->pass('MyClass', 'method2');
+    test two_passes {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->pass('MyClass', 'method1');
 
-    assert_equal outdent(<<'    TAP'), $buffer;
-      ok 1 - method1
-      ok 2 - method2
-    TAP
-  }
+        $self->{logger}->begin_test('MyClass', 'method2');
+        $self->{logger}->pass('MyClass', 'method2');
 
-  test fail
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->fail('MyClass', 'method1', 'Reason for failure');
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # Reason for failure
-    TAP
-  }
+        assert_equal $buffer, tidy(q|
+            ok 1 - method1
+            ok 2 - method2
+        |);
+    }
 
-  test two_failures
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->fail('MyClass', 'method1', 'Daddy never loved me');
+    test fail {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->fail('MyClass', 'method1', 'Reason for failure');
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # Reason for failure
+        |);
+    }
 
-    $self->logger->begin_test('MyClass', 'method2');
-    $self->logger->fail('MyClass', 'method2', 'Not enough hugs');
+    test two_failures {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->fail('MyClass', 'method1', 'Daddy never loved me');
 
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # Daddy never loved me
-      not ok 2 - method2
-      # Not enough hugs
-    TAP
-  }
+        $self->{logger}->begin_test('MyClass', 'method2');
+        $self->{logger}->fail('MyClass', 'method2', 'Not enough hugs');
 
-  test fail_with_multiline_reason
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->fail('MyClass', 'method1', "My Own Personal Failing:\nCaring too much");
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # My Own Personal Failing:
-      # Caring too much
-    TAP
-  }
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # Daddy never loved me
+            not ok 2 - method2
+            # Not enough hugs
+        |);
+    }
 
-  test error
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->error('MyClass', 'method1', 'Reason for error');
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # Reason for error
-    TAP
-  }
+    test fail_with_multiline_reason {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->fail('MyClass', 'method1', "My Own Personal Failing:\nCaring too much");
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # My Own Personal Failing:
+            # Caring too much
+        |);
+    }
 
-  test two_errors
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->error('MyClass', 'method1', 'Off by one');
+    test error {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->error('MyClass', 'method1', 'Reason for error');
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # Reason for error
+        |);
+    }
 
-    $self->logger->begin_test('MyClass', 'method2');
-    $self->logger->error('MyClass', 'method2', 'Suicide');
+    test two_errors {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->error('MyClass', 'method1', 'Off by one');
 
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # Off by one
-      not ok 2 - method2
-      # Suicide
-    TAP
-  }
+        $self->{logger}->begin_test('MyClass', 'method2');
+        $self->{logger}->error('MyClass', 'method2', 'Suicide');
 
-  test error_with_multiline_reason
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->error('MyClass', 'method1', "Death,\nIt's final");
-    assert_equal outdent(<<'    TAP'), $buffer;
-      not ok 1 - method1
-      # Death,
-      # It's final
-    TAP
-  }
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # Off by one
+            not ok 2 - method2
+            # Suicide
+        |);
+    }
 
-  test skip
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->skip('MyClass', 'method1', "School's boring");
-    assert_equal outdent(<<'    TAP'), $buffer;
-      ok 1 - method1 # SKIP: School's boring
-    TAP
-  }
+    test error_with_multiline_reason {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->error('MyClass', 'method1', "Death,\nIt's final");
+        assert_equal $buffer, tidy(q|
+            not ok 1 - method1
+            # Death,
+            # It's final
+        |);
+    }
 
-  test two_skips
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->skip('MyClass', 'method1', 'One, two...');
+    test skip {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->skip('MyClass', 'method1', "School's boring");
+        assert_equal $buffer, tidy(q|
+            ok 1 - method1 # SKIP: School's boring
+        |);
+    }
 
-    $self->logger->begin_test('MyClass', 'method2');
-    $self->logger->skip('MyClass', 'method2', '... to my Lou');
+    test two_skips {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->skip('MyClass', 'method1', 'One, two...');
 
-    assert_equal outdent(<<'    TAP'), $buffer;
-      ok 1 - method1 # SKIP: One, two...
-      ok 2 - method2 # SKIP: ... to my Lou
-    TAP
-  }
+        $self->{logger}->begin_test('MyClass', 'method2');
+        $self->{logger}->skip('MyClass', 'method2', '... to my Lou');
 
-  test skip_with_multiline_reason
-  {
-    $self->logger->begin_test('MyClass', 'method1');
-    $self->logger->skip('MyClass', 'method1', "School's Cool\nDon't be a fool");
-    assert_equal outdent(<<'    TAP'), $buffer;
-      ok 1 - method1 # SKIP
-      # School's Cool
-      # Don't be a fool
-    TAP
-  }
+        assert_equal $buffer, tidy(q|
+            ok 1 - method1 # SKIP: One, two...
+            ok 2 - method2 # SKIP: ... to my Lou
+        |);
+    }
+
+    test skip_with_multiline_reason {
+        $self->{logger}->begin_test('MyClass', 'method1');
+        $self->{logger}->skip('MyClass', 'method1', "School's Cool\nDon't be a fool");
+        assert_equal $buffer, tidy(q|
+            ok 1 - method1 # SKIP
+            # School's Cool
+            # Don't be a fool
+        |);
+    }
 }

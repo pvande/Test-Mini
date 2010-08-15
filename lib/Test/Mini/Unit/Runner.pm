@@ -1,143 +1,111 @@
-use MooseX::Declare;
+package Test::Mini::Unit::Runner;
+use strict;
+use warnings;
 
-class Test::Mini::Unit::Runner {
-  use Try::Tiny;
-  use MooseX::Attribute::ENV;
-  use aliased 'Test::Mini::Unit::TestCase';
-  use List::Util qw/ shuffle /;
+use Getopt::Long;
+use Try::Tiny;
+use Class::MOP;
+use aliased 'Test::Mini::Unit::TestCase';
+use List::Util qw/ shuffle /;
 
-  with 'MooseX::Getopt';
+sub new {
+    my ($class, %args) = @_;
 
-  has 'verbose' => (
-    traits     => ['ENV'],
-    is         => 'rw',
-    isa        => 'Bool',
-    env_prefix => 'TEST_MINI',
-    default    => 0,
-  );
+    my %argv = (
+        verbose   => $ENV{TEST_MINI_VERBOSE} || 0,
+        filter    => $ENV{TEST_MINI_FILTER}  || '',
+        logger    => $ENV{TEST_MINI_LOGGER}  || 'Test::Mini::Logger::TAP',
+        seed      => $ENV{TEST_MINI_SEED}    || int(rand(64_000_000)),
+        exit_code => 0,
+    );
 
-  has 'filter' => (
-    traits     => ['ENV'],
-    is         => 'rw',
-    isa        => 'Str',
-    env_prefix => 'TEST_MINI',
-    default    => '',
-  );
+    GetOptions(\%argv, qw/ verbose! filter=s logger=s seed=s /);
+    return bless { %argv, %args }, $class;
+}
 
-  has 'logger' => (
-    traits     => ['ENV'],
-    is         => 'rw',
-    isa        => 'Str',
-    env_prefix => 'TEST_MINI',
-    default    => 'Test::Mini::Logger::TAP',
-  );
+sub verbose   { shift->{verbose}   }
+sub filter    { shift->{filter}    }
+sub logger    { shift->{logger}    }
+sub seed      { shift->{seed}      }
+sub exit_code { shift->{exit_code} }
 
-  has 'seed' => (
-    traits     => ['ENV'],
-    is         => 'rw',
-    isa        => 'Int',
-    env_prefix => 'TEST_MINI',
-    default    => int(rand(64_000_000)),
-  );
-
-  has '_logger' => (
-    writer  => 'set_logger',
-    isa     => 'Test::Mini::Logger',
-    handles => [
-      (map {
-        (
-          "begin_$_"  => "begin_$_",
-          "finish_$_" => "finish_$_",
-        )
-      } qw/ test_suite test_case test /),
-      pass  => 'pass',
-      skip  => 'skip',
-      fail  => 'fail',
-      error => 'error',
-    ],
-  );
-
-  has '_exit_code' => (accessor => 'exit_code', default => 0);
-
-
-  # class_has file => (
-  #   is      => 'ro',
-  #   default => sub { use Cwd 'abs_path'; abs_path(__FILE__); },
-  # );
-
-  method run
-  {
+sub run {
+    my ($self) = @_;
     my $logger = $self->logger;
-    try
-    {
+    try {
         Class::MOP::load_class($logger);
     }
-    catch
-    {
+    catch {
         $logger = "Test::Mini::Logger::$logger";
         Class::MOP::load_class($logger);
     };
 
     $logger = $logger->new(verbose => $self->verbose);
-    $self->set_logger($logger);
+    $self->{logger} = $logger;
 
     srand($self->seed);
 
     return $self->run_test_suite(filter => $self->filter, seed => $self->seed);
-  }
+}
 
-  method run_test_suite(:$filter, :$seed)
-  {
-    my @testcases = TestCase->meta->subclasses;
-    $self->exit_code(255) unless @testcases;
+sub run_test_suite {
+    my ($self, %args) = @_;
+    $self->logger->begin_test_suite(%args);
+
+    my @testcases = @{ mro::get_isarev(TestCase) };
+    $self->{exit_code} = 255 unless @testcases;
 
     for my $tc (shuffle @testcases) {
-      my @tests = grep { /^test.+/ } $tc->meta->get_all_method_names();
-      $self->run_test_case($tc, grep { qr/$filter/ } @tests);
+        no strict 'refs';
+        my @tests = grep { /^test.+/ && defined &{"$tc\::$_"}} keys %{"$tc\::"};
+        $self->run_test_case($tc, grep { $_ =~ qr/$args{filter}/ } @tests);
     }
 
+    $self->logger->finish_test_case(%args, $self->exit_code);
     return $self->exit_code;
-  }
-
-  method run_test_case(ClassName $tc, @tests)
-  {
-    $self->exit_code(127) unless @tests;
-    $self->run_test($tc, $_) for shuffle @tests;
-  }
-
-  method run_test(ClassName $tc, Str $test)
-  {
-    my $instance = $tc->new(name => $test);
-    return $instance->run($self);
-  }
-
-  method randomize(@list)
-  {
-    return sort { int(rand(3)) - 1 } @list;
-  }
-
-
-  around run_test_suite(@args) {
-    $self->begin_test_suite(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test_suite(@args, $retval);
-    return $retval;
-  }
-
-  around run_test_case(@args) {
-    $self->begin_test_case(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test_case(@args, $retval);
-    return $retval;
-  }
-
-  around run_test(@args) {
-    $self->begin_test(@args);
-    my $retval = $self->$orig(@args);
-    $self->finish_test(@args, $retval);
-    return $retval;
-  }
-
-  after fail(@)  { $self->exit_code(1) unless $self->exit_code > 1 }
-  after error(@) { $self->exit_code(1) unless $self->exit_code > 1 }
 }
+
+sub run_test_case {
+    my ($self, $tc, @tests) = @_;
+    $self->logger->begin_test_case($tc, @tests);
+
+    $self->{exit_code} = 127 unless @tests;
+    $self->run_test($tc, $_) for shuffle @tests;
+
+    $self->logger->finish_test_case($tc, @tests);
+}
+
+sub run_test {
+    my ($self, $tc, $test) = @_;
+    $self->logger->begin_test($tc, $test);
+
+    my $instance = $tc->new(name => $test);
+    my $result = $instance->run($self);
+
+    $self->logger->finish_test($tc, $test, $result);
+    return $result;
+}
+
+sub pass {
+    my ($self, $tc, $test) = @_;
+    $self->logger->pass($tc, $test);
+}
+
+sub skip {
+    my ($self, $tc, $test, $e) = @_;
+    $self->logger->skip($tc, $test, $e);
+}
+
+sub fail {
+    my ($self, $tc, $test, $e) = @_;
+    $self->{exit_code} = 1 unless $self->{exit_code};
+    $self->logger->fail($tc, $test, $e);
+}
+
+sub error {
+    my ($self, $tc, $test, $e) = @_;
+    $self->{exit_code} = 1 unless $self->{exit_code};
+    $self->logger->error($tc, $test, $e);
+}
+
+1;

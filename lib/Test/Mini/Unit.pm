@@ -1,44 +1,36 @@
-use MooseX::Declare 0.31;
-
+package Test::Mini::Unit;
+use strict;
+use warnings;
 use 5.008;
 
-class Test::Mini::Unit
-{
-  use aliased 'MooseX::Declare::Syntax::Keyword::Class',     'ClassKeyword';
-  use aliased 'MooseX::Declare::Syntax::Keyword::Role',      'RoleKeyword';
-  use aliased 'Test::Mini::Unit::Syntax::Keyword::TestCase', 'TestCaseKeyword';
+use aliased 'Test::Mini::Unit::Sugar::TestCase',       'TestCaseKeyword';
 
-  method import(ClassName $class: %args)
-  {
+sub import {
+    my ($class, %args) = @_;
     my $caller = caller();
 
     strict->import;
     warnings->import;
 
-    for my $keyword (
-      ClassKeyword->new(identifier => 'class'),
-      RoleKeyword->new(identifier => 'role'),
-      TestCaseKeyword->new(identifier => 'testcase'),
-    ) {
-      $keyword->setup_for($caller, %args, provided_by => $class);
-    }
-  }
+    TestCaseKeyword->import(into => $caller);
+}
 
-  use Test::Mini::Unit::Runner;
+use Test::Mini::Unit::Runner;
 
-  END {
+END {
     $| = 1;
     return if $?;
-    $? = Test::Mini::Unit::Runner->new_with_options()->run();
-  }
+    $? = Test::Mini::Unit::Runner->new()->run();
 }
+
+1;
 
 __END__
 # Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Test::Mini::Unit - Clean Unit Testing with Moose
+Test::Mini::Unit - Clean Unit Testing
 
 =head1 SYNOPSIS
 

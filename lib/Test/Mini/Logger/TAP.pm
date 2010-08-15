@@ -1,63 +1,74 @@
-use MooseX::Declare;
+package Test::Mini::Logger::TAP;
+use base 'Test::Mini::Logger';
+use strict;
+use warnings;
 
-class Test::Mini::Logger::TAP
-    extends Test::Mini::Logger
-{
-  has 'test_counter' => (
-    traits  => [ 'Counter' ],
-    is      => 'rw',
-    isa     => 'Int',
-    default => 0,
-    handles => {
-      inc_counter   => 'inc',
-      reset_counter => 'reset',
-    },
-  );
+sub new {
+    my ($class, %args) = @_;
+    return $class->SUPER::new(test_counter => 0, %args);
+}
 
-  method diag(@msgs)
-  {
+sub test_counter {
+    my ($self) = @_;
+    return $self->{test_counter};
+}
+
+sub inc_counter {
+    my ($self) = @_;
+    $self->{test_counter}++;
+}
+
+sub reset_counter {
+    my ($self) = @_;
+    $self->{test_counter} = 0;
+}
+
+sub diag {
+    my ($self, @msgs) = @_;
     my $msg = join "\n", @msgs;
     $msg =~ s/^/# /mg;
     $self->say($msg);
-  }
+}
 
-  method begin_test_case(ClassName $tc, @tests)
-  {
+sub begin_test_case {
+    my ($self, $tc, @tests) = @_;
     $self->say("1..@{[scalar @tests]}");
     $self->diag("Test Case: $tc");
     $self->reset_counter();
-  }
+}
 
-  method begin_test(@)
-  {
+sub begin_test {
+    my ($self) = @_;
     $self->inc_counter();
-  }
+}
 
-  method pass(ClassName $tc, $test)
-  {
+sub pass {
+    my ($self, undef, $test) = @_;
     $self->say("ok @{[$self->test_counter]} - $test");
-  }
+}
 
-  method fail(ClassName $tc, $test, $msg)
-  {
+sub fail {
+    my ($self, undef, $test, $msg) = @_;
     $self->say("not ok @{[$self->test_counter]} - $test");
     $self->diag($msg);
-  }
+}
 
-  method error(ClassName $tc, $test, $msg)
-  {
+sub error {
+    my ($self, undef, $test, $msg) = @_;
     $self->say("not ok @{[$self->test_counter]} - $test");
     $self->diag($msg);
-  }
+}
 
-  method skip(ClassName $tc, $test, $msg)
-  {
+sub skip {
+    my ($self, undef, $test, $msg) = @_;
     $self->print("ok @{[$self->test_counter]} - $test # SKIP");
+
     if ($msg =~ /\n/) {
       $self->say();
       $self->diag($msg);
     } else {
       $self->say(": $msg");
     }
-  }
 }
+
+1;
