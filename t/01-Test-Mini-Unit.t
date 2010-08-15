@@ -3,6 +3,8 @@ use Test::More tests => 13;
 use strict;
 use warnings;
 
+require Test::Mini::Assertions;
+
 use B;
 
 my $END;
@@ -72,7 +74,7 @@ sub run_tests { Test::Mini::Unit::Runner->new(logger => 'Mock::Logger')->run() }
         no warnings 'redefine';
         *{'Mock::TestCase::test_method'} = sub {
             $tests_called++;
-            shift->assert(0);
+            Test::Mini::Assertions::assert(0);
         };
     }
 
@@ -90,7 +92,7 @@ sub run_tests { Test::Mini::Unit::Runner->new(logger => 'Mock::Logger')->run() }
         no warnings 'redefine';
         *{'Mock::TestCase::test_method'} = sub {
             $tests_called++;
-            shift->assert(1);
+            Test::Mini::Assertions::assert(1);
         };
     }
 

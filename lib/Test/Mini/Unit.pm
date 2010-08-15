@@ -3,8 +3,6 @@ use strict;
 use warnings;
 use 5.008;
 
-use aliased 'MooseX::Declare::Syntax::Keyword::Class', 'ClassKeyword';
-use aliased 'MooseX::Declare::Syntax::Keyword::Role',  'RoleKeyword';
 use aliased 'Test::Mini::Unit::Sugar::TestCase',       'TestCaseKeyword';
 
 sub import {
@@ -32,7 +30,7 @@ __END__
 
 =head1 NAME
 
-Test::Mini::Unit - Clean Unit Testing with Moose
+Test::Mini::Unit - Clean Unit Testing
 
 =head1 SYNOPSIS
 
