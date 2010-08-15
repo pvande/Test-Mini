@@ -5,7 +5,7 @@ use warnings;
 use Getopt::Long;
 use Try::Tiny;
 use Class::MOP;
-use aliased 'Test::Mini::Unit::TestCase';
+use aliased 'Test::Mini::TestCase';
 use List::Util qw/ shuffle /;
 
 sub new {

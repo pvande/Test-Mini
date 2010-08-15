@@ -1,4 +1,4 @@
-package Test::Mini::Unit::TestCase;
+package Test::Mini::TestCase;
 use strict;
 use warnings;
 
@@ -6,9 +6,9 @@ use Exception::Class;
 use Test::Mini::Assertions;
 
 {
-  my $class = __PACKAGE__;
-  no strict 'refs';
-  *$class = \{ 'setup' => [], 'teardown' => [] };
+    my $class = __PACKAGE__;
+    no strict 'refs';
+    *$class = \{ 'setup' => [], 'teardown' => [] };
 }
 
 sub new {

@@ -1,5 +1,5 @@
 package VintageTest;
-use base 'Test::Mini::Unit::TestCase';
+use base 'Test::Mini::TestCase';
 
 use Test::Mini::Assertions;
 

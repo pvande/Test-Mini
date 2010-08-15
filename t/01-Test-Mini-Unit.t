@@ -26,7 +26,7 @@ sub run_tests { Test::Mini::Runner->new(logger => 'Mock::Logger')->run() }
 {
     note 'Test: when run with an empty test module, exits with 127';
 
-    @Mock::TestCase::ISA = qw/ Test::Mini::Unit::TestCase /;
+    @Mock::TestCase::ISA = qw/ Test::Mini::TestCase /;
 
     is run_tests(), 127, 'Exit code';
 }

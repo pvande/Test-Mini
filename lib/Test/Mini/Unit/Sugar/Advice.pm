@@ -16,7 +16,7 @@ sub import {
         *{"$caller\::$args{name}"} = sub (&) {};
         on_scope_end {
             no warnings;
-            *{"$caller\::$args{name}"} = \&{"Test::Mini::Unit::TestCase::$args{name}"};
+            *{"$caller\::$args{name}"} = \&{"Test::Mini::TestCase::$args{name}"};
         }
     }
 

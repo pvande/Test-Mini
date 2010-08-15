@@ -52,7 +52,7 @@ sub parser {
     $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "setup");');
     $self->inject_if_block('use Test::Mini::Unit::Sugar::Test;');
     $self->inject_if_block('use Test::Mini::Assertions;');
-    $self->inject_if_block('use base "Test::Mini::Unit::TestCase";');
+    $self->inject_if_block('use base "Test::Mini::TestCase";');
     $self->inject_if_block("package $name;");
     $self->inject_if_block($self->scope_injector_call());
 

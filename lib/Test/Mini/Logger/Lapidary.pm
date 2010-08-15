@@ -11,7 +11,7 @@ sub new {
 sub clean_backtrace {
     my $error = shift;
 
-    my @context = grep { ?? .. $_->package =~ /Test::Mini::Unit::TestCase/ } $error->trace->frames();
+    my @context = grep { ?? .. $_->package =~ /Test::Mini::TestCase/ } $error->trace->frames();
     pop @context;
     reset;
 
