@@ -1,31 +1,39 @@
-use MooseX::Declare;
 use Test::Mini::Unit;
 
-role Mock::Enumerable
 {
-  has is_empty  => (is => 'ro');
-  has _equals   => (is => 'ro', init_arg => 'equals');
-  has _contains => (is => 'ro', init_arg => 'contains');
-
-  method equals(@)   { $self->_equals() }
-  method contains(@) { $self->_contains() }
+    package Mock::Dummy;
+    sub new {
+        my ($class, %args) = @_;
+        return bless \%args, $class;
+    }
 }
 
-class Mock::Dummy { }
-class Mock::Collection with Mock::Enumerable { }
-class Mock::Bag extends Mock::Collection { }
-
-testcase Test::Mini::Assertions::Test
 {
-  # use aliased 'Test::Mini::Assertions';
-  sub assert_passes(&;$)
-  {
-    my ($code, $msg) = @_;
-    $msg .= "\n" if $msg;
+    package Mock::Collection;
 
-    my $failures = 0;
-    no strict 'refs';
-    no warnings 'redefine';
+    sub new {
+        my ($class, %args) = @_;
+        return bless \%args, $class;
+    }
+
+    sub is_empty { shift->{is_empty} }
+    sub equals   { shift->{equals}   }
+    sub contains { shift->{contains} }
+}
+
+{
+    package Mock::Bag;
+    use base 'Mock::Collection';
+}
+
+testcase Test::Mini::Assertions::Test {
+    sub assert_passes (&;$) {
+        my ($code, $msg) = @_;
+        $msg .= "\n" if $msg;
+
+        my $failures = 0;
+        no strict 'refs';
+        no warnings 'redefine';
     
     *Test::Mini::Assertions::assert = sub ($;$) {
       my ($test, $msg) = @_;
