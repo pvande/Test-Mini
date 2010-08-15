@@ -1,21 +1,14 @@
 use Test::More tests => 13;
-
 use strict;
 use warnings;
 
 require Test::Mini::Assertions;
 
-use B;
-
 my $END;
 
-{ package Mock::TestCase; }
-{
-    package Mock::Logger;
-    use base 'Test::Mini::Logger';
-}
+{ package Mock::TestCase }
 
-sub run_tests { Test::Mini::Runner->new(logger => 'Mock::Logger')->run() }
+sub run_tests { Test::Mini::Runner->new(logger => 'Test::Mini::Logger')->run() }
 
 {
     note 'Test: when run with no test modules, exits with 255';
@@ -114,17 +107,22 @@ sub run_tests { Test::Mini::Runner->new(logger => 'Mock::Logger')->run() }
 }
 
 BEGIN {
-    use_ok 'Test::Mini::Unit';
+    use_ok 'Test::Mini';
     use List::Util qw/ first /;
     use B qw/ end_av /;
 
     my $index = first {
         my $cv = end_av->ARRAYelt($_);
-        ref $cv eq 'B::CV' && $cv->STASH->NAME eq 'Test::Mini::Unit';
+        ref $cv eq 'B::CV' && $cv->STASH->NAME eq 'Test::Mini';
     } 0..(end_av->MAX);
 
     ok defined($index), 'END hook installed';
 
     $END = end_av->ARRAYelt($index)->object_2svref();
     splice(@{ end_av()->object_2svref() }, $index, 1);
+}
+
+END {
+    # Cleanup, so that others aren't polluted if run in the same process.
+    @Mock::TestCase::ISA = ();
 }

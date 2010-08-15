@@ -1,20 +1,15 @@
-package Test::Mini::Unit;
+package Test::Mini;
 use strict;
 use warnings;
 use 5.008;
 
-use Test::Mini;
 use Test::Mini::Runner;
 require Test::Mini::Unit::Sugar::TestCase;
 
-sub import {
-    my ($class, @args) = @_;
-    my $caller = caller();
-
-    strict->import;
-    warnings->import;
-
-    Test::Mini::Unit::Sugar::TestCase->import(into => $caller, @args);
+END {
+    $| = 1;
+    return if $?;
+    $? = Test::Mini::Runner->new()->run();
 }
 
 1;
@@ -24,7 +19,7 @@ __END__
 
 =head1 NAME
 
-Test::Mini::Unit - Clean Unit Testing
+Test::Mini - Clean Unit Testing
 
 =head1 SYNOPSIS
 
@@ -34,7 +29,7 @@ Real Documentation is coming.  In the meantime, enjoy the montage!
 
   package TraditionalTest;
 
-  use Test::Mini::Unit;
+  use Test::Mini 'sugarfree';
   use Test::Mini::Assertions;
 
   sub setup    { 'This runs before each test...' }
@@ -46,28 +41,11 @@ Real Documentation is coming.  In the meantime, enjoy the montage!
 
   1;
 
-=head2 Classical Style
-
-  use Test::Mini::Unit;
-
-  class ClassicalTest extends Test::Mini::Unit::TestCase
-  {
-    use Test::Mini::Assertions;
-
-    method setup()    { 'This runs before each test...' }
-    method teardown() { 'This runs after each test...' }
-
-    method test_assert() { assert 1, 'I should pass' }
-    method test_refute() { refute 0, 'I should fail' }
-    method test_skip()   { skip "I've got better things to do" }
-  }
-
 =head2 Sweetened Style
 
-  use Test::Mini::Unit;
+  use Test::Mini;
 
-  testcase SugaryTest
-  {
+  testcase SugaryTest {
     setup    { 'This runs before each test...' }
     teardown { 'This runs after each test...' }
 
@@ -78,11 +56,11 @@ Real Documentation is coming.  In the meantime, enjoy the montage!
 
 =head1 AUTHOR
 
-Pieter Vande Bruggen, E<lt>pvande@cpan.org<gt>
+Pieter van de Bruggen, E<lt>pvande@cpan.org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 by Pieter Vande Bruggen
+Copyright (C) 2010 by Pieter van de Bruggen
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.9 or,

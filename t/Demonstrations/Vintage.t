@@ -1,6 +1,7 @@
 package VintageTest;
 use base 'Test::Mini::TestCase';
 
+use Test::Mini;
 use Test::Mini::Assertions;
 
 sub setup    { 'This runs before each test...' }
@@ -11,6 +12,3 @@ sub test_refute { refute 0, 'I should fail' }
 sub test_skip   { skip "I've got better things to do" }
 
 1;
-
-use Test::Mini::Runner;
-exit Test::Mini::Runner->new()->run();

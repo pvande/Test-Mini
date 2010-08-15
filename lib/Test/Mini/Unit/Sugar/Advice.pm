@@ -50,7 +50,7 @@ sub code_for {
     return sub (&) {
         my $code = shift;
         no strict 'refs';
-        push @{$$pkg->{$name}}, $code;
+        push @{${"::$pkg"}->{$name}}, $code;
     };
 }
 
