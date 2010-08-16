@@ -9,6 +9,8 @@ use Sub::Name;
 
 sub import {
     my ($class, %args) = @_;
+    return unless $args{name};
+
     my $caller = $args{into} || caller;
 
     {

@@ -12,8 +12,8 @@ ok !__PACKAGE__->can('teardown');
 testcase TestCase {
     main::can_ok(__PACKAGE__, qw/ test setup teardown /);
     
-    my $setup_calls = 0;
-    my $test_calls  = 0;
+    our $setup_calls = 0;
+    our $test_calls  = 0;
     
     setup {
         main::isa_ok $self, __PACKAGE__;
@@ -63,15 +63,15 @@ testcase TestCase {
         $test_calls--;
     }
 
-    END { main::is $test_calls, 0 }
+    END { main::is $TestCase::test_calls, 0 }
 };
 
 # Testing namespaced class names
 testcase Test::Case {
     main::can_ok(__PACKAGE__, qw/ test setup teardown /);
     
-    my $setup_calls = 0;
-    my $test_calls  = 0;
+    our $setup_calls = 0;
+    our $test_calls  = 0;
     
     setup {
         main::isa_ok $self, __PACKAGE__;
@@ -121,7 +121,7 @@ testcase Test::Case {
         $test_calls--;
     }
 
-    END { main::is $test_calls, 0 }
+    END { main::is $Test::Case::test_calls, 0 }
 };
 
 use Test::Mini::Runner;
