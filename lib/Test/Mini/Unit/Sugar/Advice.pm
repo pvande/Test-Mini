@@ -9,7 +9,7 @@ use Sub::Name;
 
 sub import {
     my ($class, %args) = @_;
-    return unless $args{name};
+    die 'Test::Mini::Unit::Sugar::Advice requires a name argument!' unless $args{name};
 
     my $caller = $args{into} || caller;
 
