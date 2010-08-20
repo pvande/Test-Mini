@@ -1,12 +1,19 @@
+# A simple base class for exceptions raised during test runs.
+package Test::Mini::Exception;
+use base 'Exception::Class::Base';
+
+# An exception that is raised when an assertion fails.
+package Test::Mini::Exception::Assert;
+use base 'Test::Mini::Exception';
+
+# An exception that is raised to indicate that the remainder of the test
+# should be skipped.
+package Test::Mini::Exception::Skip;
+use base 'Test::Mini::Exception::Assert';
+
 package Test::Mini::Assertions;
 use strict;
 use warnings;
-
-use Exception::Class 1.29
-  'Test::Mini::Unit::Error', => {  },
-  'Test::Mini::Unit::Assert' => { isa => 'Test::Mini::Unit::Error' },
-  'Test::Mini::Unit::Skip'   => { isa => 'Test::Mini::Unit::Assert' },
-;
 
 use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
 use List::Util   1.21 qw/ min /;
@@ -82,12 +89,12 @@ sub assert ($;$) {
 
     $assertion_count++;
 
-    Test::Mini::Unit::Assert->throw(
+    return 1 if $test;
+
+    Test::Mini::Exception::Assert->throw(
         message        => $msg,
         ignore_package => [__PACKAGE__],
-    ) unless $test;
-
-    return 1;
+    );
 }
 
 =item X<refute>(C<$test, $msg?>)
@@ -381,7 +388,7 @@ sub skip (;$) {
     my ($msg) = @_;
     $msg = 'Test skipped; no message given.' unless defined $msg;
     $msg = $msg->() if ref $msg eq 'CODE';
-    Test::Mini::Unit::Skip->throw(
+    Test::Mini::Exception::Skip->throw(
         message        => $msg,
         ignore_package => [__PACKAGE__],
     );

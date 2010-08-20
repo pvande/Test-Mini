@@ -50,18 +50,18 @@ sub run {
 
     eval {
         local $SIG{__DIE__} = sub {
-            package Test::Mini::Unit::SIGDIE;
+            package Test::Mini::SIGDIE;
 
-            die $@ if UNIVERSAL::isa($@, 'Test::Mini::Unit::Error');
+            die $@ if UNIVERSAL::isa($@, 'Test::Mini::Exception');
 
             (my $msg = "@_") =~ s/ at .*? line \d+\.\n$//;
-            my $error = Test::Mini::Unit::Error->new(
+            my $error = Test::Mini::Exception->new(
                 message        => "$msg\n",
-                ignore_package => [qw/ Test::Mini::Unit::SIGDIE Carp /],
+                ignore_package => [qw/ Test::Mini::SIGDIE Carp /],
             );
 
             my $me = $error->trace->frame(0);
-            if ($me->{subroutine} eq 'Test::Mini::Unit::TestCase::__ANON__') {
+            if ($me->{subroutine} eq 'Test::Mini::TestCase::__ANON__') {
                 $me->{subroutine} = 'die';
                 $me->{args} = [ $msg ];
             }
@@ -79,13 +79,13 @@ sub run {
     if ($e = Exception::Class->caught()) {
         $self->passed(0);
 
-        if ($e = Exception::Class->caught('Test::Mini::Unit::Skip')) {
+        if ($e = Exception::Class->caught('Test::Mini::Exception::Skip')) {
             $runner->skip(ref $self, $test, $e);
         }
-        elsif ($e = Exception::Class->caught('Test::Mini::Unit::Assert')) {
+        elsif ($e = Exception::Class->caught('Test::Mini::Exception::Assert')) {
             $runner->fail(ref $self, $test, $e);
         }
-        elsif ($e = Exception::Class->caught('Test::Mini::Unit::Error')) {
+        elsif ($e = Exception::Class->caught('Test::Mini::Exception')) {
             $runner->error(ref $self, $test, $e);
         }
     }
