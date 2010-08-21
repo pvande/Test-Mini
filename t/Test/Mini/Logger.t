@@ -35,3 +35,5 @@ sub test_full_test_run_should_remain_silent {
 
     assert_equal $buffer, '';
 }
+
+1;

@@ -151,3 +151,5 @@ sub test_skip_with_multiline_reason {
         # Don't be a fool
     |);
 }
+
+1;

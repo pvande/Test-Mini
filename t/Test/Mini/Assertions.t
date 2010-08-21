@@ -1085,3 +1085,5 @@ sub assert_error (&;$) {
         } 'undef is undefined';
     }
 }
+
+1;
