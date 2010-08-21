@@ -1,37 +1,37 @@
-use Test::Mini::Unit;
+package t::Test::Mini::Logger;
+use base 'Test::Mini::TestCase';
+use strict;
+use warnings;
 
-testcase Test::Mini::Logger::Test {
-    use aliased 'IO::Scalar'         => 'Buffer';
-    use aliased 'Test::Mini::Logger' => 'Logger';
+use Test::Mini;
+use Test::Mini::Assertions;
 
-    my $buffer;
-    setup {
-        $self->{logger} = Logger->new(buffer => Buffer->new(\($buffer = '')));
-    }
+use aliased 'IO::Scalar'         => 'Buffer';
+use aliased 'Test::Mini::Logger' => 'Logger';
 
-    sub logger {
-        my ($self) = @_;
-        return $self->{logger};
-    }
+my ($buffer, $logger);
 
-    test full_test_run_should_remain_silent {
-        $self->logger->begin_test_suite();
-        $self->logger->begin_test_case('MyClass', qw/ m1 m2 m3 m4 /);
-        $self->logger->begin_test('MyClass', 'm1');
-        $self->logger->pass('MyClass', 'm1');
-        $self->logger->finish_test('MyClass', 'm1', 1);
-        $self->logger->begin_test('MyClass', 'm2');
-        $self->logger->fail('MyClass', 'm2', 'failure message');
-        $self->logger->finish_test('MyClass', 'm2', 2);
-        $self->logger->begin_test('MyClass', 'm3');
-        $self->logger->error('MyClass', 'm3', 'error message');
-        $self->logger->finish_test('MyClass', 'm3', 3);
-        $self->logger->begin_test('MyClass', 'm4');
-        $self->logger->skip('MyClass', 'm4', 'reason');
-        $self->logger->finish_test('MyClass', 'm4', 0);
-        $self->logger->finish_test_case('MyClass', qw/ m1 m2 m3 m4 /);
-        $self->logger->finish_test_suite(1);
+sub setup {
+    $logger = Logger->new(buffer => Buffer->new(\($buffer = '')));
+}
 
-        assert_equal $buffer, '';
-    }
+sub test_full_test_run_should_remain_silent {
+    $logger->begin_test_suite();
+    $logger->begin_test_case('MyClass', qw/ m1 m2 m3 m4 /);
+    $logger->begin_test('MyClass', 'm1');
+    $logger->pass('MyClass', 'm1');
+    $logger->finish_test('MyClass', 'm1', 1);
+    $logger->begin_test('MyClass', 'm2');
+    $logger->fail('MyClass', 'm2', 'failure message');
+    $logger->finish_test('MyClass', 'm2', 2);
+    $logger->begin_test('MyClass', 'm3');
+    $logger->error('MyClass', 'm3', 'error message');
+    $logger->finish_test('MyClass', 'm3', 3);
+    $logger->begin_test('MyClass', 'm4');
+    $logger->skip('MyClass', 'm4', 'reason');
+    $logger->finish_test('MyClass', 'm4', 0);
+    $logger->finish_test_case('MyClass', qw/ m1 m2 m3 m4 /);
+    $logger->finish_test_suite(1);
+
+    assert_equal $buffer, '';
 }
