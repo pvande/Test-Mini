@@ -13,17 +13,6 @@ use Test::Mini::Assertions;
 
 sub new {
     my ($class, %args) = @_;
-}
-
-sub name {
-    my ($self) = @_;
-    return $self->{name};
-}
-
-sub passed {
-    my ($self, $value) = @_;;
-    return $self->{passed} if @_ % 2;
-    $self->{passed} = $value;
     return bless { %args, passed => 0 }, $class;
 }
 
@@ -46,7 +35,7 @@ sub teardown {
 sub run {
     my ($self, $runner) = @_;
     my $e;
-    my $test = $self->name();
+    my $test = $self->{name};
 
     eval {
         local $SIG{__DIE__} = sub {
@@ -71,13 +60,13 @@ sub run {
 
         $self->setup() if $self->can('setup');
         $self->$test();
-        $self->passed(1);
+        $self->{passed} = 1;
 
         die 'No assertions called' unless $self->count_assertions();
     };
 
     if ($e = Exception::Class->caught()) {
-        $self->passed(0);
+        $self->{passed} = 0;
 
         if ($e = Exception::Class->caught('Test::Mini::Exception::Skip')) {
             $runner->skip(ref $self, $test, $e);
@@ -92,7 +81,7 @@ sub run {
 
     eval {
         $self->teardown() if $self->can('teardown');
-        $runner->pass(ref $self, $self->name()) if $self->passed();
+        $runner->pass(ref $self, $self->{name}) if $self->{passed};
     };
     if ($e = Exception::Class->caught()) {
         $runner->error(ref $self, $test, $e);
