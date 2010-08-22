@@ -11,6 +11,27 @@ use Test::Mini::Assertions;
     *$class = \{ 'setup' => [], 'teardown' => [] };
 }
 
+# Run the appropriate advice for the test.  'setup' advice should be run in
+# declaration order, from the most distant ancestor to the most recent.
+# 'teardown' advice is run from modernity to antiquity, but should be run in
+# the reverse of declaration order.
+#
+# @param ['setup'|'teardown'] $type The advice type to run.
+sub run_advice {
+    my ($self, $type) = @_;
+
+    no strict 'refs';
+
+    my @methods = map { ${"::$_"}->{$type} } @{ mro::get_linear_isa(ref $self) };
+
+    @methods = reverse @methods                 if $type eq 'setup';
+    @methods = map { [ reverse @$_ ] } @methods if $type eq 'teardown';
+
+    map { $_->($self) } @$_ for @methods;
+}
+
+use namespace::clean;
+
 sub new {
     my ($class, %args) = @_;
     return bless { %args, passed => 0 }, $class;
@@ -18,18 +39,12 @@ sub new {
 
 sub setup {
     my ($self) = @_;
-    no strict 'refs';
-    for my $class (reverse @{ mro::get_linear_isa(ref $self) }) {
-        $_->($self) for @{ ${"::$class"}->{setup} };
-    }
+    &run_advice($self, 'setup');
 }
 
 sub teardown {
     my ($self) = @_;
-    no strict 'refs';
-    for my $class (@{ mro::get_linear_isa(ref $self) }) {
-        $_->($self) for reverse @{ ${"::$class"}->{teardown} || [] };
-    }
+    &run_advice($self, 'teardown');
 }
 
 sub run {
