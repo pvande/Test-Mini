@@ -58,7 +58,7 @@ sub run {
             die $error;
         };
 
-        $self->setup() if $self->can('setup');
+        $self->setup();
         $self->$test();
         $self->{passed} = 1;
 
@@ -80,7 +80,7 @@ sub run {
     }
 
     eval {
-        $self->teardown() if $self->can('teardown');
+        $self->teardown();
         $runner->pass(ref $self, $self->{name}) if $self->{passed};
     };
     if ($e = Exception::Class->caught()) {
