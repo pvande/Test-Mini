@@ -32,21 +32,66 @@ sub run_advice {
 
 use namespace::clean;
 
+# Creates a new instance of the class.
+# @private
+#
+# @param [Hash] %args Initial state for the new instance.
+# @option %args name The specific test this instance should run.
 sub new {
     my ($class, %args) = @_;
     return bless { %args, passed => 0 }, $class;
 }
 
+# Test setup behavior, automatically invoked prior to each test.  Intended to
+# be overridden by subclasses.
+#
+# @example
+#   package TestSomething;
+#   use base 'Test::Mini::TestCase';
+#
+#   use Something;
+#
+#   sub setup { $obj = Something->new(); }
+#
+#   sub test_can_foo {
+#       assert_can($obj, 'foo');
+#   }
+#
+# @see #teardown
 sub setup {
     my ($self) = @_;
     &run_advice($self, 'setup');
 }
 
+# Test teardown behavior, automatically invoked following each test.  Intended
+# to be overridden by subclasses.
+#
+# @example
+#   package Test;
+#   use base 'Test::Mini::TestCase';
+#
+#   sub teardown { unlink 'foo.bar' }
+#
+#   sub test_touching_files {
+#       `touch foo.bar`;
+#       assert(-f 'foo.bar');
+#   }
+#
+# @see #setup
 sub teardown {
     my ($self) = @_;
     &run_advice($self, 'teardown');
 }
 
+# Runs the test specified at construction time.  This method is responsible
+# for invoking the setup and teardown advice for the method, in addition to
+# ensuring that any fatal errors encountered by the program are suitably
+# handled.  Appropriate diagnostic information should be sent to the supplied
+# +$runner+.
+# @private
+#
+# @param [Test::Mini::Runner] $runner
+# @return The number of assertions called by this test.
 sub run {
     my ($self, $runner) = @_;
     my $e;
