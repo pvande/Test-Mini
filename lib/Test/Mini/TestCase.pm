@@ -13,7 +13,6 @@ use Test::Mini::Assertions;
 
 sub new {
     my ($class, %args) = @_;
-    return bless { passed => 0, %args }, $class;
 }
 
 sub name {
@@ -25,6 +24,7 @@ sub passed {
     my ($self, $value) = @_;;
     return $self->{passed} if @_ % 2;
     $self->{passed} = $value;
+    return bless { %args, passed => 0 }, $class;
 }
 
 sub setup {
