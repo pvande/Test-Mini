@@ -126,7 +126,7 @@ sub run {
         $self->$test();
         $self->{passed} = 1;
 
-        die 'No assertions called' unless $self->count_assertions();
+        die 'No assertions called' unless count_assertions();
     };
 
     if ($e = Exception::Class->caught()) {
@@ -151,7 +151,7 @@ sub run {
         $runner->error(ref $self, $test, $e);
     }
 
-    return $self->count_assertions();
+    return reset_assertions();
 }
 
 1;

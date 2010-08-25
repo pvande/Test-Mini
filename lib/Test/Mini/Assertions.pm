@@ -82,7 +82,11 @@ sub import {
 }
 
 sub _count_assertions { return $assertion_count }
-sub _reset_assertions { $assertion_count  = 0   }
+sub _reset_assertions {
+    my $final_count = $assertion_count;
+    $assertion_count = 0;
+    return $final_count;
+}
 
 
 # Asserts that +$test+ is truthy, and throws a {Test::Mini::Exception::Assert}
