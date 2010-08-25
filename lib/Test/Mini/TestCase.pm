@@ -22,7 +22,11 @@ sub run_advice {
 
     no strict 'refs';
 
-    my @methods = map { ${"::$_"}->{$type} } @{ mro::get_linear_isa(ref $self) };
+    my @methods = map {
+        # Hand-built subclasses are unlikely to have the $$class hash set up.
+        # To officially support them, we'll have to concede an empty arrayref.
+        ${"::$_"}->{$type} || []
+    } @{ mro::get_linear_isa(ref $self) };
 
     @methods = reverse @methods                 if $type eq 'setup';
     @methods = map { [ reverse @$_ ] } @methods if $type eq 'teardown';
