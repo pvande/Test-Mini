@@ -17,7 +17,7 @@ sub setup {
 
 sub test_full_test_run_should_remain_silent {
     $logger->begin_test_suite();
-    $logger->begin_test_case('MyClass', qw/ m1 m2 m3 m4 /);
+    $logger->begin_test_case('MyClass');
     $logger->begin_test('MyClass', 'm1');
     $logger->pass('MyClass', 'm1');
     $logger->finish_test('MyClass', 'm1', 1);
