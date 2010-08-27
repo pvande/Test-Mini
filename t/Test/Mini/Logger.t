@@ -3,7 +3,6 @@ use base 'Test::Mini::TestCase';
 use strict;
 use warnings;
 
-use Test::Mini;
 use Test::Mini::Assertions;
 
 use aliased 'IO::Scalar'         => 'Buffer';

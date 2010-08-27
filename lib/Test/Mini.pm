@@ -5,12 +5,10 @@
 # infrastructure for more expressive test fromeworks to be written.
 #
 # Since example code speaks louder than words:
-#   use strict;
-#   use warnings;
-#   use Test::Mini;
-#
 #   package t::Test
 #   use base 'Test::Mini::TestCase';
+#   use strict;
+#   use warnings;
 #
 #   # This will run before each test
 #   sub setup { ... }

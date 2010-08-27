@@ -2,6 +2,7 @@ package Test::Mini::TestCase;
 use strict;
 use warnings;
 
+use Test::Mini;
 use Exception::Class;
 use Test::Mini::Assertions;
 
