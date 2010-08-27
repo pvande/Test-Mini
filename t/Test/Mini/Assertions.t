@@ -446,8 +446,8 @@ sub assert_error (&;$) {
         } '{ a => 1} equals { "a", 1 }';
         assert_passes {
             Test::Mini::Assertions::assert_equal(
-                {pass => 1, test => 1, assertions => 1},
-                {test => 1, pass => 1, assertions => 1}
+                { (1..1000) },
+                { (501..1000), (1..500) }
             );
         } "key order in hashes mustn't matter";
         assert_passes {
