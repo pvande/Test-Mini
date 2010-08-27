@@ -410,8 +410,8 @@ sub assert_equal ($$;$) {
         }
         elsif (ref $actual eq 'HASH' && ref $expected eq 'HASH') {
             $passed = (keys %$actual == keys %$expected);
-            unshift @actual, %$actual;
-            unshift @expected, %$expected;
+            unshift @actual,   map {$_, $actual->{$_}  } sort keys %$actual;
+            unshift @expected, map {$_, $expected->{$_}} sort keys %$expected;
         }
         elsif (ref $actual && ref $expected) {
             $passed = (ref $actual eq ref $expected);

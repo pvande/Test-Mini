@@ -446,6 +446,12 @@ sub assert_error (&;$) {
             Test::Mini::Assertions::assert_equal({ a => 1 }, { 'a', 1 });
         } '{ a => 1} equals { "a", 1 }';
         assert_passes {
+            Test::Mini::Assertions::assert_equal(
+                {pass => 1, test => 1, assertions => 1},
+                {test => 1, pass => 1, assertions => 1}
+            );
+        } "key order in hashes mustn't matter";
+        assert_passes {
             Test::Mini::Assertions::assert_equal(Mock::Dummy->new(), Mock::Dummy->new());
         } 'Mock::Dummy->new()';
         assert_passes {
