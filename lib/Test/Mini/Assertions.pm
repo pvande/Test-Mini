@@ -165,7 +165,7 @@ sub refute_block (&;$) {
 }
 
 # Verifies that the given +$obj+ is capable of responding to the given
-# +$method+ name.  Also available as {#assert_responds_to}.
+# +$method+ name.
 #
 # @example
 #   assert_can $date, 'day_of_week';
@@ -182,7 +182,7 @@ sub assert_can ($$;$) {
 }
 
 # Verifies that the given +$obj+ is *not* capable of responding to the given
-# +$method+ name.  Also available as {#refute_responds_to}.
+# +$method+ name.
 #
 # @example
 #   refute_can $date, 'to_time';
@@ -199,7 +199,6 @@ sub refute_can ($$;$) {
 }
 
 # Verifies that the given +$collection+ contains the given +$obj+ as a member.
-# Aliased as {#assert_includes}.
 #
 # @example
 #   assert_contains [qw/ 1 2 3 /], 2;
@@ -233,7 +232,7 @@ sub assert_contains ($$;$) {
 }
 
 # Verifies that the given +$collection+ does not contain the given +$obj+ as a
-# member.  Aliased as {#refute_includes}.
+# member.
 #
 # @example
 #   refute_contains [qw/ 1 2 3 /], 5;
@@ -267,11 +266,20 @@ sub refute_contains ($$;$) {
 }
 
 # Validates that the given +$obj+ is defined.
-# @see #refute_undef
-sub assert_defined ($;$) { goto &refute_undef }
+#
+# @example
+#   assert_defined $value;  # if defined $value
+#
+# @param $obj The value to check.
+# @param [String] $msg (undef) An optional description.
+sub assert_defined ($;$) {
+    my ($obj, $msg) = @_;
+    $msg = message("Expected @{[inspect($obj)]} to be defined", $msg);
+    assert(defined $obj, $msg);
+}
 
 # Validates that the given +$obj+ is undefined.
-# @see #assert_undef
+# @alias #assert_undef
 sub refute_defined ($;$) { goto &assert_undef }
 
 # Tests that the supplied code block dies, and fails if it succeeds.  If
@@ -363,14 +371,14 @@ sub refute_empty ($;$) {
 }
 
 # Checks two given arguments for equality.
-# @see #assert_equal
+# @alias #assert_equal
 sub assert_eq { goto &assert_equal }
 
 # Checks two given arguments for inequality.
-# @see #assert_equal
+# @alias #refute_equal
 sub refute_eq { goto &refute_equal }
 
-# Checks two given arguments for equality.  Aliased as {#assert_eq}.
+# Checks two given arguments for equality.
 #
 # @example
 #   assert_equal 3.000, 3;
@@ -432,7 +440,7 @@ sub assert_equal ($$;$) {
     assert($passed, $msg);
 }
 
-# Checks two given arguments for inequality.  Aliased as {#refute_eq}.
+# Checks two given arguments for inequality.
 #
 # @example
 #   refute_equal 3.001, 3;
@@ -583,12 +591,12 @@ sub refute_in_epsilon ($$;$$) {
 }
 
 # Verifies that the given +$collection+ contains the given +$obj+ as a member.
-# @see #assert_contains
+# @alias #assert_contains
 sub assert_includes ($$;$) { goto &assert_contains }
 
 # Verifies that the given +$collection+ does not contain the given +$obj+ as a
 # member.
-# @see #refute_includes
+# @alias #refute_includes
 sub refute_includes ($$;$) { goto &refute_contains }
 
 # Validates that the given object is an instance of +$type+.
@@ -606,7 +614,7 @@ sub assert_instance_of ($$;$) {
     assert(ref $obj eq $type, $msg);
 }
 
-# Validates that +$obj+ inherits from +$type+.  Aliased as {#assert_isa}.
+# Validates that +$obj+ inherits from +$type+.
 #
 # @example
 #   assert_is_a 'Employee', 'Employee';
@@ -627,7 +635,7 @@ sub assert_is_a($$;$) {
 }
 
 # Validates that +$obj+ inherits from +$type+.
-# @see #assert_is_a
+# @alias #assert_is_a
 sub assert_isa { goto &assert_is_a }
 
 # Validates that the given +$string+ matches the given +$pattern+.
@@ -660,15 +668,15 @@ sub refute_match ($$;$) {
 
 # Verifies that the given +$obj+ is capable of responding to the given
 # +$method+ name.
-# @see #assert_can
+# @alias #assert_can
 sub assert_responds_to ($$;$) { goto &assert_can }
 
 # Verifies that the given +$obj+ is *not* capable of responding to the given
 # +$method+ name.
-# @see #refute_can
+# @alias #refute_can
 sub refute_responds_to ($$;$) { goto &refute_can }
 
-# Validates that the given +$obj+ is undefined.  Aliased as {#refute_defined}.
+# Validates that the given +$obj+ is undefined.
 #
 # @example
 #   assert_undef $value;  # if not defined $value
@@ -681,18 +689,8 @@ sub assert_undef ($;$) {
     refute(defined $obj, $msg);
 }
 
-# Validates that the given +$obj+ is defined.  Aliased as {#assert_defined}.
-#
-# @example
-#   refute_undef $value;  # if defined $value
-#
-# @param $obj The value to check.
-# @param [String] $msg (undef) An optional description.
-sub refute_undef ($;$) {
-    my ($obj, $msg) = @_;
-    $msg = message("Expected @{[inspect($obj)]} to be defined", $msg);
-    assert(defined $obj, $msg);
-}
+# @alias #assert_defined
+sub refute_undef ($;$) { goto &assert_defined }
 
 # Allows the current test to be bypassed with an indeterminate status.
 # @param [String] $msg (undef) An optional description.
