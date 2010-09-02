@@ -88,6 +88,7 @@ sub _reset_assertions {
     return $final_count;
 }
 
+# @group Exported Functions
 
 # Asserts that +$test+ is truthy, and throws a {Test::Mini::Exception::Assert}
 # if that assertion fails.
