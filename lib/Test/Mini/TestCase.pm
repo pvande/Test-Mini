@@ -39,9 +39,10 @@ sub run_advice {
 
 use namespace::clean;
 
-# Creates a new instance of the class.
-# @private
+
+# Constructor.
 #
+# @private
 # @param [Hash] %args Initial state for the new instance.
 # @option %args name The specific test this instance should run.
 sub new {
@@ -95,8 +96,8 @@ sub teardown {
 # ensuring that any fatal errors encountered by the program are suitably
 # handled.  Appropriate diagnostic information should be sent to the supplied
 # +$runner+.
-# @private
 #
+# @private
 # @param [Test::Mini::Runner] $runner
 # @return The number of assertions called by this test.
 sub run {
@@ -106,6 +107,8 @@ sub run {
 
     eval {
         local $SIG{__DIE__} = sub {
+            # Package declaration for the sake of isolating the callstack.
+            # @private
             package Test::Mini::SIGDIE;
 
             die $@ if UNIVERSAL::isa($@, 'Test::Mini::Exception');

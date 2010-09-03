@@ -12,6 +12,7 @@ use List::Util qw/ shuffle /;
 # Arguments may be provided explicitly to the constructor or implicitly via
 # either @ARGV (parsed by {Getopt::Long}) or environment variables
 # ("TEST_MINI_$option").
+#
 # @param [Hash] %args Intial state for the new instance.
 # @option %args verbose (0) Logger verbosity.
 # @option %args filter [String] ('')  Test name filter.
@@ -68,6 +69,7 @@ sub exit_code {
 # Begins the test run.
 # Loads and instantiates the test output logger, then dispatches to
 # {#run_test_suite} (passing the {#filter} and {#seed}, as appropriate).
+#
 # @return The result of the {#run_test_suite} call.
 sub run {
     my ($self) = @_;
@@ -90,6 +92,7 @@ sub run {
 # Finds subclasses of {Test::Mini::TestCase}, and dispatches to
 # {#run_test_case} with the name of each test case and a list test methods to
 # be run.
+#
 # @param [Hash] %args
 # @option %args [String] filter Test name filter.
 # @option %args [String] seed Randomness seed.
@@ -113,6 +116,7 @@ sub run_test_suite {
 }
 
 # Runs tests in a test case.
+#
 # @param [Class] $tc The test case to run.
 # @param [Array<String>] @tests A list of tests to be run.
 sub run_test_case {
@@ -127,6 +131,7 @@ sub run_test_case {
 }
 
 # Runs a specific test.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the test method to be run.
 # @return [Integer] The number of assertions called by the test.
@@ -144,6 +149,7 @@ sub run_test {
 # @group Callbacks
 
 # Callback for passing tests.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the passing test.
 sub pass {
@@ -152,6 +158,7 @@ sub pass {
 }
 
 # Callback for skipped tests.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the skipped test.
 # @param [Test::Mini::Exception::Skip] $e The exception object.
@@ -161,6 +168,7 @@ sub skip {
 }
 
 # Callback for failing tests.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the failed test.
 # @param [Test::Mini::Exception::Assert] $e The exception object.
@@ -171,6 +179,7 @@ sub fail {
 }
 
 # Callback for dying tests.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the test with an error.
 # @param [Test::Mini::Exception] $e The exception object.

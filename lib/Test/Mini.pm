@@ -33,6 +33,8 @@
 # Like any traditional xUnit framework, any method whose name begins with
 # 'test' will be automatically run.  If you've declared 'setup' or 'teardown'
 # methods, they will be run before or after each test.
+#
+# @see Test::Mini::Runner
 package Test::Mini;
 use strict;
 use warnings;

@@ -9,6 +9,7 @@ use warnings;
 use Time::HiRes;
 
 # Constructor.
+#
 # @param [Hash] %args Intial state for the new instance.
 # @option %args verbose (0) Logger verbosity.
 # @option %args buffer [IO] (STDOUT) Output buffer.
@@ -39,14 +40,18 @@ sub buffer {
 
 # @group Output Functions
 
-# Write output to the {#buffer}.  Lines will be output without added newlines.
+# Write output to the {#buffer}.
+# Lines will be output without added newlines.
+#
 # @param @msg The message(s) to be printed.  Will be handled as per +print+.
 sub print {
     my ($self, @msg) = @_;
     print { $self->buffer() } @msg;
 }
 
-# Write output to the {#buffer}.  Lines will be output with appended newlines.
+# Write output to the {#buffer}.
+# Lines will be output with appended newlines.
+#
 # @param @msg The message(s) to be printed.  Newlines will be appended to each
 # message, before being passed to {#print}.
 sub say {
@@ -57,6 +62,7 @@ sub say {
 # @group Callbacks
 
 # Called before the test suite is run.
+#
 # @param [Hash] %args Options the test suite was run with.
 # @option %args [String] filter Test name filter.
 # @option %args [String] seed Randomness seed.
@@ -66,6 +72,7 @@ sub begin_test_suite {
 }
 
 # Called before each test case is run.
+#
 # @param [Class] $tc The test case being run.
 # @param [Array<String>] @tests A list of tests to be run.
 sub begin_test_case {
@@ -74,6 +81,7 @@ sub begin_test_case {
 }
 
 # Called before each test is run.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the test method being run.
 sub begin_test {
@@ -83,6 +91,7 @@ sub begin_test {
 
 # Called after each test is run.
 # Increments the test and assertion counts, and finalizes the test's timing.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the test method just run.
 # @param [Integer] $assertions The number of assertions called.
@@ -95,6 +104,7 @@ sub finish_test {
 
 # Called after each test case is run.
 # Increments the test case count, and finalizes the test case's timing.
+#
 # @param [Class] $tc The test case just run.
 # @param [Array<String>] @tests A list of tests run.
 sub finish_test_case {
@@ -105,6 +115,7 @@ sub finish_test_case {
 
 # Called after each test suite is run.
 # Finalizes the test suite timing.
+#
 # @param [Integer] $exit_code Status the tests finished with.
 sub finish_test_suite {
     my ($self, $exit_code) = @_;
@@ -113,6 +124,7 @@ sub finish_test_suite {
 
 # Called when a test passes.
 # Increments the pass count.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the passing test.
 sub pass {
@@ -122,6 +134,7 @@ sub pass {
 
 # Called when a test is skipped.
 # Increments the skip count.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the skipped test.
 # @param [Test::Mini::Exception::Skip] $e The exception object.
@@ -132,6 +145,7 @@ sub skip {
 
 # Called when a test fails.
 # Increments the failure count.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the failed test.
 # @param [Test::Mini::Exception::Assert] $e The exception object.
@@ -142,6 +156,7 @@ sub fail {
 
 # Called when a test dies with an error.
 # Increments the error count.
+#
 # @param [Class] $tc The test case owning the test method.
 # @param [String] $test The name of the test with an error.
 # @param [Test::Mini::Exception] $e The exception object.
@@ -152,9 +167,11 @@ sub error {
 
 # @group Statistics
 
-# Accessor for counters
+# Accessor for counters.
+#
 # @overload count()
 #   @return [Hash] The count hash.
+#
 # @overload count($key)
 #   @param $key A key in the count hash.
 #   @return [Number] The value for the given key.
@@ -164,8 +181,8 @@ sub count {
 }
 
 # Accessor for the timing data.
-# @param $key The key to look up timings for.  The commonly populated values
-# are:
+#
+# @param $key The key to look up timings for.  Typical values are:
 # +$self+ :: Time for test suite
 # "TestCase" :: Time for the test case
 # "TestCase#test" :: Time for the given test

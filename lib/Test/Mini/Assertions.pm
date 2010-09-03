@@ -28,7 +28,6 @@ use Data::Inspect;
 # @param $default [String] The default message to use.
 # @param $msg [String] (undef) A message to use in place of the default.
 # @return A well-formatted message.
-# @private
 sub message {
     my ($default, $msg) = @_;
 
@@ -42,7 +41,6 @@ sub message {
 #
 # @param $ref The argument to dereference.
 # @return The referenced value or values.
-# @private
 sub deref {
     my ($ref) = @_;
     return %$ref if reftype($ref) eq 'HASH';
@@ -56,7 +54,6 @@ sub deref {
 #
 # @param $obj The object to describe.
 # @return [String] A description of the given object.
-# @private
 sub inspect {
     Data::Inspect->new()->inspect(@_);
 }
@@ -279,7 +276,7 @@ sub assert_defined ($;$) {
     assert(defined $obj, $msg);
 }
 
-# Validates that the given +$obj+ is undefined.
+# Validates that the given +$obj+ is not defined.
 # @alias #assert_undef
 sub refute_defined ($;$) { goto &assert_undef }
 
@@ -544,8 +541,8 @@ sub refute_in_delta ($$;$$) {
     refute($delta >= $n, $msg);
 }
 
-# Like {#assert_in_delta}, but better at dealing with errors proportional to
-# the given arguments.
+# Checks that the difference between +$actual+ and +$expected+ is less than
+# a given fraction of the smaller of the two numbers.
 #
 # @example
 #   assert_in_epsilon 22.0 / 7.0, Math::Trig::pi;
@@ -567,8 +564,8 @@ sub assert_in_epsilon ($$;$$) {
     );
 }
 
-# Like {#refute_in_delta}, but better at dealing with errors proportional to
-# the given arguments.
+# Checks that the difference between +$actual+ and +$expected+ is greater than
+# a given fraction of the smaller of the two numbers.
 #
 # @example
 #   refute_in_epsilon 21.0 / 7.0, Math::Trig::pi;
@@ -690,6 +687,7 @@ sub assert_undef ($;$) {
     refute(defined $obj, $msg);
 }
 
+# Validates that the given +$obj+ is not undefined.
 # @alias #assert_defined
 sub refute_undef ($;$) { goto &assert_defined }
 
