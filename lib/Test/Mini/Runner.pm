@@ -8,6 +8,15 @@ use Class::MOP;
 use aliased 'Test::Mini::TestCase';
 use List::Util qw/ shuffle /;
 
+# Constructor.
+# Arguments may be provided explicitly to the constructor or implicitly via
+# either @ARGV (parsed by {Getopt::Long}) or environment variables
+# ("TEST_MINI_$option").
+# @param [Hash] %args Intial state for the new instance.
+# @option %args verbose (0) Logger verbosity.
+# @option %args filter [String] ('')  Test name filter.
+# @option %args logger [Class] (Test::Mini::Logger::TAP) Logger class name.
+# @option %args seed [Integer] (a random number < 64,000,000) Randomness seed.
 sub new {
     my ($class, %args) = @_;
 
@@ -16,19 +25,50 @@ sub new {
         filter    => $ENV{TEST_MINI_FILTER}  || '',
         logger    => $ENV{TEST_MINI_LOGGER}  || 'Test::Mini::Logger::TAP',
         seed      => $ENV{TEST_MINI_SEED}    || int(rand(64_000_000)),
-        exit_code => 0,
     );
 
-    GetOptions(\%argv, qw/ verbose! filter=s logger=s seed=s /);
-    return bless { %argv, %args }, $class;
+    GetOptions(\%argv, qw/ verbose=s filter=s logger=s seed=i /);
+    return bless { %argv, %args, exit_code => 0 }, $class;
 }
 
-sub verbose   { shift->{verbose}   }
-sub filter    { shift->{filter}    }
-sub logger    { shift->{logger}    }
-sub seed      { shift->{seed}      }
-sub exit_code { shift->{exit_code} }
+# @group Attribute Accessors
 
+# @return Logger verbosity.
+sub verbose {
+    my $self = shift;
+    return $self->{verbose};
+}
+
+# @return Test name filter.
+sub filter {
+    my $self = shift;
+    return $self->{filter};
+}
+
+# @return Logger instance.
+sub logger {
+    my $self = shift;
+    return $self->{logger};
+}
+
+# @return Randomness seed.
+sub seed {
+    my $self = shift;
+    return $self->{seed};
+}
+
+# @return Exit code, representing the status of the test run.
+sub exit_code {
+    my $self = shift;
+    return $self->{exit_code};
+}
+
+# @group Test Run Hooks
+
+# Begins the test run.
+# Loads and instantiates the test output logger, then dispatches to
+# {#run_test_suite} (passing the {#filter} and {#seed}, as appropriate).
+# @return The result of the {#run_test_suite} call.
 sub run {
     my ($self) = @_;
     my $logger = $self->logger;
@@ -43,15 +83,22 @@ sub run {
     $logger = $logger->new(verbose => $self->verbose);
     $self->{logger} = $logger;
 
-    srand($self->seed);
-
     return $self->run_test_suite(filter => $self->filter, seed => $self->seed);
 }
 
+# Runs the test suite.
+# Finds subclasses of {Test::Mini::TestCase}, and dispatches to
+# {#run_test_case} with the name of each test case and a list test methods to
+# be run.
+# @param [Hash] %args
+# @option %args [String] filter Test name filter.
+# @option %args [String] seed Randomness seed.
+# @return The value of {#exit_code}.
 sub run_test_suite {
     my ($self, %args) = @_;
     $self->logger->begin_test_suite(%args);
 
+    srand($args{seed});
     my @testcases = @{ mro::get_isarev(TestCase) };
     $self->{exit_code} = 255 unless @testcases;
 
@@ -61,10 +108,13 @@ sub run_test_suite {
         $self->run_test_case($tc, grep { $_ =~ qr/$args{filter}/ } @tests);
     }
 
-    $self->logger->finish_test_case(%args, $self->exit_code);
+    $self->logger->finish_test_suite($self->exit_code);
     return $self->exit_code;
 }
 
+# Runs tests in a test case.
+# @param [Class] $tc The test case to run.
+# @param [Array<String>] @tests A list of tests to be run.
 sub run_test_case {
     my ($self, $tc, @tests) = @_;
     $self->logger->begin_test_case($tc, @tests);
@@ -73,35 +123,57 @@ sub run_test_case {
     $self->run_test($tc, $_) for shuffle @tests;
 
     $self->logger->finish_test_case($tc, @tests);
+    return scalar @tests;
 }
 
+# Runs a specific test.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the test method to be run.
+# @return [Integer] The number of assertions called by the test.
 sub run_test {
     my ($self, $tc, $test) = @_;
     $self->logger->begin_test($tc, $test);
 
     my $instance = $tc->new(name => $test);
-    my $result = $instance->run($self);
+    my $assertions = $instance->run($self);
 
-    $self->logger->finish_test($tc, $test, $result);
-    return $result;
+    $self->logger->finish_test($tc, $test, $assertions);
+    return $assertions;
 }
 
+# @group Callbacks
+
+# Callback for passing tests.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the passing test.
 sub pass {
     my ($self, $tc, $test) = @_;
     $self->logger->pass($tc, $test);
 }
 
+# Callback for skipped tests.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the skipped test.
+# @param [Test::Mini::Exception::Skip] $e The exception object.
 sub skip {
     my ($self, $tc, $test, $e) = @_;
     $self->logger->skip($tc, $test, $e);
 }
 
+# Callback for failing tests.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the failed test.
+# @param [Test::Mini::Exception::Assert] $e The exception object.
 sub fail {
     my ($self, $tc, $test, $e) = @_;
     $self->{exit_code} = 1 unless $self->{exit_code};
     $self->logger->fail($tc, $test, $e);
 }
 
+# Callback for dying tests.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the test with an error.
+# @param [Test::Mini::Exception] $e The exception object.
 sub error {
     my ($self, $tc, $test, $e) = @_;
     $self->{exit_code} = 1 unless $self->{exit_code};
