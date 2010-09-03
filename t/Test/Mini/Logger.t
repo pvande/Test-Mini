@@ -37,17 +37,17 @@ sub test_full_test_run_should_remain_silent {
 
 sub test_count {
     $logger->pass('MyClass', 'm1');
-    $logger->finish_test('MyClass', 'm1', 8);
+    $logger->finish_test('MyClass', 'm1', 1);
     $logger->error('MyClass', 'm2');
-    $logger->finish_test('MyClass', 'm2', 7);
+    $logger->finish_test('MyClass', 'm2', 2);
     $logger->pass('MyClass', 'm3');
-    $logger->finish_test('MyClass', 'm3', 6);
+    $logger->finish_test('MyClass', 'm3', 4);
 
-    assert_equal($logger->count, {test => 3, pass => 2, error => 1, assertions => 21});
+    assert_equal($logger->count, {test => 3, pass => 2, error => 1, assertions => 7});
     assert_equal($logger->count('test'), 3);
     assert_equal($logger->count('pass'), 2);
     assert_equal($logger->count('error'), 1);
-    assert_equal($logger->count('assertions'), 21);
+    assert_equal($logger->count('assertions'), 7);
 
     assert_equal($logger->count('daily build of rome'), 0);
 }
