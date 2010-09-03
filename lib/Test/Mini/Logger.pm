@@ -32,6 +32,7 @@ sub buffer {
     return $self->{buffer};
 }
 
+# Accessor for counters
 # @overload count()
 #   @return [Hash] The count hash.
 # @overload count($key)
@@ -127,11 +128,12 @@ sub error {
     $self->{count}->{error}++;
 }
 
+# Accessor for the timing data.
 # @param $key The key to look up timings for.  The commonly populated values
 # are:
-#   +$self+ :: Time for test suite
-#   +"TestCase" :: Time for the test case
-#   +"TestCase#test" :: Time for the given test
+# +$self+ :: Time for test suite
+# "TestCase" :: Time for the test case
+# "TestCase#test" :: Time for the given test
 # @return The time taken by the given argument.
 sub time {
     my ($self, $key) = @_;
