@@ -9,16 +9,21 @@ use warnings;
 use Time::HiRes;
 
 # Constructor.
+# @param [Hash] %args Intial state for the new instance.
+# @option %args verbose (0) Logger verbosity.
+# @option %args buffer [IO] (STDOUT) Output buffer.
 sub new {
     my ($class, %args) = @_;
     return bless {
         verbose => 0,
         buffer  => *STDOUT{IO},
+        %args,
         count   => {},
         times   => {},
-        %args,
     }, $class;
 }
+
+# @group Attribute Accessors
 
 # @return Logger verbosity.
 sub verbose {
@@ -26,21 +31,10 @@ sub verbose {
     return $self->{verbose};
 }
 
-# @return Output buffer.
+# @return [IO] Output buffer.
 sub buffer {
     my ($self) = @_;
     return $self->{buffer};
-}
-
-# Accessor for counters
-# @overload count()
-#   @return [Hash] The count hash.
-# @overload count($key)
-#   @param $key A key in the count hash.
-#   @return [Number] The value for the given key.
-sub count {
-    my ($self, $key) = @_;
-    return ($key ? $self->{count}->{$key} : $self->{count}) || 0;
 }
 
 # @group Output Functions
@@ -63,69 +57,110 @@ sub say {
 # @group Callbacks
 
 # Called before the test suite is run.
+# @param [Hash] %args Options the test suite was run with.
+# @option %args [String] filter Test name filter.
+# @option %args [String] seed Randomness seed.
 sub begin_test_suite {
-    my ($self) = @_;
+    my ($self, %args) = @_;
     $self->{times}->{$self} = -Time::HiRes::time();
 }
 
 # Called before each test case is run.
+# @param [Class] $tc The test case being run.
+# @param [Array<String>] @tests A list of tests to be run.
 sub begin_test_case {
-    my ($self, $tc) = @_;
+    my ($self, $tc, @tests) = @_;
     $self->{times}->{$tc} = -Time::HiRes::time();
 }
 
 # Called before each test is run.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the test method being run.
 sub begin_test {
     my ($self, $tc, $test) = @_;
     $self->{times}->{"$tc#$test"} = -Time::HiRes::time();
 }
 
 # Called after each test is run.
+# Increments the test and assertion counts, and finalizes the test's timing.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the test method just run.
+# @param [Integer] $assertions The number of assertions called.
 sub finish_test {
-    my ($self, $tc, $test, $assertion_count) = @_;
+    my ($self, $tc, $test, $assertions) = @_;
     $self->{count}->{test}++;
-    $self->{count}->{assert} += $assertion_count;
+    $self->{count}->{assert} += $assertions;
     $self->{times}->{"$tc#$test"} += Time::HiRes::time();
 }
 
 # Called after each test case is run.
+# Increments the test case count, and finalizes the test case's timing.
+# @param [Class] $tc The test case just run.
+# @param [Array<String>] @tests A list of tests run.
 sub finish_test_case {
-    my ($self, $tc) = @_;
+    my ($self, $tc, @tests) = @_;
     $self->{count}->{test_case}++;
     $self->{times}->{$tc} += Time::HiRes::time();
 }
 
 # Called after each test suite is run.
+# Finalizes the test suite timing.
+# @param [Integer] $exit_code Status the tests finished with.
 sub finish_test_suite {
-    my ($self) = @_;
-    $self->{count}->{test_suite}++;
+    my ($self, $exit_code) = @_;
     $self->{times}->{$self} += Time::HiRes::time();
+}
+
+# Called when a test passes.
+# Increments the pass count.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the passing test.
+sub pass {
+    my ($self, $tc, $test) = @_;
+    $self->{count}->{pass}++;
+}
+
+# Called when a test is skipped.
+# Increments the skip count.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the skipped test.
+# @param [Test::Mini::Exception::Skip] $e The exception object.
+sub skip {
+    my ($self, $tc, $test, $e) = @_;
+    $self->{count}->{skip}++;
+}
+
+# Called when a test fails.
+# Increments the failure count.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the failed test.
+# @param [Test::Mini::Exception::Assert] $e The exception object.
+sub fail {
+    my ($self, $tc, $test, $e) = @_;
+    $self->{count}->{fail}++;
+}
+
+# Called when a test dies with an error.
+# Increments the error count.
+# @param [Class] $tc The test case owning the test method.
+# @param [String] $test The name of the test with an error.
+# @param [Test::Mini::Exception] $e The exception object.
+sub error {
+    my ($self, $tc, $test, $e) = @_;
+    $self->{count}->{error}++;
 }
 
 # @group Statistics
 
-# @return The number of passing tests run.
-sub pass {
-    my $self = shift;
-    return $self->{count}->{pass}++;
-}
-
-# @return The number of failing tests run.
-sub fail {
-    my $self = shift;
-    $self->{count}->{fail}++;
-}
-
-# @return The number of skipped tests.
-sub skip {
-    my $self = shift;
-    $self->{count}->{skip}++;
-}
-
-# @return The number of tests with errors.
-sub error {
-    my $self = shift;
-    $self->{count}->{error}++;
+# Accessor for counters
+# @overload count()
+#   @return [Hash] The count hash.
+# @overload count($key)
+#   @param $key A key in the count hash.
+#   @return [Number] The value for the given key.
+sub count {
+    my ($self, $key) = @_;
+    return ($key ? $self->{count}->{$key} : $self->{count}) || 0;
 }
 
 # Accessor for the timing data.
@@ -134,10 +169,11 @@ sub error {
 # +$self+ :: Time for test suite
 # "TestCase" :: Time for the test case
 # "TestCase#test" :: Time for the given test
-# @return The time taken by the given argument.
+# Times for units that have not finished should not be relied upon.
+# @return [Number] The time taken by the given argument, in seconds.
 sub time {
     my ($self, $key) = @_;
-    $self->{times}->{$key};
+    return $self->{times}->{$key};
 }
 
 1;
