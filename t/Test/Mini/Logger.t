@@ -37,13 +37,13 @@ sub test_full_test_run_should_remain_silent {
 }
 
 sub test_print {
-    $logger->print('foo bar baz');
-    assert_equal($buffer, 'foo bar baz');
+    $logger->print(qw/foo bar baz/);
+    assert_equal($buffer, 'foobarbaz');
 }
 
 sub test_say {
-    $logger->say('foo bar baz');
-    assert_equal($buffer, "foo bar baz\n");
+    $logger->say(qw/foo bar baz/);
+    assert_equal($buffer, "foo\nbar\nbaz\n");
 }
 
 sub test_timings {
@@ -79,11 +79,12 @@ sub test_count {
     $logger->pass('MyClass', 'm3');
     $logger->finish_test('MyClass', 'm3', 4);
 
-    assert_equal($logger->count, {test => 3, pass => 2, error => 1, assertions => 7});
-    assert_equal($logger->count('test'), 3);
-    assert_equal($logger->count('pass'), 2);
+    assert_equal($logger->count, {test => 3, pass => 2, error => 1, assert => 7});
+    assert_equal($logger->count('fail'), 0);
     assert_equal($logger->count('error'), 1);
-    assert_equal($logger->count('assertions'), 7);
+    assert_equal($logger->count('pass'), 2);
+    assert_equal($logger->count('test'), 3);
+    assert_equal($logger->count('assert'), 7);
 
     assert_equal($logger->count('daily build of rome'), 0);
 }
