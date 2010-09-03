@@ -2,6 +2,8 @@ package Test::Mini::Logger;
 use strict;
 use warnings;
 
+use Time::HiRes;
+
 sub new {
     my ($class, %args) = @_;
     return bless {
@@ -40,36 +42,36 @@ sub say {
 
 sub begin_test_suite {
     my ($self) = @_;
-    $self->{times}->{$self} = -time();
+    $self->{times}->{$self} = -Time::HiRes::time();
 }
 
 sub begin_test_case {
     my ($self, $tc) = @_;
-    $self->{times}->{$tc} = -time();
+    $self->{times}->{$tc} = -Time::HiRes::time();
 }
 
 sub begin_test {
     my ($self, $tc, $test) = @_;
-    $self->{times}->{"$tc#$test"} = -time();
+    $self->{times}->{"$tc#$test"} = -Time::HiRes::time();
 }
 
 sub finish_test {
     my ($self, $tc, $test, $assertion_count) = @_;
     $self->{count}->{test}++;
     $self->{count}->{assertions} += $assertion_count;
-    $self->{times}->{"$tc#$test"} += time();
+    $self->{times}->{"$tc#$test"} += Time::HiRes::time();
 }
 
 sub finish_test_case {
     my ($self, $tc) = @_;
     $self->{count}->{test_case}++;
-    $self->{times}->{$tc} += time();
+    $self->{times}->{$tc} += Time::HiRes::time();
 }
 
 sub finish_test_suite {
     my ($self) = @_;
     $self->{count}->{test_suite}++;
-    $self->{times}->{$self} += time();
+    $self->{times}->{$self} += Time::HiRes::time();
 }
 
 sub pass  { shift->{count}->{pass}++  }

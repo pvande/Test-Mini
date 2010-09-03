@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::Mini::Assertions;
+use Time::HiRes ('sleep');
 
 use aliased 'IO::Scalar'         => 'Buffer';
 use aliased 'Test::Mini::Logger' => 'Logger';
@@ -33,6 +34,41 @@ sub test_full_test_run_should_remain_silent {
     $logger->finish_test_suite(1);
 
     assert_equal $buffer, '';
+}
+
+sub test_print {
+    $logger->print('foo bar baz');
+    assert_equal($buffer, 'foo bar baz');
+}
+
+sub test_say {
+    $logger->say('foo bar baz');
+    assert_equal($buffer, "foo bar baz\n");
+}
+
+sub test_timings {
+    $logger->begin_test_suite();
+    $logger->begin_test_case('TestCaseOne');
+    $logger->begin_test(TestCaseOne => 'test_one');
+    sleep(0.1);
+    $logger->finish_test(TestCaseOne => 'test_one', 1);
+    $logger->begin_test(TestCaseOne => 'test_two');
+    sleep(0.2);
+    $logger->finish_test(TestCaseOne => 'test_two', 1);
+    $logger->finish_test_case(TestCaseOne => qw/ test_one test_two /);
+    $logger->begin_test_case('TestCaseTwo');
+    $logger->begin_test(TestCaseTwo => 'test_one');
+    sleep(0.4);
+    $logger->finish_test(TestCaseTwo => 'test_one', 1);
+    $logger->finish_test_case(TestCaseTwo => qw/ test_one /);
+    $logger->finish_test_suite();
+
+    assert_in_delta($logger->time('TestCaseOne#test_one'), 0.1);
+    assert_in_delta($logger->time('TestCaseOne#test_two'), 0.2);
+    assert_in_delta($logger->time('TestCaseOne'), 0.3);
+    assert_in_delta($logger->time('TestCaseTwo#test_one'), 0.4);
+    assert_in_delta($logger->time('TestCaseTwo'), 0.4);
+    assert_in_delta($logger->time($logger), 0.7);
 }
 
 sub test_count {
