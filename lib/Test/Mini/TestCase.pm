@@ -1,3 +1,5 @@
+# Base class for all Test::Mini test cases.  For more information about how,
+# when, and why tests are run, please see {Test::Mini::Runner}.
 package Test::Mini::TestCase;
 use strict;
 use warnings;
