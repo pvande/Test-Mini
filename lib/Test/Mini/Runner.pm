@@ -1,3 +1,31 @@
+# The Test::Mini::Runner is responsible for finding and running the
+# appropriate tests, setting up output logging, and returning an appropriate
+# status code.  For those looking to write tests with this framework, the
+# points of note are as follows:
+#
+# * Tests are run automatically at process exit.
+# * All test cases (subclasses of {Test::Mini::TestCase} that have been loaded
+#   at that time will be considered.  This includes indirect subclasses.
+# * Within each test case, all methods defined with a name matching
+#   <tt>/^test.+/</tt> will be run.
+#   * Each test will run in its own test case instance.
+#   * Tests will be run in random order.
+#   * #setup will be called before each test is run.
+#   * #teardown will be called after each test is run.
+#   * Inherited tests are *not* run.
+# * Tests may be run via +`prove`+, by loading (via +use+, +do+ or +require+)
+#   the files into another script, or by simply executing a file containing a
+#   test case in the Perl interpreter.
+#   * If you want to use a non-TAP output logger, +`prove`+ is not an option.
+# * Options may be passed in either as command line options, or as environment
+#   variables.
+#   * Environment variable names are prefixed with 'TEST_MINI_'.
+#   * Valid options are:
+#     * +verbose+ - Specifies the logger's verbosity.
+#     * +filter+ - Only tests with names matching this pattern should be run.
+#     * +logger+ - Specifies an alternate output logger class.
+#     * +seed+ - Specifies a random number seed; used to specify repeatable
+#       test orderings.
 package Test::Mini::Runner;
 use strict;
 use warnings;
