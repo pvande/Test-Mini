@@ -40,12 +40,18 @@ use strict;
 use warnings;
 use 5.008;
 
-use Test::Mini::Runner;
+# @scope class
+# @return [Class] The test runner class to use.
+sub runner_class { 'Test::Mini::Runner' }
 
 END {
     $| = 1;
     return if $?;
-    $? = Test::Mini::Runner->new()->run();
+
+    my $class = __PACKAGE__->runner_class;
+    eval "require $class;";
+
+    $? = $class->new()->run();
 }
 
 1;
