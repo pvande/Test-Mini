@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 require Test::Mini::Assertions;
+require Test::Mini::Runner;
 
 my $END;
 
