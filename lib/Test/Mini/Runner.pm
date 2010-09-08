@@ -32,7 +32,7 @@ use warnings;
 
 use Getopt::Long;
 use Try::Tiny;
-use Class::MOP;
+use MRO::Compat;
 use aliased 'Test::Mini::TestCase';
 use List::Util qw/ shuffle /;
 
@@ -103,11 +103,10 @@ sub run {
     my ($self) = @_;
     my $logger = $self->logger;
     try {
-        Class::MOP::load_class($logger);
+        eval "require $logger;" or die $@;
     }
     catch {
-        $logger = "Test::Mini::Logger::$logger";
-        Class::MOP::load_class($logger);
+        eval "require Test::Mini::Logger::$logger;" or die $@;
     };
 
     $logger = $logger->new(verbose => $self->verbose);
