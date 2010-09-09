@@ -150,7 +150,7 @@ sub run_test_case {
     my ($self, $tc, @tests) = @_;
     $self->logger->begin_test_case($tc, @tests);
 
-    $self->{exit_code} = 127 unless @tests;
+    $self->{exit_code} = 127 unless @{[ @tests, @{ mro::get_isarev($tc) } ]};
     $self->run_test($tc, $_) for shuffle @tests;
 
     $self->logger->finish_test_case($tc, @tests);
