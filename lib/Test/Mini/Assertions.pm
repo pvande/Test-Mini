@@ -1,17 +1,17 @@
-# A simple base class for exceptions raised during test runs.
+# Raised on Test Error.
 package Test::Mini::Exception;
 use base 'Exception::Class::Base';
 
-# An exception that is raised when an assertion fails.
+
+# Raised on Test Failure.
 package Test::Mini::Exception::Assert;
 use base 'Test::Mini::Exception';
 
-# An exception that is raised to indicate that the remainder of the test
-# should be skipped.
+# Raised on Test Skip.
 package Test::Mini::Exception::Skip;
 use base 'Test::Mini::Exception::Assert';
 
-# The basic set of assertions for use with the {Test::Mini} framework.
+# Basic Assertions for {Test::Mini}.
 package Test::Mini::Assertions;
 use strict;
 use warnings;
@@ -135,7 +135,7 @@ sub refute ($;$) {
 # @example
 #   assert_block \&some_sub, 'expected better from &some_sub';
 #
-# @param [CODE] $block The coderef to test.
+# @param [CODE] $block The code reference to test.
 # @param [String] $msg (undef) An optional description.
 sub assert_block (&;$) {
     my ($block, $msg) = @_;
@@ -152,7 +152,7 @@ sub assert_block (&;$) {
 # @example
 #   refute_block \&some_sub, 'expected worse from &some_sub';
 #
-# @param [CODE] $block The coderef to test.
+# @param [CODE] $block The code reference to test.
 # @param [String] $msg (undef) An optional description.
 sub refute_block (&;$) {
     my ($block, $msg) = @_;

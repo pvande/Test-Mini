@@ -1,11 +1,14 @@
+# Default Test Runner.
+#
 # The Test::Mini::Runner is responsible for finding and running the
 # appropriate tests, setting up output logging, and returning an appropriate
 # status code.  For those looking to write tests with this framework, the
 # points of note are as follows:
 #
 # * Tests are run automatically at process exit.
-# * All test cases (subclasses of {Test::Mini::TestCase} that have been loaded
-#   at that time will be considered.  This includes indirect subclasses.
+# * All test cases (subclasses of {Test::Mini::TestCase}) that have been
+#   loaded at that time will be considered.  This includes indirect
+#   subclasses.
 # * Within each test case, all methods defined with a name matching
 #   <tt>/^test.+/</tt> will be run.
 #   * Each test will run in its own test case instance.
@@ -41,7 +44,7 @@ use List::Util qw/ shuffle /;
 # either @ARGV (parsed by {Getopt::Long}) or environment variables
 # ("TEST_MINI_$option").
 #
-# @param [Hash] %args Intial state for the new instance.
+# @param [Hash] %args Initial state for the new instance.
 # @option %args verbose (0) Logger verbosity.
 # @option %args filter [String] ('')  Test name filter.
 # @option %args logger [Class] (Test::Mini::Logger::TAP) Logger class name.

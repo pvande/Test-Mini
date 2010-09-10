@@ -1,7 +1,8 @@
-# This class acts as a base class for new output loggers.  Whether you're
-# using a tool that expects output in a certain format, or you just long for
-# the familiar look and feel of another testing framework, this is what you're
-# looking for.
+# Output Logger Base Class.
+#
+# Whether you're using a tool that expects output in a certain format, or you
+# just long for the familiar look and feel of another testing framework, this
+# is what you're looking for.
 package Test::Mini::Logger;
 use strict;
 use warnings;
@@ -10,7 +11,7 @@ use Time::HiRes;
 
 # Constructor.
 #
-# @param [Hash] %args Intial state for the new instance.
+# @param [Hash] %args Initial state for the new instance.
 # @option %args verbose (0) Logger verbosity.
 # @option %args buffer [IO] (STDOUT) Output buffer.
 sub new {
@@ -43,7 +44,7 @@ sub buffer {
 # Write output to the {#buffer}.
 # Lines will be output without added newlines.
 #
-# @param @msg The message(s) to be printed.  Will be handled as per +print+.
+# @param @msg The message(s) to be printed; will be handled as per +print+.
 sub print {
     my ($self, @msg) = @_;
     print { $self->buffer() } @msg;
@@ -52,8 +53,8 @@ sub print {
 # Write output to the {#buffer}.
 # Lines will be output with appended newlines.
 #
-# @param @msg The message(s) to be printed.  Newlines will be appended to each
-# message, before being passed to {#print}.
+# @param @msg The message(s) to be printed; newlines will be appended to each
+#   message, before being passed to {#print}.
 sub say {
     my ($self, @msg) = @_;
     $self->print(join("\n", @msg), "\n");
@@ -183,10 +184,10 @@ sub count {
 # Accessor for the timing data.
 #
 # @param $key The key to look up timings for.  Typical values are:
-# +$self+ :: Time for test suite
-# "TestCase" :: Time for the test case
-# "TestCase#test" :: Time for the given test
-# Times for units that have not finished should not be relied upon.
+#   +$self+ :: Time for test suite
+#   "TestCase" :: Time for the test case
+#   "TestCase#test" :: Time for the given test
+#   Times for units that have not finished should not be relied upon.
 # @return [Number] The time taken by the given argument, in seconds.
 sub time {
     my ($self, $key) = @_;

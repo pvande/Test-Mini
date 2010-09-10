@@ -1,10 +1,13 @@
+# Lightweight xUnit Testing for Perl.
+#
 # Test::Mini is a light, spry testing framework built to bring the familiarity
-# of a xUnit testing framework to Perl as a first-class citizen.  Based
-# initially on Ryan Davis' minitest (http://blog.zenspider.com/minitest), it
+# of an xUnit testing framework to Perl as a first-class citizen.  Based
+# initially on Ryan Davis' {http://blog.zenspider.com/minitest minitest}, it
 # provides a not only a simple way to write and run tests, but the necessary
 # infrastructure for more expressive test fromeworks to be written.
 #
 # Since example code speaks louder than words:
+#
 #   package t::Test
 #   use base 'Test::Mini::TestCase';
 #   use strict;

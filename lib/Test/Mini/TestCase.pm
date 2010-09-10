@@ -1,5 +1,6 @@
-# Base class for all Test::Mini test cases.  For more information about how,
-# when, and why tests are run, please see {Test::Mini::Runner}.
+# Base class for Test::Mini test cases.
+#
+# @see Test::Mini::Runner
 package Test::Mini::TestCase;
 use strict;
 use warnings;
@@ -107,8 +108,7 @@ sub run {
 
     eval {
         local $SIG{__DIE__} = sub {
-            # Package declaration for the sake of isolating the callstack.
-            # @private
+            # Package declaration for isolating the callstack.
             package Test::Mini::SIGDIE;
 
             die $@ if UNIVERSAL::isa($@, 'Test::Mini::Exception');
