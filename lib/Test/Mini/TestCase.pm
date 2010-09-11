@@ -9,38 +9,6 @@ use Test::Mini;
 use Exception::Class;
 use Test::Mini::Assertions;
 
-{
-    my $class = __PACKAGE__;
-    no strict 'refs';
-    *$class = \{ 'setup' => [], 'teardown' => [] };
-}
-
-# Run the appropriate advice for the test.  'setup' advice should be run in
-# declaration order, from the most distant ancestor to the most recent.
-# 'teardown' advice is run from modernity to antiquity, but should be run in
-# the reverse of declaration order.
-#
-# @param ['setup'|'teardown'] $type The advice type to run.
-sub run_advice {
-    my ($self, $type) = @_;
-
-    no strict 'refs';
-
-    my @methods = map {
-        # Hand-built subclasses are unlikely to have the $$class hash set up.
-        # To officially support them, we'll have to concede an empty arrayref.
-        ${"::$_"}->{$type} || []
-    } @{ mro::get_linear_isa(ref $self) };
-
-    @methods = reverse @methods                 if $type eq 'setup';
-    @methods = map { [ reverse @$_ ] } @methods if $type eq 'teardown';
-
-    map { $_->($self) } @$_ for @methods;
-}
-
-use namespace::clean;
-
-
 # Constructor.
 #
 # @private
@@ -69,7 +37,6 @@ sub new {
 # @see #teardown
 sub setup {
     my ($self) = @_;
-    &run_advice($self, 'setup');
 }
 
 # Test teardown behavior, automatically invoked following each test.  Intended
@@ -89,7 +56,6 @@ sub setup {
 # @see #setup
 sub teardown {
     my ($self) = @_;
-    &run_advice($self, 'teardown');
 }
 
 # Runs the test specified at construction time.  This method is responsible
