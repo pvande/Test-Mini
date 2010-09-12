@@ -75,6 +75,7 @@ sub run {
     eval {
         local $SIG{__DIE__} = sub {
             # Package declaration for isolating the callstack.
+            # @api private
             package Test::Mini::SIGDIE;
 
             die $@ if UNIVERSAL::isa($@, 'Test::Mini::Exception');

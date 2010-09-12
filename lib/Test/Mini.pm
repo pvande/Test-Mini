@@ -2,9 +2,9 @@
 #
 # Test::Mini is a light, spry testing framework built to bring the familiarity
 # of an xUnit testing framework to Perl as a first-class citizen.  Based
-# initially on Ryan Davis' {http://blog.zenspider.com/minitest minitest}, it
-# provides a not only a simple way to write and run tests, but the necessary
-# infrastructure for more expressive test fromeworks to be written.
+# initially on Ryan Davis' minitest, it provides a not only a simple way to
+# write and run tests, but the necessary infrastructure for more expressive
+# test fromeworks to be written.
 #
 # Since example code speaks louder than words:
 #
@@ -37,7 +37,9 @@
 # 'test' will be automatically run.  If you've declared 'setup' or 'teardown'
 # methods, they will be run before or after each test.
 #
+# @see http://blog.zenspider.com/minitest
 # @see Test::Mini::Runner
+# @author Pieter van de Bruggen <pvande@cpan.org>
 package Test::Mini;
 use strict;
 use warnings;

@@ -11,7 +11,7 @@ use base 'Test::Mini::Exception';
 package Test::Mini::Exception::Skip;
 use base 'Test::Mini::Exception::Assert';
 
-# Basic Assertions for {Test::Mini}.
+# Basic Assertions for Test::Mini.
 package Test::Mini::Assertions;
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ use Data::Inspect;
 # appropriate.
 #
 # @param $default [String] The default message to use.
-# @param $msg [String] (undef) A message to use in place of the default.
+# @param $msg [String] A message to use in place of the default.
 # @return A well-formatted message.
 sub message {
     my ($default, $msg) = @_;
@@ -96,7 +96,7 @@ sub _reset_assertions {
 #   assert 'true', 'Truth should shine clear';
 #
 # @param $test The value to test.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert ($;$) {
     my ($test, $msg) = @_;
     $msg ||= 'Assertion failed; no message given.';
@@ -121,7 +121,7 @@ sub assert ($;$) {
 #   refute undef, 'Deny the untruths';
 #
 # @param $test The value to test.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute ($;$) {
     my ($test, $msg) = @_;
     $msg ||= 'Refutation failed; no message given.';
@@ -136,7 +136,7 @@ sub refute ($;$) {
 #   assert_block \&some_sub, 'expected better from &some_sub';
 #
 # @param [CODE] $block The code reference to test.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_block (&;$) {
     my ($block, $msg) = @_;
     ($msg, $block) = ($block, $msg) if $msg && ref $block ne 'CODE';
@@ -153,7 +153,7 @@ sub assert_block (&;$) {
 #   refute_block \&some_sub, 'expected worse from &some_sub';
 #
 # @param [CODE] $block The code reference to test.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_block (&;$) {
     my ($block, $msg) = @_;
     ($msg, $block) = ($block, $msg) if $msg && ref $block ne 'CODE';
@@ -172,7 +172,7 @@ sub refute_block (&;$) {
 #
 # @param $obj The object being tested.
 # @param [String] $method The method name being checked for.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_can ($$;$) {
     my ($obj, $method, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
@@ -189,7 +189,7 @@ sub assert_can ($$;$) {
 #
 # @param $obj The object being tested.
 # @param [String] $method The method name being checked.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_can ($$;$) {
     my ($obj, $method, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to not respond to #$method", $msg);
@@ -209,7 +209,7 @@ sub refute_can ($$;$) {
 #
 # @param [Array|Hash|String|#contains] $collection The collection to test.
 # @param $obj The needle to find.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_contains ($$;$) {
     my ($collection, $obj, $msg) = @_;
     my $m = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $msg);
@@ -243,7 +243,7 @@ sub assert_contains ($$;$) {
 #
 # @param [Array|Hash|String|#contains] $collection The collection to test.
 # @param $obj The needle to look for.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_contains ($$;$) {
     my ($collection, $obj, $msg) = @_;
     my $m = message("Expected @{[inspect($collection)]} to not contain @{[inspect($obj)]}", $msg);
@@ -269,7 +269,7 @@ sub refute_contains ($$;$) {
 #   assert_defined $value;  # if defined $value
 #
 # @param $obj The value to check.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_defined ($;$) {
     my ($obj, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to be defined", $msg);
@@ -290,7 +290,7 @@ sub refute_defined ($;$) { goto &assert_undef }
 #
 # @param [CODE] $sub The code that should die.
 # @param [String] $error ('') The error substring expected.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_dies (&;$$) {
     my ($sub, $error, $msg) = @_;
     $error = '' unless defined $error;
@@ -318,7 +318,7 @@ sub assert_dies (&;$$) {
 #   assert_empty Collection->new();  # if Collection->new()->is_empty()
 #
 # @param [Array|Hash|String|#is_empty] $collection The collection under scrutiny.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_empty ($;$) {
     my ($collection, $msg) = @_;
     $msg = message("Expected @{[inspect($collection)]} to be empty", $msg);
@@ -349,7 +349,7 @@ sub assert_empty ($;$) {
 #   refute_empty Collection->new();  # unless Collection->new()->is_empty()
 #
 # @param [Array|Hash|String|#is_empty] $collection The collection under scrutiny.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_empty ($;$) {
     my ($collection, $msg) = @_;
     $msg = message("Expected @{[inspect($collection)]} to not be empty", $msg);
@@ -391,7 +391,7 @@ sub refute_eq { goto &refute_equal }
 #
 # @param $actual The value under test.
 # @param $expected The expected value.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_equal ($$;$) {
     my ($actual, $expected, $msg) = @_;
     $msg = message("Got @{[inspect($actual)]}\nnot @{[inspect($expected)]}", $msg);
@@ -453,7 +453,7 @@ sub assert_equal ($$;$) {
 #
 # @param $actual The value under test.
 # @param $expected The tested value.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_equal ($$;$) {
     my ($actual, $unexpected, $msg) = @_;
     $msg = message("The given values were unexpectedly equal", $msg);
@@ -511,7 +511,7 @@ sub refute_equal ($$;$) {
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
 # @param [Number] $delta (0.001) The expected delta.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
     $delta = 0.001 unless defined $delta;
@@ -532,7 +532,7 @@ sub assert_in_delta ($$;$$) {
 # @param [Number] $expected The static value.
 # @param [Number] $delta (0.001) The delta +$actual+ and +$expected+ are
 #        expected to differ by.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
     $delta = 0.001 unless defined $delta;
@@ -552,7 +552,7 @@ sub refute_in_delta ($$;$$) {
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
 # @param [Number] $epsilon (0.001) The expected tolerance factor.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
     $epsilon = 0.001 unless defined $epsilon;
@@ -576,7 +576,7 @@ sub assert_in_epsilon ($$;$$) {
 # @param [Number] $expected The static value.
 # @param [Number] $epsilon (0.001) The factor by which +$actual+ and
 #        +$expected+ are expected to differ by.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
     $epsilon = 0.001 unless defined $epsilon;
@@ -604,7 +604,7 @@ sub refute_includes ($$;$) { goto &refute_contains }
 #
 # @param $obj The instance to check.
 # @param [Class] $type The type to expect.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 # @see #assert_is_a
 sub assert_instance_of ($$;$) {
     my ($obj, $type, $msg) = @_;
@@ -625,7 +625,7 @@ sub assert_instance_of ($$;$) {
 #
 # @param $obj The instance or class to check.
 # @param [Class] $type The expected superclass.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_is_a($$;$) {
     my ($obj, $type, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
@@ -643,7 +643,7 @@ sub assert_isa { goto &assert_is_a }
 #
 # @param [String] $string The string to match.
 # @param [Regex] $pattern The regular expression to match against.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_match ($$;$) {
     my ($string, $pattern, $msg) = @_;
     $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
@@ -657,7 +657,7 @@ sub assert_match ($$;$) {
 #
 # @param [String] $string The string to match.
 # @param [Regex] $pattern The regular expression to match against.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub refute_match ($$;$) {
     my ($string, $pattern, $msg) = @_;
     $msg = message("Expected qr/$pattern/ to fail to match against @{[inspect($string)]}", $msg);
@@ -680,7 +680,7 @@ sub refute_responds_to ($$;$) { goto &refute_can }
 #   assert_undef $value;  # if not defined $value
 #
 # @param $obj The value to check.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub assert_undef ($;$) {
     my ($obj, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to be undefined", $msg);
@@ -692,7 +692,7 @@ sub assert_undef ($;$) {
 sub refute_undef ($;$) { goto &assert_defined }
 
 # Allows the current test to be bypassed with an indeterminate status.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub skip (;$) {
     my ($msg) = @_;
     $msg = 'Test skipped; no message given.' unless defined $msg;
@@ -704,7 +704,7 @@ sub skip (;$) {
 }
 
 # Causes the current test to exit immediately with a failing status.
-# @param [String] $msg (undef) An optional description.
+# @param [String] $msg An optional description.
 sub flunk (;$) {
     my ($msg) = @_;
     $msg = 'Epic failure' unless defined $msg;

@@ -48,7 +48,7 @@ use List::Util qw/ shuffle /;
 # @option %args verbose (0) Logger verbosity.
 # @option %args filter [String] ('')  Test name filter.
 # @option %args logger [Class] (Test::Mini::Logger::TAP) Logger class name.
-# @option %args seed [Integer] (a random number < 64,000,000) Randomness seed.
+# @option %args seed [Integer] (a random number +< 64_000_000+) Randomness seed.
 sub new {
     my ($class, %args) = @_;
 
