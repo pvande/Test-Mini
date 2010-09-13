@@ -36,7 +36,7 @@ use warnings;
 use Getopt::Long;
 use Try::Tiny;
 use MRO::Compat;
-use aliased 'Test::Mini::TestCase';
+use Test::Mini::TestCase;
 use List::Util qw/ shuffle /;
 
 # Constructor.
@@ -132,7 +132,7 @@ sub run_test_suite {
     $self->logger->begin_test_suite(%args);
 
     srand($args{seed});
-    my @testcases = @{ mro::get_isarev(TestCase) };
+    my @testcases = @{ mro::get_isarev('Test::Mini::TestCase') };
     $self->{exit_code} = 255 unless @testcases;
 
     for my $tc (shuffle @testcases) {
