@@ -16,10 +16,9 @@ package Test::Mini::Assertions;
 use strict;
 use warnings;
 
-use Scalar::Util 1.21 qw/ looks_like_number refaddr reftype /;
-use List::Util   1.21 qw/ min /;
+use Scalar::Util      qw/ looks_like_number refaddr reftype /;
+use List::Util        qw/ min /;
 use List::MoreUtils   qw/ any /;
-use Sub::Install      qw/ install_sub /;
 use Data::Inspect;
 
 # Formats error messages, appending periods and defaulting undefs as
