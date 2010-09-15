@@ -1,4 +1,4 @@
-# Default {Test::Mini} Output Logger.
+# Default Test::Mini Output Logger.
 package Test::Mini::Logger::TAP;
 use base 'Test::Mini::Logger';
 use strict;
