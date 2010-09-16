@@ -1,1 +1,1 @@
---no-stats --no-save lib/*.pm lib/*/*.pm lib/*/*/*.pm lib/*/*/*/*.pm -o lib --format pod --query "object.type != :module" --query "@api.nil? || @api == 'public'"
+--no-stats --no-save --format pod 'lib/**/*.pm' --query "object.type != :module" --query "@api.nil? || @api == 'public'"
