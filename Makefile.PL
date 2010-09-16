@@ -75,6 +75,7 @@ open(SKIP, '>MANIFEST.SKIP');
 print SKIP "#!include_default\n";
 print SKIP "MANIFEST.SKIP.*\n";
 print SKIP "^$DISTNAME.*\n";
+print SKIP "^\\..*\n";
 print SKIP <GITIGNORE>;
 print SKIP $SKIP_FILES;
 close SKIP;
