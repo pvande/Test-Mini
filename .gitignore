@@ -1,13 +1,2 @@
 .DS_Store
-/.author
-/blib*
-/.build
-/inc
-/Makefile
-/Makefile.old
-/MANIFEST.bak
-/META.yml
-/MYMETA.yml
-/pm_to_blib*
-.*.sw[op]
-/Test-Mini-*
+Makefile
