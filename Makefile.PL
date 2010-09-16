@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
         'TESTS' => 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t t/*/*/*/*/*.t',
     },
     'dist' => {
-        'PREOP'  => '',
+        'PREOP'  => 'RUBYLIB=:../yard-perl-plugin/lib:../yard-pod-plugin/lib yard -e yard-perl-plugin.rb -e yard-pod-plugin.rb',
         'POSTOP' => 'make realclean; rm MANIFEST',
     },
 );
@@ -57,6 +57,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 (my $DISTNAME = $WriteMakefileArgs{NAME}) =~ s/::/-/g;
+$WriteMakefileArgs{dist}->{PREOP} .= " -o $DISTNAME-$WriteMakefileArgs{VERSION}/lib";
 
 # Create a MANIFEST.SKIP file.
 open(GITIGNORE, '<.gitignore');
