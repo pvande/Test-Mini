@@ -40,7 +40,6 @@ my %WriteMakefileArgs = (
     },
 #   'DIST_REQUIRES' => {
 #       'ShipIt'                 => '0.55',
-#       'ShipIt::Step::Manifest' => '0.1',
 #   },
     'test' => {
         'TESTS' => 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t t/*/*/*/*/*.t',
