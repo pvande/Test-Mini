@@ -1,13 +1,15 @@
 # Raised on Test Error.
+# @api private
 package Test::Mini::Exception;
 use base 'Exception::Class::Base';
 
-
 # Raised on Test Failure.
+# @api private
 package Test::Mini::Exception::Assert;
 use base 'Test::Mini::Exception';
 
 # Raised on Test Skip.
+# @api private
 package Test::Mini::Exception::Skip;
 use base 'Test::Mini::Exception::Assert';
 
@@ -288,7 +290,7 @@ sub refute_defined ($;$) { goto &assert_undef }
 #   assert_dies { die 'Failure on line 27 in Foo.pm' } 'line 27';
 #
 # @param [CODE] $sub The code that should die.
-# @param [String] $error ('') The error substring expected.
+# @param [String] $error The (optional) error substring expected.
 # @param [String] $msg An optional description.
 sub assert_dies (&;$$) {
     my ($sub, $error, $msg) = @_;
@@ -509,7 +511,7 @@ sub refute_equal ($$;$) {
 #
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
-# @param [Number] $delta (0.001) The expected delta.
+# @param [Number] $delta The expected delta.  Defaults to 0.001.
 # @param [String] $msg An optional description.
 sub assert_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
@@ -529,8 +531,8 @@ sub assert_in_delta ($$;$$) {
 #
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
-# @param [Number] $delta (0.001) The delta +$actual+ and +$expected+ are
-#        expected to differ by.
+# @param [Number] $delta The delta +$actual+ and +$expected+ are expected to
+#   differ by.  Defaults to 0.001.
 # @param [String] $msg An optional description.
 sub refute_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
@@ -550,7 +552,7 @@ sub refute_in_delta ($$;$$) {
 #
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
-# @param [Number] $epsilon (0.001) The expected tolerance factor.
+# @param [Number] $epsilon The expected tolerance factor.  Defaults to 0.001.
 # @param [String] $msg An optional description.
 sub assert_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
@@ -573,8 +575,8 @@ sub assert_in_epsilon ($$;$$) {
 #
 # @param [Number] $actual The tested value.
 # @param [Number] $expected The static value.
-# @param [Number] $epsilon (0.001) The factor by which +$actual+ and
-#        +$expected+ are expected to differ by.
+# @param [Number] $epsilon The factor by which +$actual+ and +$expected+ are
+#   expected to differ by.  Defaults to 0.001.
 # @param [String] $msg An optional description.
 sub refute_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
