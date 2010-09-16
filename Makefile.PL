@@ -64,7 +64,10 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 (my $DISTNAME = $WriteMakefileArgs{NAME}) =~ s/::/-/g;
-$WriteMakefileArgs{dist}->{PREOP} .= " -o $DISTNAME-$WriteMakefileArgs{VERSION}/lib";
+my $DISTDIR = "$DISTNAME-$WriteMakefileArgs{VERSION}";
+my $LIBDIR = "$DISTDIR/lib";
+$WriteMakefileArgs{dist}->{PREOP} .= " -o $LIBDIR; ";
+$WriteMakefileArgs{dist}->{PREOP} .= "(cd $DISTDIR; find lib -name '*.pod' -type f >> MANIFEST)";
 
 # Create a MANIFEST.SKIP file.
 open(GITIGNORE, '<.gitignore');
