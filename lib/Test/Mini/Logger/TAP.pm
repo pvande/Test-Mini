@@ -19,11 +19,6 @@ sub inc_counter {
     $self->{test_counter}++;
 }
 
-sub reset_counter {
-    my ($self) = @_;
-    $self->{test_counter} = 0;
-}
-
 sub diag {
     my ($self, @msgs) = @_;
     my $msg = join "\n", @msgs;
@@ -33,9 +28,7 @@ sub diag {
 
 sub begin_test_case {
     my ($self, $tc, @tests) = @_;
-    $self->say("1..@{[scalar @tests]}");
     $self->diag("Test Case: $tc");
-    $self->reset_counter();
 }
 
 sub begin_test {
@@ -70,6 +63,11 @@ sub skip {
     } else {
       $self->say(": $msg");
     }
+}
+
+sub finish_test_suite {
+    my ($self) = @_;
+    $self->say("1..@{[$self->test_counter]}");
 }
 
 1;

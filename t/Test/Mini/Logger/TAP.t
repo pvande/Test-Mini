@@ -26,7 +26,6 @@ sub tidy {
 sub test_begin_test_case {
     $logger->begin_test_case('MyClass', qw/ method1 method2 method3 /);
     assert_equal $buffer, tidy(q|
-        1..3
         # Test Case: MyClass
     |);
 }
@@ -148,6 +147,16 @@ sub test_skip_with_multiline_reason {
         ok 1 - method1 # SKIP
         # School's Cool
         # Don't be a fool
+    |);
+}
+
+sub test_finish_test_suite {
+    $logger->begin_test('MyClass', 'method1');
+    $logger->begin_test('MyClass', 'method2');
+    $logger->begin_test('MyClass', 'method3');
+    $logger->finish_test_suite();
+    assert_equal $buffer, tidy(q|
+        1..3
     |);
 }
 
