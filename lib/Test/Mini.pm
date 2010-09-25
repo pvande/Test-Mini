@@ -53,10 +53,12 @@ END {
     $| = 1;
     return if $?;
 
-    my $class = __PACKAGE__->runner_class;
-    eval "require $class;";
+    unless $ENV{TEST_MINI_NO_AUTORUN} {
+        my $class = __PACKAGE__->runner_class;
+        eval "require $class;";
 
-    $? = $class->new()->run();
+        $? = $class->new()->run();
+    }
 }
 
 1;
