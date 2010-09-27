@@ -53,7 +53,7 @@ END {
     $| = 1;
     return if $?;
 
-    unless $ENV{TEST_MINI_NO_AUTORUN} {
+    unless ($ENV{TEST_MINI_NO_AUTORUN}) {
         my $class = __PACKAGE__->runner_class;
         eval "require $class;";
 
