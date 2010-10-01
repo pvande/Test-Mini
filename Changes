@@ -1,5 +1,14 @@
 Revision history for Test-Mini
 
+v1.1.0  2010-09-30
+        Implemented respect for the TEST_MINI_NO_AUTORUN environment variable
+
+        Fixed a bug where invalid TAP was output when running multiple test
+        cases in a single process
+
+        Attempted once again to fix an intermittent failure in
+        t/Test/Mini/Logger.t related to timings
+
 v1.0.0  2010-09-16
         First Major Version
 
