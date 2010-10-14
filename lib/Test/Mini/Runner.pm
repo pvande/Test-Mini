@@ -133,6 +133,13 @@ sub run_test_suite {
 
     srand($args{seed});
     my @testcases = @{ mro::get_isarev('Test::Mini::TestCase') };
+
+    # Since mro::get_isarev is guaranteed to never shrink, we should "double
+    # check" our testcases, to make sure that they actually are *still*
+    # subclasses of Test::Mini::TestCase.
+    # @see http://search.cpan.org/dist/perl-5.12.2/ext/mro/mro.pm#mro::get_isarev($classname)
+    @testcases = grep { $_->isa('Test::Mini::TestCase') } @testcases;
+
     $self->{exit_code} = 255 unless @testcases;
 
     for my $tc (shuffle @testcases) {
@@ -153,7 +160,10 @@ sub run_test_case {
     my ($self, $tc, @tests) = @_;
     $self->logger->begin_test_case($tc, @tests);
 
-    $self->{exit_code} = 127 unless @{[ @tests, @{ mro::get_isarev($tc) } ]};
+    $self->{exit_code} = 127 unless @{[
+        (@tests, grep { $_->isa($tc) } @{ mro::get_isarev($tc) })
+    ]};
+
     $self->run_test($tc, $_) for shuffle @tests;
 
     $self->logger->finish_test_case($tc, @tests);
