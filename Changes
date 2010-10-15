@@ -1,5 +1,13 @@
 Revision history for Test-Mini
 
+v1.1.1  2010-10-14
+        Fixed a bug w.r.t. mro::get_isarev behavior.  Test::Mini would always
+        try to run tests in any package that had ever been a subclass of
+        Test::Mini::TestCase; this prevented Test::Mini::Unit's tests from
+        passing under any Perl >= 5.9.5.  Few users will have seen this bug.
+
+        Made another pass at making t/Test/Mini/Logger.t pass on the smokers.
+
 v1.1.0  2010-09-30
         Implemented respect for the TEST_MINI_NO_AUTORUN environment variable
 
