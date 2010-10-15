@@ -163,6 +163,41 @@ sub refute_block (&;$) {
     refute($block->(), $msg);
 }
 
+# Asserts that the given code reference returns a given value.
+#
+# @example
+#   assert_block_is { 'string' } 'string';
+# @example
+#   assert_block_is \&some_sub, $value, 'expected better from &some_sub';
+#
+# @param [CODE] $block The code reference to test.
+# @param [Scalar] $value The value that you expect to be returned from $block.
+# @param [String] $msg An optional description.
+sub assert_block_is (&$;$) {
+    my ($block, $value, $msg) = @_;
+    #($msg, $block) = ($block, $msg) if $msg && ref $block ne 'CODE';
+    $msg = message('Expected block to return true value', $msg);
+    assert_instance_of($block, 'CODE');
+    assert_equal($block->(), $value, $msg);
+}
+
+# Asserts that the given code reference does not return a given value.
+#
+# @example
+#   refute_block_is { '' }, 'string';
+# @example
+#   refute_block_is \&some_sub, $value, 'expected worse from &some_sub';
+#
+# @param [CODE] $block The code reference to test.
+# @param [Scalar] $value The value that you do not expect to be returned from $block.
+# @param [String] $msg An optional description.
+sub refute_block_is (&$;$) {
+    my ($block, $value, $msg) = @_;
+    $msg = message('Expected block to return false value', $msg);
+    assert_instance_of($block, 'CODE');
+    refute_equal($block->(), $value, $msg);
+}
+
 # Verifies that the given +$obj+ is capable of responding to the given
 # +$method+ name.
 #
