@@ -63,12 +63,12 @@ sub test_timings {
     $logger->finish_test_case(TestCaseTwo => qw/ test_one /);
     $logger->finish_test_suite();
 
-    assert_in_delta($logger->time('TestCaseOne#test_one'), 0.1, 0.025);
-    assert_in_delta($logger->time('TestCaseOne#test_two'), 0.2, 0.025);
-    assert_in_delta($logger->time('TestCaseOne'),          0.3, 0.025);
-    assert_in_delta($logger->time('TestCaseTwo#test_one'), 0.4, 0.025);
-    assert_in_delta($logger->time('TestCaseTwo'),          0.4, 0.025);
-    assert_in_delta($logger->time($logger),                0.7, 0.025);
+    assert_in_epsilon($logger->time('TestCaseOne#test_one'), 0.1, 0.3);
+    assert_in_epsilon($logger->time('TestCaseOne#test_two'), 0.2, 0.3);
+    assert_in_epsilon($logger->time('TestCaseOne'),          0.3, 0.3);
+    assert_in_epsilon($logger->time('TestCaseTwo#test_one'), 0.4, 0.3);
+    assert_in_epsilon($logger->time('TestCaseTwo'),          0.4, 0.3);
+    assert_in_epsilon($logger->time($logger),                0.7, 0.3);
 }
 
 sub test_count {
