@@ -131,6 +131,9 @@ sub refute ($;$) {
 
 # Asserts that the given code reference returns a truthy value.
 #
+# @deprecated This assertion offers little advantage over the base {#assert}.
+#   This will be removed in v2.0.0.
+#
 # @example
 #   assert_block { 'true' };
 # @example
@@ -147,6 +150,9 @@ sub assert_block (&;$) {
 }
 
 # Asserts that the given code reference returns a falsey value.
+#
+# @deprecated This assertion offers little advantage over the base {#refute}.
+#   This will be removed in v2.0.0.
 #
 # @example
 #   refute_block { '' };
