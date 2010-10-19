@@ -80,6 +80,19 @@ sub filter {
 # @return Logger instance.
 sub logger {
     my $self = shift;
+
+    unless (ref($self->{logger})) { #logger is still a string, make an obj
+        my $logger = $self->{logger};
+        try {
+            eval "require $logger;" or die $@;
+        }
+        catch {
+            $logger = qq{Test::Mini::Logger::$logger};
+            eval "require $logger;" or die $@;
+        };
+        $self->{logger} = $logger->new(verbose => $self->verbose);
+    }
+
     return $self->{logger};
 }
 
@@ -104,16 +117,6 @@ sub exit_code {
 # @return The result of the {#run_test_suite} call.
 sub run {
     my ($self) = @_;
-    my $logger = $self->logger;
-    try {
-        eval "require $logger;" or die $@;
-    }
-    catch {
-        eval "require Test::Mini::Logger::$logger;" or die $@;
-    };
-
-    $logger = $logger->new(verbose => $self->verbose);
-    $self->{logger} = $logger;
 
     return $self->run_test_suite(filter => $self->filter, seed => $self->seed);
 }
