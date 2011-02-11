@@ -12,7 +12,7 @@ SKIP
 my %WriteMakefileArgs = (
     'NAME'       => 'Test::Mini',
     'ABSTRACT'   => 'Lightweight xUnit Testing for Perl',
-    'VERSION'    => 'v1.1.1',
+    'VERSION'    => 'v1.1.2',
     'AUTHOR'     => 'Pieter van de Bruggen <pvande@cpan.org>',
     'LICENSE'    => 'perl',
     'META_MERGE' => {
@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
         },
     },
     'PREREQ_PM' => {
+        'version'          => '0.77',
         'Try::Tiny'        => '0.04',
         'Scalar::Util'     => '1.21',
         'List::Util'       => '1.21',
@@ -57,11 +58,15 @@ my %WriteMakefileArgs = (
     },
 );
 
-delete $WriteMakefileArgs{BUILD_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.56) };
+unless (eval { ExtUtils::MakeMaker->VERSION(6.56) }) {
+    my $REQS = delete $WriteMakefileArgs{BUILD_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM}->{$_} = $REQS->{$_} for keys %$REQS;
+}
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+unless (eval { ExtUtils::MakeMaker->VERSION(6.52) }) {
+    my $REQS = delete $WriteMakefileArgs{CONFIGURE_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM}->{$_} = $REQS->{$_} for keys %$REQS;
+}
 
 (my $DISTNAME = $WriteMakefileArgs{NAME}) =~ s/::/-/g;
 my $DISTDIR = "$DISTNAME-$WriteMakefileArgs{VERSION}";

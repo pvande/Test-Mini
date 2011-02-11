@@ -45,6 +45,8 @@ use strict;
 use warnings;
 use 5.008;
 
+use version 0.77; our $VERSION = qv("v1.1.2");
+
 # @scope class
 # @return [Class] The test runner class to use.
 sub runner_class { 'Test::Mini::Runner' }
