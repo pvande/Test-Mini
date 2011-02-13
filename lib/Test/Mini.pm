@@ -45,7 +45,7 @@ use strict;
 use warnings;
 use 5.008;
 
-use version 0.77; our $VERSION = qv("v1.1.2");
+use version 0.77; our $VERSION = qv("v1.1.3");
 
 # @scope class
 # @return [Class] The test runner class to use.
