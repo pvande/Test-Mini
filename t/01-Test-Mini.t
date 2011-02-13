@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 15;
 use strict;
 use warnings;
 
@@ -87,6 +87,25 @@ sub run_tests { Test::Mini::Runner->new(logger => 'Test::Mini::Logger')->run() }
         *{'Mock::TestCase::test_method'} = sub {
             $tests_called++;
             Test::Mini::Assertions::assert(1);
+        };
+    }
+
+    is run_tests(), 0, 'Exit code';
+    is $tests_called, 1, 'test_method called';
+}
+
+{
+    note 'Test: when run with a skipped test, exits with 0';
+
+    my $tests_called = 0;
+
+    {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{'Mock::TestCase::test_method'} = sub {
+            $tests_called++;
+            Test::Mini::Assertions::skip();
+            $tests_called++;
         };
     }
 
