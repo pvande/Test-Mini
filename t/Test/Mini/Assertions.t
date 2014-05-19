@@ -127,7 +127,7 @@ sub assert_error (&;$) {
     }
 
     sub test_refute_block {
-        assert_passes {
+        assert_passes  {
             Test::Mini::Assertions::refute_block { 0 } 'assert_block';
         } '$true_sub, $msg';
         assert_passes {
@@ -147,6 +147,23 @@ sub assert_error (&;$) {
         assert_error {
             Test::Mini::Assertions::refute_block \&error_block, 'assert_block';
         } '\&error_sub, $msg';
+    }
+    sub test_assert_block_is {
+        assert_passes {
+            Test::Mini::Assertions::assert_block_is {'A'} 'A', 'assert_block_is';
+        } '$true_sub, $value, $msg';
+        assert_passes {
+            Test::Mini::Assertions::assert_block_is \&true_block, 1, 'assert_block_is';
+        } '\&true_sub, $value, $msg';
+    }
+
+    sub test_refute_block_is {
+        assert_passes {
+            Test::Mini::Assertions::refute_block_is {'A'} 'B', 'assert_block_is';
+        } '$true_sub, $value, $msg';
+        assert_passes {
+            Test::Mini::Assertions::refute_block_is \&false_block, 'C', 'assert_block_is';
+        } '\&true_sub, $value, $msg';
     }
 }
 
