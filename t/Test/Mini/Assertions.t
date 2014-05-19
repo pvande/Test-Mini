@@ -105,47 +105,47 @@ sub assert_error (&;$) {
 
     sub test_assert_block {
         assert_passes {
-            Test::Mini::Assertions::assert_block { 1 } 'assert_block';
+            Test::Mini::Assertions::assert sub{ 1 }->(), 'assert_block';
         } '$true_sub, $msg';
         assert_passes {
-            Test::Mini::Assertions::assert_block \&true_block, 'assert_block';
+            Test::Mini::Assertions::assert &true_block, 'assert_block';
         } '\&true_sub, $msg';
 
         assert_fails {
-            Test::Mini::Assertions::assert_block { 0 } 'assert_block';
+            Test::Mini::Assertions::assert sub{ 0 }->(), 'assert_block';
         } '$false_sub, $msg';
         assert_fails {
-            Test::Mini::Assertions::assert_block \&false_block, 'assert_block';
+            Test::Mini::Assertions::assert &false_block, 'assert_block';
         } '\&false_sub, $msg';
 
         assert_error {
-            Test::Mini::Assertions::assert_block { die } 'assert_block';
+            Test::Mini::Assertions::assert sub{ die }->(), 'assert_block';
         } '$die_sub, $msg';
         assert_error {
-            Test::Mini::Assertions::assert_block \&error_block, 'assert_block';
+            Test::Mini::Assertions::assert &error_block, 'assert_block';
         } '\&error_sub, $msg';
     }
 
     sub test_refute_block {
         assert_passes {
-            Test::Mini::Assertions::refute_block { 0 } 'assert_block';
+            Test::Mini::Assertions::refute sub{ 0 }->(), 'assert_block';
         } '$true_sub, $msg';
         assert_passes {
-            Test::Mini::Assertions::refute_block \&false_block, 'assert_block';
+            Test::Mini::Assertions::refute &false_block, 'assert_block';
         } '\&true_sub, $msg';
 
         assert_fails {
-            Test::Mini::Assertions::refute_block { 1 } 'assert_block';
+            Test::Mini::Assertions::refute sub{ 1 }->(), 'assert_block';
         } '$false_sub, $msg';
         assert_fails {
-            Test::Mini::Assertions::refute_block \&true_block, 'assert_block';
+            Test::Mini::Assertions::refute &true_block, 'assert_block';
         } '\&false_sub, $msg';
 
         assert_error {
-            Test::Mini::Assertions::refute_block { die } 'assert_block';
+            Test::Mini::Assertions::refute sub{ die }->(), 'assert_block';
         } '$die_sub, $msg';
         assert_error {
-            Test::Mini::Assertions::refute_block \&error_block, 'assert_block';
+            Test::Mini::Assertions::refute &error_block, 'assert_block';
         } '\&error_sub, $msg';
     }
 }
