@@ -487,8 +487,8 @@ sub refute_equal ($$;$) {
         }
         elsif (ref $actual eq 'HASH' && ref $unexpected eq 'HASH') {
             $passed = (keys %$actual == keys %$unexpected);
-            unshift @actual, %$actual;
-            unshift @unexpected, %$unexpected;
+            unshift @actual,     map {$_, $actual->{$_}} sort keys %$actual;
+            unshift @unexpected, map {$_, $unexpected->{$_}} sort keys %$unexpected;
         }
         elsif (ref $actual && ref $unexpected) {
             $passed = (ref $actual eq ref $unexpected);
