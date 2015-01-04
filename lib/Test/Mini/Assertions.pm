@@ -19,8 +19,7 @@ use strict;
 use warnings;
 
 use Scalar::Util      qw/ looks_like_number refaddr reftype /;
-use List::Util        qw/ min /;
-use List::MoreUtils   qw/ any /;
+use List::Util        qw/ min any /;
 use Data::Inspect;
 
 # Formats error messages, appending periods and defaulting undefs as
