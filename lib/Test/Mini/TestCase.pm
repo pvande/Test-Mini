@@ -78,7 +78,7 @@ sub run {
             # @api private
             package Test::Mini::SIGDIE;
 
-            die $_[0] if UNIVERSAL::isa($_[0], 'Test::Mini::Exception');
+            die $_[0] if eval {$_[0]->isa('Test::Mini::Exception')};
 
             (my $msg = "@_") =~ s/ at .*? line \d+\.\n$//;
             my $error = Test::Mini::Exception->new(
