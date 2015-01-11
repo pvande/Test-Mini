@@ -1,4 +1,13 @@
 package t::Test::Mini::Assertions;
+BEGIN {
+    # Ignore our own warnings because we know, but we still want to
+    # test until they're gone.
+    *CORE::GLOBAL::warn = sub {
+        return if $_[0] =~ /deprecated/;
+        CORE::warn @_;
+    };
+}
+
 use base 'Test::Mini::TestCase';
 use strict;
 use warnings;
