@@ -415,7 +415,7 @@ sub assert_equal ($$;$) {
 
         next if ref $actual && ref $expected && refaddr($actual) == refaddr($expected);
 
-        if (UNIVERSAL::can($expected, 'equals')) {
+        if (eval { $expected->can('equals') }) {
             $passed = $expected->equals($actual);
         }
         elsif (ref $actual eq 'ARRAY' && ref $expected eq 'ARRAY') {
@@ -477,7 +477,7 @@ sub refute_equal ($$;$) {
 
         next if ref $actual && ref $unexpected && refaddr($actual) == refaddr($unexpected);
 
-        if (UNIVERSAL::can($unexpected, 'equals')) {
+        if (eval { $unexpected->can('equals') }) {
             $passed = $unexpected->equals($actual);
         }
         elsif (ref $actual eq 'ARRAY' && ref $unexpected eq 'ARRAY') {
