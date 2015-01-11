@@ -19,13 +19,6 @@ sub inc_counter {
     $self->{test_counter}++;
 }
 
-sub diag {
-    my ($self, @msgs) = @_;
-    my $msg = join "\n", @msgs;
-    $msg =~ s/^/# /mg;
-    $self->say($msg);
-}
-
 sub begin_test_case {
     my ($self, $tc, @tests) = @_;
     $self->diag("Test Case: $tc");

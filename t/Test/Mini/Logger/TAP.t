@@ -13,6 +13,9 @@ my ($buffer, $logger);
 
 sub setup {
     $logger = Logger->new(buffer => Buffer->new(\($buffer = '')));
+
+    # Again, forcing single-channel output
+    $logger->{diag_buffer} = $logger->buffer;
 }
 
 sub error { Test::Mini::Unit::Error->new(message => "Error Message\n") }

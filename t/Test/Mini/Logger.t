@@ -13,6 +13,10 @@ my ($buffer, $logger);
 
 sub setup {
     $logger = Logger->new(buffer => Buffer->new(\($buffer = '')));
+
+    # For testing, we want to force output to one channel regardless of the
+    # actual test harness, so we're violating the interface a bit here.
+    $logger->{diag_buffer} = $logger->buffer;
 }
 
 sub test_full_test_run_should_remain_silent {
@@ -44,6 +48,11 @@ sub test_print {
 sub test_say {
     $logger->say(qw/foo bar baz/);
     assert_equal($buffer, "foo\nbar\nbaz\n");
+}
+
+sub test_diag {
+    $logger->diag(qw/foo bar baz/);
+    assert_equal($buffer, "# foo\n# bar\n# baz\n");
 }
 
 sub test_timings {

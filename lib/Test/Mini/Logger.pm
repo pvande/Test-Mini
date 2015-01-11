@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use Time::HiRes;
+use IO::Handle;
 
 # Constructor.
 #
@@ -17,11 +18,11 @@ use Time::HiRes;
 sub new {
     my ($class, %args) = @_;
     return bless {
-        verbose => 0,
-        buffer  => *STDOUT{IO},
+        verbose     => 0,
+        buffer      => IO::Handle->new_from_fd(fileno(STDOUT),'w'),
         %args,
-        count   => {},
-        times   => {},
+        count       => {},
+        times       => {},
     }, $class;
 }
 
@@ -39,6 +40,16 @@ sub buffer {
     return $self->{buffer};
 }
 
+# @return [IO] Diagnostic output buffer.
+sub diag_buffer {
+    my ($self) = @_;
+    return $self->{diag_buffer} //= (
+        $ENV{HARNESS_VERBOSE}
+            ? $self->{buffer}
+            : IO::Handle->new_from_fd(fileno(STDERR),'w')
+    );
+}
+
 # @group Output Functions
 
 # Write output to the {#buffer}.
@@ -47,7 +58,7 @@ sub buffer {
 # @param @msg The message(s) to be printed; will be handled as per +print+.
 sub print {
     my ($self, @msg) = @_;
-    print { $self->buffer() } @msg;
+    $self->buffer->print( @msg );
 }
 
 # Write output to the {#buffer}.
@@ -58,6 +69,18 @@ sub print {
 sub say {
     my ($self, @msg) = @_;
     $self->print(join("\n", @msg), "\n");
+}
+
+# Write output to the {#diag_buffer}.
+# Lines will be prepended with '# ' and separate messages will have newlines
+# appended.
+#
+# @param @msg The diagnostics to be printed.
+sub diag {
+    my ($self, @msgs) = @_;
+    my $msg = join "\n", @msgs;
+    $msg =~ s/^/# /mg;
+    $self->diag_buffer->print($msg, "\n");
 }
 
 # @group Callbacks
