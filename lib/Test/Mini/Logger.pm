@@ -43,7 +43,8 @@ sub buffer {
 # @return [IO] Diagnostic output buffer.
 sub diag_buffer {
     my ($self) = @_;
-    return $self->{diag_buffer} //= (
+    return $self->{diag_buffer} if defined $self->{diag_buffer};
+    return $self->{diag_buffer} = (
         $ENV{HARNESS_VERBOSE}
             ? $self->{buffer}
             : IO::Handle->new_from_fd(fileno(STDERR),'w')
