@@ -19,8 +19,7 @@ use strict;
 use warnings;
 
 use Scalar::Util      qw/ looks_like_number refaddr reftype /;
-use List::Util        qw/ min /;
-use List::MoreUtils   qw/ any /;
+use List::Util        qw/ min any /;
 use Data::Inspect;
 
 # Formats error messages, appending periods and defaulting undefs as
@@ -415,7 +414,7 @@ sub assert_equal ($$;$) {
 
         next if ref $actual && ref $expected && refaddr($actual) == refaddr($expected);
 
-        if (UNIVERSAL::can($expected, 'equals')) {
+        if (eval { $expected->can('equals') }) {
             $passed = $expected->equals($actual);
         }
         elsif (ref $actual eq 'ARRAY' && ref $expected eq 'ARRAY') {
@@ -477,7 +476,7 @@ sub refute_equal ($$;$) {
 
         next if ref $actual && ref $unexpected && refaddr($actual) == refaddr($unexpected);
 
-        if (UNIVERSAL::can($unexpected, 'equals')) {
+        if (eval { $unexpected->can('equals') }) {
             $passed = $unexpected->equals($actual);
         }
         elsif (ref $actual eq 'ARRAY' && ref $unexpected eq 'ARRAY') {
