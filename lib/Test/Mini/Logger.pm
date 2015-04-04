@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use Time::HiRes;
+use IO::Handle;
 
 # Constructor.
 #
@@ -17,11 +18,11 @@ use Time::HiRes;
 sub new {
     my ($class, %args) = @_;
     return bless {
-        verbose => 0,
-        buffer  => *STDOUT{IO},
+        verbose     => 0,
+        buffer      => IO::Handle->new_from_fd(fileno(STDOUT),'w'),
         %args,
-        count   => {},
-        times   => {},
+        count       => {},
+        times       => {},
     }, $class;
 }
 
@@ -47,7 +48,7 @@ sub buffer {
 # @param @msg The message(s) to be printed; will be handled as per +print+.
 sub print {
     my ($self, @msg) = @_;
-    print { $self->buffer() } @msg;
+    $self->buffer->print( @msg );
 }
 
 # Write output to the {#buffer}.
