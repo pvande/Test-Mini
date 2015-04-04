@@ -14,7 +14,8 @@ my ($buffer, $logger);
 sub setup {
     $logger = Logger->new(buffer => Buffer->new(\($buffer = '')));
 
-    # Again, forcing single-channel output
+    # For testing, we want to force output to one channel regardless of the
+    # actual test harness, so we're violating the interface a bit here.
     $logger->{diag_buffer} = $logger->buffer;
 }
 
@@ -31,6 +32,11 @@ sub test_begin_test_case {
     assert_equal $buffer, tidy(q|
         # Test Case: MyClass
     |);
+}
+
+sub test_diag {
+    $logger->diag(qw/foo bar baz/);
+    assert_equal($buffer, "# foo\n# bar\n# baz\n");
 }
 
 sub test_pass {
