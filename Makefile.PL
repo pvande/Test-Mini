@@ -1,10 +1,16 @@
 use strict;
 use warnings;
 
-BEGIN { require 5.008; } 
+BEGIN { require 5.006; } 
 
 use ExtUtils::MakeMaker 6.31;
 use ExtUtils::Manifest  1.56;
+
+my $mm_ver = $ExtUtils::MakeMaker::VERSION;
+if ($mm_ver =~ /_/) { # dev version
+    $mm_ver = eval $mm_ver;
+    die $@ if $@;
+}
 
 my $SKIP_FILES = <<SKIP;
 SKIP
@@ -45,6 +51,10 @@ my %WriteMakefileArgs = (
          'ExtUtils::MakeMaker' => '6.31',
          'ExtUtils::Manifest'  => '1.56',
     },
+    ($mm_ver >= 6.48
+        ? (MIN_PERL_VERSION => 5.006)
+        : ()
+    ),
 #   'DIST_REQUIRES' => {
 #       'ShipIt'                 => '0.55',
 #   },

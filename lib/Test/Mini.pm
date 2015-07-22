@@ -43,7 +43,7 @@
 package Test::Mini;
 use strict;
 use warnings;
-use 5.008;
+use 5.006;
 
 use version 0.77; our $VERSION = qv("v1.1.3");
 

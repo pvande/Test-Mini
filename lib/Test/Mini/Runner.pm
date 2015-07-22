@@ -30,6 +30,7 @@
 #     * +seed+ - Specifies a random number seed; used to specify repeatable
 #       test orderings.
 package Test::Mini::Runner;
+use 5.006;
 use strict;
 use warnings;
 

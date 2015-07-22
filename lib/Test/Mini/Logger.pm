@@ -4,6 +4,7 @@
 # just long for the familiar look and feel of another testing framework, this
 # is what you're looking for.
 package Test::Mini::Logger;
+use 5.006;
 use strict;
 use warnings;
 

@@ -15,6 +15,7 @@ use base 'Test::Mini::Exception::Assert';
 
 # Basic Assertions for Test::Mini.
 package Test::Mini::Assertions;
+use 5.006;
 use strict;
 use warnings;
 

@@ -2,6 +2,7 @@
 #
 # @see Test::Mini::Runner
 package Test::Mini::TestCase;
+use 5.006;
 use strict;
 use warnings;
 
