@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README.pod
+lib/Test/Mini.pm
+lib/Test/Mini/Assertions.pm
+lib/Test/Mini/Logger.pm
+lib/Test/Mini/Runner.pm
+lib/Test/Mini/TestCase.pm
+lib/Test/Mini/Logger/TAP.pm
+t/01-Test-Mini.t
+t/Test/Mini/Assertions.t
+t/Test/Mini/Logger.t
+t/Test/Mini/Logger/TAP.t
