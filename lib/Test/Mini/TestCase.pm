@@ -1,7 +1,6 @@
-# Base class for Test::Mini test cases.
-#
-# @see Test::Mini::Runner
 package Test::Mini::TestCase;
+
+use 5.006;
 use strict;
 use warnings;
 
@@ -9,64 +8,19 @@ use Test::Mini;
 use Exception::Class;
 use Test::Mini::Assertions;
 
-# Constructor.
-#
-# @private
-# @param [Hash] %args Initial state for the new instance.
-# @option %args name The specific test this instance should run.
 sub new {
     my ($class, %args) = @_;
     return bless { %args, passed => 0 }, $class;
 }
 
-# Test setup behavior, automatically invoked prior to each test.  Intended to
-# be overridden by subclasses.
-#
-# @example
-#   package TestSomething;
-#   use base 'Test::Mini::TestCase';
-#
-#   use Something;
-#
-#   sub setup { $obj = Something->new(); }
-#
-#   sub test_can_foo {
-#       assert_can($obj, 'foo');
-#   }
-#
-# @see #teardown
 sub setup {
     my ($self) = @_;
 }
 
-# Test teardown behavior, automatically invoked following each test.  Intended
-# to be overridden by subclasses.
-#
-# @example
-#   package Test;
-#   use base 'Test::Mini::TestCase';
-#
-#   sub teardown { unlink 'foo.bar' }
-#
-#   sub test_touching_files {
-#       `touch foo.bar`;
-#       assert(-f 'foo.bar');
-#   }
-#
-# @see #setup
 sub teardown {
     my ($self) = @_;
 }
 
-# Runs the test specified at construction time.  This method is responsible
-# for invoking the setup and teardown advice for the method, in addition to
-# ensuring that any fatal errors encountered by the program are suitably
-# handled.  Appropriate diagnostic information should be sent to the supplied
-# +$runner+.
-#
-# @private
-# @param [Test::Mini::Runner] $runner
-# @return The number of assertions called by this test.
 sub run {
     my ($self, $runner) = @_;
     my $e;
@@ -128,3 +82,110 @@ sub run {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Test::Mini::TestCase - base class for Test::Mini test cases
+
+=head1 SYNOPSIS
+
+ package TestSomething;
+ use parent 'Test::Mini::TestCase';
+ use Something;
+
+ sub setup        { ... }
+ sub test_can_foo { ... }
+ sub teardown     { ... }
+
+=head1 DESCRIPTION
+
+This module should usually be the base class for any L<Test::Mini>
+test cases that you write.
+
+Any method whose name begins with C<test_> will be automatically run.
+If you've defined a C<setup> method, that will be called before each test,
+and if you've defined a C<teardown> method,
+that will be called after each test.
+
+
+=head1 CLASS METHODS
+
+=head2 new(%args)
+
+The one valid key you can pass is B<name>,
+which gives the name of a specific test to run.
+
+
+=head1 INSTANCE METHODS
+
+
+=head2 setup()
+
+Performs any initialisation required for the test,
+run once before each test. Intended to be overridden
+by subclasses.
+
+   package TestSomething;
+   use parent 'Test::Mini::TestCase';
+
+   use Something;
+
+   sub setup { $obj = Something->new(); }
+
+   sub test_can_foo {
+       assert_can($obj, 'foo');
+   }
+
+
+=head2 teardown()
+
+Test teardown behavior, automatically invoked following each test.
+Intended to be overridden by subclasses.
+
+ package Test;
+ use parent 'Test::Mini::TestCase';
+
+ sub teardown { unlink 'foo.bar' }
+
+ sub test_touching_files {
+     `touch foo.bar`;
+     assert(-f 'foo.bar');
+ }
+
+
+=head2 run($runner)
+
+Runs the test specified at construction time.
+This method is responsible for invoking the setup and teardown advice
+for the method,
+in addition to ensuring that any fatal errors encountered by the program
+are suitably handled.
+Appropriate diagnostic information should be sent to the supplied C<$runner>.
+
+Returns the number of assertions called by this test.
+
+Most of the time you won't need to override this method.
+
+
+=head1 SEE ALSO
+
+L<Test::Mini>
+
+=head1 REPOSITORY
+
+L<https://github.com/pvande/Test-Mini>
+
+=head1 AUTHOR
+
+Pieter van de Bruggen E<lt>pvande@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by
+Pieter van de Bruggen E<lt>pvande@cpan.orgE<gt>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

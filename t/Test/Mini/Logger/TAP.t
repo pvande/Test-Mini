@@ -1,5 +1,5 @@
 package t::Test::Mini::Logger::TAP;
-use base 'Test::Mini::TestCase';
+use parent 'Test::Mini::TestCase';
 use strict;
 use warnings;
 
