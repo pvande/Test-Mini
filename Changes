@@ -1,6 +1,8 @@
 Revision history for Test-Mini
 
 1.1.3_01 2015-07-24 NEILB
+    - Converted all the documentation to traditional pod, from the Yard-based
+      documentation that was used previously.
     - Set min perl version in all modules and dist metadata to 5.006.
       Previously Test::Mini required 5.008, but actually is fine with 5.006
     - Updated Makefile.PL and MANIFEST to a simpler more static model;

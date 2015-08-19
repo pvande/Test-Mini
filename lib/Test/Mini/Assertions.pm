@@ -1,19 +1,20 @@
-# Raised on Test Error.
-# @api private
+#
+# First we define some cuckoo packages that we're going to use
+#
 package Test::Mini::Exception;
-use base 'Exception::Class::Base';
+use parent -norequire, 'Exception::Class::Base';
 
-# Raised on Test Failure.
-# @api private
 package Test::Mini::Exception::Assert;
-use base 'Test::Mini::Exception';
+use parent -norequire, 'Test::Mini::Exception';
 
-# Raised on Test Skip.
-# @api private
 package Test::Mini::Exception::Skip;
-use base 'Test::Mini::Exception::Assert';
+use parent -norequire, 'Test::Mini::Exception::Assert';
 
+#
+# And then we have the module proper itself
+#
 # Basic Assertions for Test::Mini.
+#
 package Test::Mini::Assertions;
 use 5.006;
 use strict;
@@ -23,12 +24,8 @@ use Scalar::Util      qw/ looks_like_number refaddr reftype /;
 use List::Util        qw/ min any /;
 use Data::Inspect;
 
-# Formats error messages, appending periods and defaulting undefs as
-# appropriate.
-#
-# @param $default [String] The default message to use.
-# @param $msg [String] A message to use in place of the default.
-# @return A well-formatted message.
+# Formats error messages,
+# appending periods and defaulting undefs as appropriate.
 sub message {
     my ($default, $msg) = @_;
 
@@ -39,9 +36,6 @@ sub message {
 }
 
 # Dereferences the given argument, if possible.
-#
-# @param $ref The argument to dereference.
-# @return The referenced value or values.
 sub deref {
     my ($ref) = @_;
     return %$ref if reftype($ref) eq 'HASH';
@@ -52,9 +46,6 @@ sub deref {
 }
 
 # Produce a more useful string representation of the given argument.
-#
-# @param $obj The object to describe.
-# @return [String] A description of the given object.
 sub inspect {
     Data::Inspect->new()->inspect(@_);
 }
@@ -86,18 +77,12 @@ sub _reset_assertions {
     return $final_count;
 }
 
-# @group Exported Functions
+# ========================
+# Exported Functions
+# ========================
 
-# Asserts that +$test+ is truthy, and throws a {Test::Mini::Exception::Assert}
+# Assert that $test is truthy, and throw a Test::Mini::Exception::Assert
 # if that assertion fails.
-#
-# @example
-#   assert 1;
-# @example
-#   assert 'true', 'Truth should shine clear';
-#
-# @param $test The value to test.
-# @param [String] $msg An optional description.
 sub assert ($;$) {
     my ($test, $msg) = @_;
     $msg ||= 'Assertion failed; no message given.';
@@ -113,16 +98,8 @@ sub assert ($;$) {
     );
 }
 
-# Asserts that +$test+ is falsey, and throws a {Test::Mini::Exception::Assert}
+# Asserts that $test is falsey, and throw a Test::Mini::Exception::Assert
 # if that assertion fails.
-#
-# @example
-#   refute 0;
-# @example
-#   refute undef, 'Deny the untruths';
-#
-# @param $test The value to test.
-# @param [String] $msg An optional description.
 sub refute ($;$) {
     my ($test, $msg) = @_;
     $msg ||= 'Refutation failed; no message given.';
@@ -130,17 +107,7 @@ sub refute ($;$) {
 }
 
 # Asserts that the given code reference returns a truthy value.
-#
-# @deprecated This assertion offers little advantage over the base {#assert}.
-#   This will be removed in v2.0.0.
-#
-# @example
-#   assert_block { 'true' };
-# @example
-#   assert_block \&some_sub, 'expected better from &some_sub';
-#
-# @param [CODE] $block The code reference to test.
-# @param [String] $msg An optional description.
+# DEPRECATED - this will be removed in v2.0.0.
 sub assert_block (&;$) {
     my ($block, $msg) = @_;
     warn '#assert_block is deprecated; please use #assert instead.';
@@ -151,17 +118,7 @@ sub assert_block (&;$) {
 }
 
 # Asserts that the given code reference returns a falsey value.
-#
-# @deprecated This assertion offers little advantage over the base {#refute}.
-#   This will be removed in v2.0.0.
-#
-# @example
-#   refute_block { '' };
-# @example
-#   refute_block \&some_sub, 'expected worse from &some_sub';
-#
-# @param [CODE] $block The code reference to test.
-# @param [String] $msg An optional description.
+# DEPRECATED - this will be removed in v2.0.0.
 sub refute_block (&;$) {
     my ($block, $msg) = @_;
     warn '#refute_block is deprecated; please use #refute instead.';
@@ -171,54 +128,23 @@ sub refute_block (&;$) {
     refute($block->(), $msg);
 }
 
-# Verifies that the given +$obj+ is capable of responding to the given
-# +$method+ name.
-#
-# @example
-#   assert_can $date, 'day_of_week';
-# @example
-#   assert_can $time, 'seconds', '$time cannot respond to #seconds';
-#
-# @param $obj The object being tested.
-# @param [String] $method The method name being checked for.
-# @param [String] $msg An optional description.
+# Verifies that the given $obj is capable of responding to the given
+# $method name.
 sub assert_can ($$;$) {
     my ($obj, $method, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to respond to #$method", $msg);
     assert($obj->can($method), $msg);
 }
 
-# Verifies that the given +$obj+ is *not* capable of responding to the given
-# +$method+ name.
-#
-# @example
-#   refute_can $date, 'to_time';
-# @example
-#   refute_can $time, 'day', '$time cannot respond to #day';
-#
-# @param $obj The object being tested.
-# @param [String] $method The method name being checked.
-# @param [String] $msg An optional description.
+# Verifies that the given $obj is *not* capable of responding to the given
+# $method name.
 sub refute_can ($$;$) {
     my ($obj, $method, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} (@{[ref $obj || 'SCALAR']}) to not respond to #$method", $msg);
     refute($obj->can($method), $msg);
 }
 
-# Verifies that the given +$collection+ contains the given +$obj+ as a member.
-#
-# @example
-#   assert_contains [qw/ 1 2 3 /], 2;
-# @example
-#   assert_contains { a => 'b' }, 'a';  # 'b' also contained
-# @example
-#   assert_contains 'expectorate', 'xp';
-# @example
-#   assert_contains Collection->new(1, 2, 3), 2;  # if Collection->contains(2)
-#
-# @param [Array|Hash|String|#contains] $collection The collection to test.
-# @param $obj The needle to find.
-# @param [String] $msg An optional description.
+# Verifies that the given $collection contains the given $obj as a member.
 sub assert_contains ($$;$) {
     my ($collection, $obj, $msg) = @_;
     my $m = message("Expected @{[inspect($collection)]} to contain @{[inspect($obj)]}", $msg);
@@ -238,21 +164,8 @@ sub assert_contains ($$;$) {
     }
 }
 
-# Verifies that the given +$collection+ does not contain the given +$obj+ as a
+# Verifies that the given $collection does not contain the given $obj as a
 # member.
-#
-# @example
-#   refute_contains [qw/ 1 2 3 /], 5;
-# @example
-#   refute_contains { a => 'b' }, 'x';
-# @example
-#   refute_contains 'expectorate', 'spec';
-# @example
-#   refute_contains Collection->new(1, 2, 3), 5;  # unless Collection->contains(5)
-#
-# @param [Array|Hash|String|#contains] $collection The collection to test.
-# @param $obj The needle to look for.
-# @param [String] $msg An optional description.
 sub refute_contains ($$;$) {
     my ($collection, $obj, $msg) = @_;
     my $m = message("Expected @{[inspect($collection)]} to not contain @{[inspect($obj)]}", $msg);
@@ -272,34 +185,18 @@ sub refute_contains ($$;$) {
     }
 }
 
-# Validates that the given +$obj+ is defined.
-#
-# @example
-#   assert_defined $value;  # if defined $value
-#
-# @param $obj The value to check.
-# @param [String] $msg An optional description.
+# Validates that the given $obj is defined.
 sub assert_defined ($;$) {
     my ($obj, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to be defined", $msg);
     assert(defined $obj, $msg);
 }
 
-# Validates that the given +$obj+ is not defined.
-# @alias #assert_undef
+# Validates that the given $obj is not defined.
 sub refute_defined ($;$) { goto &assert_undef }
 
 # Tests that the supplied code block dies, and fails if it succeeds.  If
-# +$error+ is provided, the error message in +$@+ must contain it.
-#
-# @example
-#   assert_dies { die 'LAGHLAGHLAGHL' };
-# @example
-#   assert_dies { die 'Failure on line 27 in Foo.pm' } 'line 27';
-#
-# @param [CODE] $sub The code that should die.
-# @param [String] $error The (optional) error substring expected.
-# @param [String] $msg An optional description.
+# $error is provided, the error message in $@ must contain it.
 sub assert_dies (&;$$) {
     my ($sub, $error, $msg) = @_;
     $error = '' unless defined $error;
@@ -316,18 +213,6 @@ sub assert_dies (&;$$) {
 }
 
 # Verifies the emptiness of a collection.
-#
-# @example
-#   assert_empty [];
-# @example
-#   assert_empty {};
-# @example
-#   assert_empty '';
-# @example
-#   assert_empty Collection->new();  # if Collection->new()->is_empty()
-#
-# @param [Array|Hash|String|#is_empty] $collection The collection under scrutiny.
-# @param [String] $msg An optional description.
 sub assert_empty ($;$) {
     my ($collection, $msg) = @_;
     $msg = message("Expected @{[inspect($collection)]} to be empty", $msg);
@@ -347,18 +232,6 @@ sub assert_empty ($;$) {
 }
 
 # Verifies the non-emptiness of a collection.
-#
-# @example
-#   refute_empty [ 1 ];
-# @example
-#   refute_empty { a => 1 };
-# @example
-#   refute_empty 'full';
-# @example
-#   refute_empty Collection->new();  # unless Collection->new()->is_empty()
-#
-# @param [Array|Hash|String|#is_empty] $collection The collection under scrutiny.
-# @param [String] $msg An optional description.
 sub refute_empty ($;$) {
     my ($collection, $msg) = @_;
     $msg = message("Expected @{[inspect($collection)]} to not be empty", $msg);
@@ -378,29 +251,12 @@ sub refute_empty ($;$) {
 }
 
 # Checks two given arguments for equality.
-# @alias #assert_equal
 sub assert_eq { goto &assert_equal }
 
 # Checks two given arguments for inequality.
-# @alias #refute_equal
 sub refute_eq { goto &refute_equal }
 
 # Checks two given arguments for equality.
-#
-# @example
-#   assert_equal 3.000, 3;
-# @example
-#   assert_equal lc('FOO'), 'foo';
-# @example
-#   assert_equal [qw/ 1 2 3 /], [ 1, 2, 3 ];
-# @example
-#   assert_equal { a => 'eh' }, { a => 'eh' };
-# @example
-#   assert_equal Class->new(), $expected;  # if $expected->equals(Class->new())
-#
-# @param $actual The value under test.
-# @param $expected The expected value.
-# @param [String] $msg An optional description.
 sub assert_equal ($$;$) {
     my ($actual, $expected, $msg) = @_;
     $msg = message("Got @{[inspect($actual)]}\nnot @{[inspect($expected)]}", $msg);
@@ -448,21 +304,6 @@ sub assert_equal ($$;$) {
 }
 
 # Checks two given arguments for inequality.
-#
-# @example
-#   refute_equal 3.001, 3;
-# @example
-#   refute_equal lc('FOOL'), 'foo';
-# @example
-#   refute_equal [qw/ 1 23 /], [ 1, 2, 3 ];
-# @example
-#   refute_equal { a => 'ae' }, { a => 'eh' };
-# @example
-#   refute_equal Class->new(), $expected;  # unless $expected->equals(Class->new())
-#
-# @param $actual The value under test.
-# @param $expected The tested value.
-# @param [String] $msg An optional description.
 sub refute_equal ($$;$) {
     my ($actual, $unexpected, $msg) = @_;
     $msg = message("The given values were unexpectedly equal", $msg);
@@ -509,18 +350,8 @@ sub refute_equal ($$;$) {
     refute($passed, $msg);
 }
 
-# Checks that the difference between +$actual+ and +$expected+ is less than
-# +$delta+.
-#
-# @example
-#   assert_in_delta 1.001, 1;
-# @example
-#   assert_in_delta 104, 100, 5;
-#
-# @param [Number] $actual The tested value.
-# @param [Number] $expected The static value.
-# @param [Number] $delta The expected delta.  Defaults to 0.001.
-# @param [String] $msg An optional description.
+# Checks that the difference between $actual and $expected is less than
+# $delta.
 sub assert_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
     $delta = 0.001 unless defined $delta;
@@ -529,19 +360,8 @@ sub assert_in_delta ($$;$$) {
     assert($delta >= $n, $msg);
 }
 
-# Checks that the difference between +$actual+ and +$expected+ is greater than
-# +$delta+.
-#
-# @example
-#   refute_in_delta 1.002, 1;
-# @example
-#   refute_in_delta 106, 100, 5;
-#
-# @param [Number] $actual The tested value.
-# @param [Number] $expected The static value.
-# @param [Number] $delta The delta +$actual+ and +$expected+ are expected to
-#   differ by.  Defaults to 0.001.
-# @param [String] $msg An optional description.
+# Checks that the difference between $actual and $expected is greater than
+# $delta.
 sub refute_in_delta ($$;$$) {
     my ($actual, $expected, $delta, $msg) = @_;
     $delta = 0.001 unless defined $delta;
@@ -550,18 +370,8 @@ sub refute_in_delta ($$;$$) {
     refute($delta >= $n, $msg);
 }
 
-# Checks that the difference between +$actual+ and +$expected+ is less than
+# Checks that the difference between $actual and $expected is less than
 # a given fraction of the smaller of the two numbers.
-#
-# @example
-#   assert_in_epsilon 22.0 / 7.0, Math::Trig::pi;
-# @example
-#   assert_in_epsilon 220, 200, 0.10
-#
-# @param [Number] $actual The tested value.
-# @param [Number] $expected The static value.
-# @param [Number] $epsilon The expected tolerance factor.  Defaults to 0.001.
-# @param [String] $msg An optional description.
 sub assert_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
     $epsilon = 0.001 unless defined $epsilon;
@@ -573,19 +383,8 @@ sub assert_in_epsilon ($$;$$) {
     );
 }
 
-# Checks that the difference between +$actual+ and +$expected+ is greater than
+# Checks that the difference between $actual and $expected is greater than
 # a given fraction of the smaller of the two numbers.
-#
-# @example
-#   refute_in_epsilon 21.0 / 7.0, Math::Trig::pi;
-# @example
-#   refute_in_epsilon 220, 200, 0.20
-#
-# @param [Number] $actual The tested value.
-# @param [Number] $expected The static value.
-# @param [Number] $epsilon The factor by which +$actual+ and +$expected+ are
-#   expected to differ by.  Defaults to 0.001.
-# @param [String] $msg An optional description.
 sub refute_in_epsilon ($$;$$) {
     my ($actual, $expected, $epsilon, $msg) = @_;
     $epsilon = 0.001 unless defined $epsilon;
@@ -597,111 +396,63 @@ sub refute_in_epsilon ($$;$$) {
     );
 }
 
-# Verifies that the given +$collection+ contains the given +$obj+ as a member.
-# @alias #assert_contains
+# Verifies that the given $collection contains the given $obj as a member.
 sub assert_includes ($$;$) { goto &assert_contains }
 
-# Verifies that the given +$collection+ does not contain the given +$obj+ as a
+# Verifies that the given $collection does not contain the given $obj as a
 # member.
-# @alias #refute_includes
 sub refute_includes ($$;$) { goto &refute_contains }
 
-# Validates that the given object is an instance of +$type+.
-#
-# @example
-#   assert_instance_of MyApp::Person->new(), 'MyApp::Person';
-#
-# @param $obj The instance to check.
-# @param [Class] $type The type to expect.
-# @param [String] $msg An optional description.
-# @see #assert_is_a
+# Validates that the given object is an instance of $type.
 sub assert_instance_of ($$;$) {
     my ($obj, $type, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to be an instance of $type, not @{[ref $obj]}", $msg);
     assert(ref $obj eq $type, $msg);
 }
 
-# Validates that +$obj+ inherits from +$type+.
-#
-# @example
-#   assert_is_a 'Employee', 'Employee';
-# @example
-#   assert_is_a Employee->new(), 'Employee';
-# @example
-#   assert_is_a 'Employee', 'Person'; # assuming Employee->isa('Person')
-# @example
-#   assert_is_a Employee->new(), 'Person';
-#
-# @param $obj The instance or class to check.
-# @param [Class] $type The expected superclass.
-# @param [String] $msg An optional description.
+# Validates that $obj inherits from $type.
 sub assert_is_a($$;$) {
     my ($obj, $type, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to inherit from $type", $msg);
     assert($obj->isa($type), $msg);
 }
 
-# Validates that +$obj+ inherits from +$type+.
-# @alias #assert_is_a
+# Validates that $obj inherits from $type.
 sub assert_isa { goto &assert_is_a }
 
-# Validates that the given +$string+ matches the given +$pattern+.
-#
-# @example
-#   assert_match 'Four score and seven years ago...', qr/score/;
-#
-# @param [String] $string The string to match.
-# @param [Regex] $pattern The regular expression to match against.
-# @param [String] $msg An optional description.
+# Validates that the given $string matches the given $pattern.
 sub assert_match ($$;$) {
     my ($string, $pattern, $msg) = @_;
     $msg = message("Expected qr/$pattern/ to match against @{[inspect($string)]}", $msg);
     assert($string =~ $pattern, $msg);
 }
 
-# Validates that the given +$string+ does not match the given +$pattern+.
-#
-# @example
-#   refute_match 'Four score and seven years ago...', qr/score/;
-#
-# @param [String] $string The string to match.
-# @param [Regex] $pattern The regular expression to match against.
-# @param [String] $msg An optional description.
+# Validates that the given $string does not match the given $pattern.
 sub refute_match ($$;$) {
     my ($string, $pattern, $msg) = @_;
     $msg = message("Expected qr/$pattern/ to fail to match against @{[inspect($string)]}", $msg);
     refute($string =~ $pattern, $msg);
 }
 
-# Verifies that the given +$obj+ is capable of responding to the given
-# +$method+ name.
-# @alias #assert_can
+# Verifies that the given $obj is capable of responding to the given
+# $method name.
 sub assert_responds_to ($$;$) { goto &assert_can }
 
-# Verifies that the given +$obj+ is *not* capable of responding to the given
-# +$method+ name.
-# @alias #refute_can
+# Verifies that the given $obj is *not* capable of responding to the given
+# $method name.
 sub refute_responds_to ($$;$) { goto &refute_can }
 
-# Validates that the given +$obj+ is undefined.
-#
-# @example
-#   assert_undef $value;  # if not defined $value
-#
-# @param $obj The value to check.
-# @param [String] $msg An optional description.
+# Validates that the given $obj is undefined.
 sub assert_undef ($;$) {
     my ($obj, $msg) = @_;
     $msg = message("Expected @{[inspect($obj)]} to be undefined", $msg);
     refute(defined $obj, $msg);
 }
 
-# Validates that the given +$obj+ is not undefined.
-# @alias #assert_defined
+# Validates that the given $obj is not undefined.
 sub refute_undef ($;$) { goto &assert_defined }
 
 # Allows the current test to be bypassed with an indeterminate status.
-# @param [String] $msg An optional description.
 sub skip (;$) {
     my ($msg) = @_;
     $msg = 'Test skipped; no message given.' unless defined $msg;
@@ -713,7 +464,6 @@ sub skip (;$) {
 }
 
 # Causes the current test to exit immediately with a failing status.
-# @param [String] $msg An optional description.
 sub flunk (;$) {
     my ($msg) = @_;
     $msg = 'Epic failure' unless defined $msg;
@@ -721,3 +471,347 @@ sub flunk (;$) {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Test::Mini - base assertions for Test::Mini
+
+=head1 SYNOPSIS
+
+ use Test::Mini::Assertions;
+
+ assert($day_of_week eq 'Friday', 'Test should only be run on Friday!');
+
+=head1 DESCRIPTION
+
+This module provides a number of assertion functions,
+which are imported into your namespace when you use the module.
+
+All of these functions take an optional final argument, C<$msg>,
+which will be used as the text of the assertion, if specified.
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 assert($test, $msg)
+
+Asserts that C<$test> is truthy,
+and throws a L<Test::Mini::Exception::Assert> if that assertion fails.
+For example:
+
+ assert 1;
+ assert 'true', 'Truth should shine clear';
+
+
+=head2 assert_block($block, $msg)
+
+Deprecated, as this function offers little advantage over the
+C<assert()> function, described above.
+
+Asserts that the given code reference returns a truthy value.
+For example:
+
+ assert_block { 'true' };
+
+ assert_block \&some_sub, 'expected better from &some_sub';
+
+
+=head2 assert_can($obj, $method, $msg)
+
+Verifies that the given C<$obj>
+is capable of responding to the given C<$method> name.
+
+Examples:
+
+ assert_can $date, 'day_of_week';
+ 
+ assert_can $time, 'seconds', '$time cannot respond to #seconds';
+
+This function is aliased as function C<assert_responds_to()>.
+
+
+=head2 assert_contains($collection, $obj, $msg)
+
+Verifies that the given C<$collection> contains the given C<$obj> as a member.
+
+Examples:
+
+ assert_contains [qw/ 1 2 3 /], 2;
+ assert_contains { a => 'b' }, 'a';  # 'b' also contained
+ assert_contains 'expectorate', 'xp';
+ assert_contains Collection->new(1, 2, 3), 2;  # if Collection->contains(2)
+
+The first argument, C<$collection>, can be an array, a hash,
+a string, or an object that provides a C<contains> method.
+
+This function is aliased as C<assert_includes()>.
+
+
+=head2 assert_defined($obj, $msg)
+
+Validates that the given C<$obj> is defined.
+
+Example:
+
+ assert_defined $value;
+
+This function is aliased as C<refute_undef()>.
+
+
+=head2 assert_dies($sub, $error, $msg)
+
+Tests that the supplied code block dies, and fails if it succeeds.
+If C<$error> is provided, the error message in C<$@> must contain it.
+
+Examples:
+
+ assert_dies { die 'LAGHLAGHLAGHL' };
+ assert_dies { die 'Failure on line 27 in Foo.pm' } 'line 27';
+
+
+=head2 assert_empty($collection, $msg)
+
+Verifies the emptiness of a collection.
+
+Examples:
+
+ assert_empty [];
+ assert_empty {};
+ assert_empty '';
+ assert_empty Collection->new();  # if Collection->new()->is_empty()
+
+
+=head2 assert_equal($actual, $expected, $msg)
+
+Checks two given arguments for equality.
+The first argument, C<$actual>, is the value being tested
+(eg has been calculated by code under test),
+and the second argument gives the expected value.
+
+Examples:
+
+ assert_equal 3.000, 3;
+ assert_equal lc('FOO'), 'foo';
+ assert_equal [qw/ 1 2 3 /], [ 1, 2, 3 ];
+ assert_equal { a => 'eh' }, { a => 'eh' };
+
+ # if $expected->equals(Class->new())
+ assert_equal Class->new(), $expected;
+
+This function is also aliased as C<assert_eq()>.
+
+
+=head2 assert_in_delta($actual, $expected, $delta, $msg)
+
+Checks that the difference between C<$actual> and C<$expected>
+is less than C<$delta>.
+
+Examples:
+
+ assert_in_delta 1.001, 1;
+ assert_in_delta 104, 100, 5;
+
+
+=head2 assert_in_epsilon($actual, $expected, $epsilon, $msg)
+
+Checks that the difference between C<$actual> and C<$expected>
+is less than a given fraction of the smaller of the two numbers.
+
+Examples:
+
+ assert_in_epsilon 22.0 / 7.0, Math::Trig::pi;
+ assert_in_epsilon 220, 200, 0.10;
+
+If C<$epsilon> isn't given, it defaults to 0.001.
+
+
+=head2 assert_instance_of($object, $type, $msg)
+
+Validates that the given C<$object> is an instance of C<$type>.
+
+Examples:
+
+ my $object = MyApp::Person->new();
+ assert_instance_of $object, 'MyApp::Person';
+
+
+=head2 assert_is_a($obj, $type, $msg)
+
+Validates that C<$obj> inherits from C<$type>.
+
+Examples:
+
+ assert_is_a 'Employee', 'Employee';
+ assert_is_a Employee->new(), 'Employee';
+ assert_is_a 'Employee', 'Person'; # assuming Employee->isa('Person')
+ assert_is_a Employee->new(), 'Person';
+
+This function is also available as C<assert_isa()>.
+
+
+=head2 assert_match($string, $pattern, $msg)
+
+Validates that the given C<$string> matches the given C<$pattern>.
+
+Examples:
+
+ assert_match 'Four score and seven years ago...', qr/score/;
+
+
+=head2 assert_undef($obj, $msg)
+
+Validates that the given C<$obj> is undefined.
+
+Examples:
+
+ assert_undef $value;  # if not defined $value
+
+Also available as C<refute_defined()>.
+
+
+=head2 flunk($msg)
+
+Causes the current test to exit immediately with a failing status.
+
+
+=head2 refute($test, $msg)
+
+Asserts that C<$test> is falsey,
+and throws a L<Test::Mini::Exception::Assert> if that assertion fails.
+
+Examples:
+
+ refute 0;
+ refute undef, 'Deny the untruths';
+
+
+=head2 refute_block($block, $msg) 
+  
+B<Deprecated>:
+This assertion offers little advantage over the base C<refute()>.
+This will be removed in v2.0.0.
+
+Asserts that the given code reference returns a falsey value.
+
+Examples:
+
+ refute_block { '' };
+ refute_block \&some_sub, 'expected worse from &some_sub';
+
+
+=head2 refute_can($obj, $method, $msg)
+
+Verifies that the given C<$obj> is not capable of responding
+to the given C<$method> name.
+
+Examples:
+
+ refute_can $date, 'to_time';
+ refute_can $time, 'day', '$time cannot respond to #day';
+
+Also available as C<refute_responds_to()>.
+
+
+=head2 refute_contains($collection, $obj, $msg)
+
+Verifies that the given C<$collection> does not contain the given
+C<$obj> as a member.
+
+Examples:
+
+ refute_contains [qw/ 1 2 3 /], 5;
+ refute_contains { a => 'b' }, 'x';
+ refute_contains 'expectorate', 'spec';
+ refute_contains Collection->new(1, 2, 3), 5;  # unless Collection->contains(5)
+
+The C<$collection> can be a hash ref, an array ref, a string,
+or an instance of a class that provides a C<contains()> method.
+
+
+=head2 refute_empty($collection, $msg)
+
+Verifies the non-emptiness of a collection.
+
+Examples:
+
+ refute_empty [ 1 ];
+ refute_empty { a => 1 };
+ refute_empty 'full';
+ refute_empty Collection->new();  # unless Collection->new()->is_empty()
+
+See the description for C<refute_contains()> above for
+what C<$collection> can be.
+
+
+=head2 refute_equal($actual, $unexpected, $msg)
+
+Checks two given arguments for inequality.
+
+Examples:
+
+ refute_equal 3.001, 3;
+ refute_equal lc('FOOL'), 'foo';
+ refute_equal [qw/ 1 23 /], [ 1, 2, 3 ];
+ refute_equal { a => 'ae' }, { a => 'eh' };
+ refute_equal Class->new(), $expected;  # unless $expected->equals(Class->new())
+
+Also available as C<refute_eq()>.
+
+
+=head2 refute_in_delta($actual, $expected, $delta, $msg)
+
+Checks that the difference between C<$actual> and C<$expected>
+is greater than C<$delta>.
+
+Examples:
+
+ refute_in_delta 1.002, 1;
+ refute_in_delta 106, 100, 5;
+
+
+=head2 refute_in_epsilon($actual, $expected, $epsilon, $msg)
+
+Checks that the difference between C<$actual> and C<$expected>
+is greater than a given fraction of the smaller of the two numbers.
+
+Examples:
+
+ refute_in_epsilon 21.0 / 7.0, Math::Trig::pi;
+ refute_in_epsilon 220, 200, 0.20
+
+
+=head2 refute_match($string, $pattern, $msg)
+
+Validates that the given C<$string> does not match the given C<$pattern>.
+
+Examples:
+
+ refute_match 'Four score and seven years ago...', qr/score/;
+
+
+=head2 skip($msg)
+
+Allows the current test to be bypassed with an indeterminate status.
+
+
+=head1 SEE ALSO
+
+L<Test::Mini>
+
+=head1 REPOSITORY
+
+L<https://github.com/pvande/Test-Mini>
+
+=head1 AUTHOR
+
+Pieter van de Bruggen E<lt>pvande@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Pieter van de Bruggen
+E<lt>pvande@cpan.orgE<gt>
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

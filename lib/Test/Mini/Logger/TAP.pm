@@ -1,9 +1,11 @@
 # Default Test::Mini Output Logger.
 package Test::Mini::Logger::TAP;
+
 use 5.006;
-use base 'Test::Mini::Logger';
 use strict;
 use warnings;
+
+use parent 'Test::Mini::Logger';
 
 sub new {
     my ($class, %args) = @_;

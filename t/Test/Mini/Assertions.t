@@ -8,7 +8,7 @@ BEGIN {
     };
 }
 
-use base 'Test::Mini::TestCase';
+use parent 'Test::Mini::TestCase';
 use strict;
 use warnings;
 
@@ -38,7 +38,7 @@ use Test::Mini::Assertions;
 
 {
     package Mock::Bag;
-    use base 'Mock::Collection';
+    use parent -norequire, 'Mock::Collection';
 }
 
 sub assert_passes (&;$) {
