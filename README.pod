@@ -70,7 +70,7 @@ L<<<< S<<<<< Test::Mini::Runner >>>>>|Test::Mini::Runner >>>>
 
 =item B<<<< runner_class >>>>
 
-    runner_class # => Class 
+    runner_class # => Class
 
 
 The test runner class to use.
@@ -94,3 +94,11 @@ Returns:
 =head1 AUTHOR
 
 Pieter van de Bruggen <pvande@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010 by Pieter van de Bruggen.
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
